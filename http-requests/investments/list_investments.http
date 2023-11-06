@@ -1,0 +1,2 @@
+### Lista todos os investimentos
+GET http://localhost:8000/portfolios/6a267bfca6/investments/ HTTP/1.1

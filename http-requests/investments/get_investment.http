@@ -1,0 +1,6 @@
+### Obtém um investimento pelo ID
+#GET http://localhost:8000/portfolios/6a267bfca6/investments/454c021046 HTTP/1.1
+
+
+GET http://localhost:8000/portfolios/6a267bfca6/investments-diversification HTTP/1.1
+
