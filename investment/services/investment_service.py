@@ -3,7 +3,7 @@ from decimal import Decimal
 from enum import Enum
 
 from investment.domains import InvestmentModel, PortfolioConsolidationModel, InvestmentError, PortfolioError, \
-    PortfolioModel
+    PortfolioModel, PortfolioOverviewModel
 from investment.repository.investment_db_repositorio import InvestmentRepo
 from investment.repository.portfolio_db_repositorio import PortfolioRepo
 
@@ -66,7 +66,7 @@ class InvestmentService:
             return PortfolioError.PortfolioNotFound
         return self.investment_repo.update(portfolio_code, investment_code, updated_investment)
 
-    def consolidate_portfolio(self, portfolio_code: str) -> Union[PortfolioConsolidationModel, InvestmentError]:
+    def get_portfolio_overview(self, portfolio_code: str) -> Union[PortfolioOverviewModel, InvestmentError]:
         try:
             portfolio = self.portfolio_repo.find_by_code(portfolio_code)
             if isinstance(portfolio, InvestmentError):
@@ -87,14 +87,14 @@ class InvestmentService:
             portfolio_yield = (current_balance - amount_invested) / amount_invested * 100
             portfolio_gross_nominal_yield = current_balance - amount_invested
 
-            consolidation = PortfolioConsolidationModel(
+            consolidation = PortfolioOverviewModel(
                 code=portfolio.code,
                 name=portfolio.name,
                 description=portfolio.description,
-                amount_invested=amount_invested,
-                current_balance=current_balance,
+                amount_invested=round(amount_invested, 2),
+                current_balance=round(current_balance, 2),
                 portfolio_yield=round(portfolio_yield, 1),
-                portfolio_gross_nominal_yield=portfolio_gross_nominal_yield
+                portfolio_gross_nominal_yield=round(portfolio_gross_nominal_yield, 2),
             )
 
             return consolidation

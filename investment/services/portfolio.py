@@ -41,37 +41,3 @@ class PortfolioService:
         except Exception as e:
             return PortfolioError.DatabaseError
 
-    def consolidate_portfolio(self, portfolio_code: str) -> Union[PortfolioConsolidationModel, PortfolioError]:
-        try:
-            portfolio = self.find_portfolio_by_code(portfolio_code)
-            if isinstance(portfolio, PortfolioError):
-                return portfolio
-
-            investments = self.investment_service.find_all_investments(portfolio_code)
-            if isinstance(investments, PortfolioError):
-                return investments
-
-            amount_invested = Decimal(0)
-            current_balance = Decimal(0)
-
-            for investment in investments:
-                amount_invested += Decimal(investment.purchase_price * investment.quantity)
-                if investment.current_average_price:
-                    current_balance += Decimal(investment.current_average_price * investment.quantity)
-
-            portfolio_yield = ((
-                                       current_balance - amount_invested) / amount_invested) * 100 if amount_invested != 0 else 0
-
-            consolidation = PortfolioConsolidationModel(
-                code=portfolio.code,
-                name=portfolio.name,
-                description=portfolio.description,
-                amount_invested=amount_invested,
-                current_balance=current_balance,
-                portfolio_yield=round(portfolio_yield, 1)
-            )
-
-            return consolidation
-
-        except Exception as e:
-            return PortfolioError.Unexpected

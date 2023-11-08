@@ -3,7 +3,7 @@ import os
 from investment.repository.consolidated_balance_db_repositorio import ConsolidatedBalanceRepo
 from investment.repository.investment_db_repositorio import InvestmentRepo
 from investment.repository.portfolio_db_repositorio import PortfolioRepo
-from investment.services.consolidated_balance_service import ConsolidatedPortfolioService
+from investment.services.consolidated_service import ConsolidatedPortfolioService
 from investment.services.investment_service import InvestmentService
 from investment.services.portfolio import PortfolioService
 

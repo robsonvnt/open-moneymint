@@ -4,7 +4,8 @@ from typing import List, Optional
 from datetime import date
 
 import constants
-from investment.domains import InvestmentModel, PortfolioError, InvestmentError
+from investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioConsolidationModel, \
+    PortfolioOverviewModel
 from investment.services.investment_service import InvestmentService
 from investment.services.service_factory import ServiceFactory
 
@@ -101,7 +102,6 @@ async def update_investment(portfolio_code: str, investment_code: str, input: In
 
 @router.get("/{portfolio_code}/investments-diversification", response_model=List[AssetTypeValue])
 async def get_diversification_portfolio(portfolio_code: str):
-
     result = investment_service.get_diversification_portfolio(portfolio_code)
 
     match result:
@@ -118,3 +118,10 @@ async def get_diversification_portfolio(portfolio_code: str):
                 detail="An unexpected error occurred."
             )
 
+
+@router.get("/portfolio-consolidation/{portfolio_code}", response_model=PortfolioOverviewModel)
+async def get_portfolio_consolidation(portfolio_code: str):
+    portfolio_overview = investment_service.get_portfolio_overview(portfolio_code)
+    if portfolio_overview is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Portfolio not found.")
+    return portfolio_overview

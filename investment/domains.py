@@ -15,6 +15,13 @@ class PortfolioModel(BaseModel):
 
 
 class PortfolioConsolidationModel(BaseModel):
+    portfolio_code: str
+    date: date
+    balance: float
+    amount_invested: float
+
+
+class PortfolioOverviewModel(BaseModel):
     code: str
     name: str
     description: str
