@@ -26,6 +26,7 @@ class ServiceFactory:
     @staticmethod
     def create_consolidated_balance_service() -> ConsolidatedPortfolioService:
         consolidated_balance_repo = ConsolidatedBalanceRepo(db_url)
-        return ConsolidatedPortfolioService(consolidated_balance_repo)
+        investment_service = ServiceFactory.create_investment_service()
+        return ConsolidatedPortfolioService(consolidated_balance_repo, investment_service)
 # Uso:
 # portfolio_service = PortfolioServiceFactory.create()
