@@ -76,16 +76,16 @@ class InvestmentService:
             if isinstance(investments, InvestmentError):
                 return investments
 
-            amount_invested = 0.0
-            current_balance = 0.0
+            amount_invested = Decimal(0.0)
+            current_balance = Decimal(0.0)
 
             for investment in investments:
                 amount_invested += Decimal(investment.purchase_price * investment.quantity)
                 if investment.current_average_price:
                     current_balance += Decimal(investment.current_average_price * investment.quantity)
 
-            portfolio_yield = ((
-                                       current_balance - amount_invested) / amount_invested) * 100 if amount_invested != 0 else 0
+            portfolio_yield = (current_balance - amount_invested) / amount_invested * 100
+            portfolio_gross_nominal_yield = current_balance - amount_invested
 
             consolidation = PortfolioConsolidationModel(
                 code=portfolio.code,
@@ -93,7 +93,8 @@ class InvestmentService:
                 description=portfolio.description,
                 amount_invested=amount_invested,
                 current_balance=current_balance,
-                portfolio_yield=round(portfolio_yield, 1)
+                portfolio_yield=round(portfolio_yield, 1),
+                portfolio_gross_nominal_yield=portfolio_gross_nominal_yield
             )
 
             return consolidation

@@ -21,6 +21,7 @@ class PortfolioConsolidationModel(BaseModel):
     amount_invested: float
     current_balance: float
     portfolio_yield: float
+    portfolio_gross_nominal_yield: float
 
 
 class PortfolioError(Enum):
