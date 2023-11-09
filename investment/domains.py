@@ -73,7 +73,7 @@ class ConsolidatedBalancePortfolioError(Enum):
     Unexpected = "Unexpected error"
 
 
-class ConsolidatedBalancePortfolioModel(BaseModel):
+class ConsolidatedPortfolioModel(BaseModel):
     portfolio_code: Optional[str]
     date: date
     balance: float

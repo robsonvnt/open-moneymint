@@ -54,6 +54,8 @@ class InvestmentRepo:
                 return InvestmentError.AlreadyExists
             else:
                 return InvestmentError.DatabaseError
+        finally:
+            session.close()
 
     def find_by_code(self, portfolio_code: str, investment_code):
         session = self.Session()
