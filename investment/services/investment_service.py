@@ -78,14 +78,17 @@ class InvestmentService:
 
             amount_invested = Decimal(0.0)
             current_balance = Decimal(0.0)
+            portfolio_yield = Decimal(0.0)
+            portfolio_gross_nominal_yield = Decimal(0.0)
 
             for investment in investments:
                 amount_invested += Decimal(investment.purchase_price * investment.quantity)
                 if investment.current_average_price:
                     current_balance += Decimal(investment.current_average_price * investment.quantity)
 
-            portfolio_yield = (current_balance - amount_invested) / amount_invested * 100
-            portfolio_gross_nominal_yield = current_balance - amount_invested
+            if len(investments) > 0:
+                portfolio_yield = (current_balance - amount_invested) / amount_invested * 100
+                portfolio_gross_nominal_yield = current_balance - amount_invested
 
             consolidation = PortfolioOverviewModel(
                 code=portfolio.code,

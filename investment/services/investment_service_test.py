@@ -30,7 +30,7 @@ def investment_service(mock_portfolio_repo, mock_investment_repo):
 
 
 # Test for consolidating a portfolio
-def test_get_portfolio_overview(investment_service, mock_portfolio_repo, mock_investment_repo):
+def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo, mock_investment_repo):
     mock_portfolio_repo.find_by_code.return_value = PortfolioModel(code='001', name='test', description='test')
     mock_investment_repo.find_all_by_portfolio_code.return_value = [
         InvestmentModel(code='code1', purchase_price=100, quantity=2, current_average_price=110, portfolio_code='001',
@@ -44,6 +44,16 @@ def test_get_portfolio_overview(investment_service, mock_portfolio_repo, mock_in
     assert result.amount_invested == 700.0
     assert result.portfolio_yield == 11.4
     assert result.portfolio_gross_nominal_yield == 80.0
+
+
+    # Testando sem nenhum investimento cadastrado
+    mock_investment_repo.find_all_by_portfolio_code.return_value = []
+
+    result = investment_service.get_portfolio_overview('001')
+
+    assert result.amount_invested == 0
+    assert result.portfolio_yield == 0
+    assert result.portfolio_gross_nominal_yield == 0.0
     print(result)
 
 
