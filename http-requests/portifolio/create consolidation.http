@@ -1,0 +1,12 @@
+### Cria um nova consolidação
+POST http://localhost:8000/portfolios/8791a08015/consolidations/consolidate
+Content-Type: application/json
+
+{}
+
+
+
+
+
+
+

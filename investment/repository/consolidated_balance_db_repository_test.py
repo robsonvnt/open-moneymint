@@ -1,16 +1,16 @@
 import pytest
 from unittest.mock import create_autospec, Mock, patch
 
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 from sqlalchemy.orm import sessionmaker
 from datetime import date, timedelta
 
 from investment.domains import (
     ConsolidatedPortfolioModel,
-    ConsolidatedBalancePortfolioError
+    ConsolidatedPortfolioError
 )
-from investment.repository.consolidated_balance_db_repositorio import ConsolidatedBalanceRepo, \
-    ConsolidatedBalancePortfolio, to_database
+from investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo, \
+    ConsolidatedPortfolio, to_database
 
 
 # from .your_module import ConsolidatedBalancePortfolio, ConsolidatedBalanceRepo, to_database
@@ -41,8 +41,8 @@ def test_filter_by_date_range_success(repo, mock_session_factory):
     # Mock the query chain to return a list of ConsolidatedBalancePortfolio objects
     mock_query_all = mock_session_factory.return_value.query.return_value.filter.return_value.filter.return_value.filter.return_value.order_by.return_value.all
     mock_query_all.return_value = [
-        ConsolidatedBalancePortfolio(portfolio_code='001', date=start_date, balance=1000.0, amount_invested=800.0),
-        ConsolidatedBalancePortfolio(portfolio_code='001', date=end_date, balance=1100.0, amount_invested=900.0),
+        ConsolidatedPortfolio(portfolio_code='001', date=start_date, balance=1000.0, amount_invested=800.0),
+        ConsolidatedPortfolio(portfolio_code='001', date=end_date, balance=1100.0, amount_invested=900.0),
     ]
 
     results = repo.filter_by_date_range(portfolio_code='001', start_date=start_date, end_date=end_date)
@@ -68,7 +68,7 @@ def test_filter_by_date_range_sqlalchemy_error(repo, mock_session_factory):
     result = repo.filter_by_date_range(portfolio_code='001', start_date=date.today(), end_date=date.today())
 
     mock_session_factory.return_value.close.assert_called_once()
-    assert result == ConsolidatedBalancePortfolioError.DatabaseError
+    assert result == ConsolidatedPortfolioError.DatabaseError
 
 
 # Test unexpected exception handling
@@ -77,13 +77,12 @@ def test_filter_by_date_range_unexpected_error(repo, mock_session_factory):
 
     result = repo.filter_by_date_range(portfolio_code='001', start_date=date.today(), end_date=date.today())
     mock_session_factory.return_value.close.assert_called_once()
-    assert result == ConsolidatedBalancePortfolioError.Unexpected
+    assert result == ConsolidatedPortfolioError.Unexpected
 
 
 # Create method tests
 # Test for the 'create' method success scenario
 def test_create_success(repo, mock_session_factory):
-
     # Arrange
     test_model = ConsolidatedPortfolioModel(
         portfolio_code='001',
@@ -91,18 +90,21 @@ def test_create_success(repo, mock_session_factory):
         balance=1000.0,
         amount_invested=1000.0
     )
+    repo.__get_consolidated_portfolio = Mock()
+
+    mock_session_factory.return_value.query.return_value.filter.return_value.filter.return_value.one.side_effect = NoResultFound()
+
     # Act
-    result = repo.create(test_model)
+    result = repo.create_or_update(test_model)
     # Assert
     assert isinstance(result, ConsolidatedPortfolioModel)
     mock_session_factory.return_value.add.assert_called_once()
     mock_session_factory.return_value.commit.assert_called_once()
-    mock_session_factory.return_value.refresh.assert_called_once()
-    mock_session_factory.return_value.close.assert_called_once()
+    assert mock_session_factory.return_value.close.call_count == 1
 
 
-# Test for the 'create' method when a SQLAlchemyError occurs
-def test_create_database_error(repo, mock_session_factory):
+# Update method tests
+def test_update_success(repo, mock_session_factory):
     # Arrange
     test_model = ConsolidatedPortfolioModel(
         portfolio_code='001',
@@ -110,15 +112,42 @@ def test_create_database_error(repo, mock_session_factory):
         balance=1000.0,
         amount_invested=1000.0
     )
-    mock_session_factory.return_value.add.side_effect = SQLAlchemyError("Erro Teste")
-    result = repo.create(test_model)
+    repo.__get_consolidated_portfolio = Mock()
+
+    mock_session_factory.return_value.query.return_value.filter.return_value.filter.return_value.one.return_value = to_database(
+        test_model)
+
+    # Act
+    result = repo.create_or_update(test_model)
+    # Assert
+    assert isinstance(result, ConsolidatedPortfolioModel)
+    assert mock_session_factory.return_value.add.call_count == 0
+    mock_session_factory.return_value.commit.assert_called_once()
+    mock_session_factory.return_value.refresh.assert_called_once()
+    assert mock_session_factory.return_value.close.call_count == 1
+
+
+# Test for the 'create' method when a SQLAlchemyError occurs
+def test_create_or_update_database_error(repo, mock_session_factory):
+    # Arrange
+    test_model = ConsolidatedPortfolioModel(
+        portfolio_code='001',
+        date=date.today(),
+        balance=1000.0,
+        amount_invested=1000.0
+    )
+    mock_session_factory.return_value.query.return_value.filter.return_value.filter.return_value.one.return_value = to_database(
+        test_model)
+    mock_session_factory.return_value.refresh.side_effect = SQLAlchemyError("Erro Teste")
+    result = repo.create_or_update(test_model)
 
     # Assert
-    assert result == ConsolidatedBalancePortfolioError.DatabaseError
-    mock_session_factory.return_value.close.assert_called_once()
+    assert result == ConsolidatedPortfolioError.DatabaseError
+    assert mock_session_factory.return_value.close.call_count == 1
+
 
 # Test for the 'create' method when an unexpected Exception occurs
-def test_create_unexpected_error(repo, mock_session_factory):
+def test_create_or_update_unexpected_error(repo, mock_session_factory):
     # Arrange
     test_model = ConsolidatedPortfolioModel(
         portfolio_code='001',
@@ -127,8 +156,8 @@ def test_create_unexpected_error(repo, mock_session_factory):
         amount_invested=1000.0
     )
     mock_session_factory.return_value.add.side_effect = Exception("Unexpected Error")
-    result = repo.create(test_model)
+    result = repo.create_or_update(test_model)
 
     # Assert
-    assert result == ConsolidatedBalancePortfolioError.Unexpected
-    mock_session_factory.return_value.close.assert_called_once()
+    assert result == ConsolidatedPortfolioError.Unexpected
+    assert mock_session_factory.return_value.close.call_count == 1

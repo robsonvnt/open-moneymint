@@ -68,8 +68,9 @@ class Transaction(BaseModel):
     fees: Optional[float]
 
 
-class ConsolidatedBalancePortfolioError(Enum):
+class ConsolidatedPortfolioError(Enum):
     DatabaseError = "Database error"
+    ConsolidatedPortfolioNotFound = "ConsolidatedPortfolio Not Found."
     Unexpected = "Unexpected error"
 
 
