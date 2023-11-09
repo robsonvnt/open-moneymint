@@ -30,7 +30,7 @@ async def get_consolidated_balance(
 
 
 @router.post("/{portfolio_code}/consolidations/consolidate")
-async def get_consolidated_balance(
+async def consolidate_balance(
         portfolio_code: str
 ):
     result = consolidated_balance_service.consolidate_portfolio(portfolio_code)
