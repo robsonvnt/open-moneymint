@@ -9,7 +9,7 @@ from investment.domains import (
     ConsolidatedPortfolioModel,
     ConsolidatedBalancePortfolioError
 )
-from investment.repository.consolidated_balance_db_repositorio import ConsolidatedBalanceRepo, \
+from investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo, \
     ConsolidatedBalancePortfolio, to_database
 
 

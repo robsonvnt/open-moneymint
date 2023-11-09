@@ -3,7 +3,7 @@ from decimal import Decimal
 from enum import Enum
 
 from investment.domains import PortfolioModel, PortfolioConsolidationModel, PortfolioError
-from investment.repository.portfolio_db_repositorio import PortfolioRepo
+from investment.repository.portfolio_db_repository import PortfolioRepo
 from investment.services.investment_service import InvestmentService
 
 

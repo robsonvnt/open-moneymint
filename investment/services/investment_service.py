@@ -4,8 +4,8 @@ from enum import Enum
 
 from investment.domains import InvestmentModel, PortfolioConsolidationModel, InvestmentError, PortfolioError, \
     PortfolioModel, PortfolioOverviewModel
-from investment.repository.investment_db_repositorio import InvestmentRepo
-from investment.repository.portfolio_db_repositorio import PortfolioRepo
+from investment.repository.investment_db_repository import InvestmentRepo
+from investment.repository.portfolio_db_repository import PortfolioRepo
 
 
 class InvestmentService:
@@ -66,7 +66,7 @@ class InvestmentService:
             return PortfolioError.PortfolioNotFound
         return self.investment_repo.update(portfolio_code, investment_code, updated_investment)
 
-    def get_portfolio_overview(self, portfolio_code: str) -> Union[PortfolioOverviewModel, InvestmentError]:
+    def get_portfolio_overview(self, portfolio_code: str) -> PortfolioOverviewModel | InvestmentError:
         try:
             portfolio = self.portfolio_repo.find_by_code(portfolio_code)
             if isinstance(portfolio, InvestmentError):

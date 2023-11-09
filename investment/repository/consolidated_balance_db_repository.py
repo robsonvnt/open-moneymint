@@ -66,7 +66,7 @@ class ConsolidatedBalanceRepo:
     def create(
             self,
             consolidated_portfolio: ConsolidatedPortfolioModel
-    ) -> Union[ConsolidatedPortfolioModel, ConsolidatedBalancePortfolioError]:
+    ) -> ConsolidatedPortfolioModel | ConsolidatedBalancePortfolioError:
         session = self.session_factory()
         try:
             new_consolidated_portfolio = to_database(consolidated_portfolio)
