@@ -119,6 +119,8 @@ class InvestmentService:
             return PortfolioError.PortfolioNotFound
         investments = result
         for investment in investments:
+            if investment.asset_type != "STOCK":
+                continue
             symbol = investment.ticker
             current_price = self.stock_repo.get_price(symbol)
             investment.current_average_price = current_price
