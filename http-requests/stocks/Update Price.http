@@ -1,4 +1,4 @@
-PUT http://localhost:8000/update-prices
+PUT http://localhost:8001/portfolios/b185557eda/investments-prices
 Accept: application/json
 
 ###

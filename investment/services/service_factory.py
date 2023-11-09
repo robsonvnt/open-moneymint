@@ -19,7 +19,8 @@ class ServiceFactory:
     def create_investment_service() -> InvestmentService:
         portfolio_repo = RepositoryFactory.create_portfolio_repo()
         investment_repo = RepositoryFactory.create_investment_repo()
-        return InvestmentService(portfolio_repo, investment_repo)
+        stock_repo = RepositoryFactory.create_stock_repo()
+        return InvestmentService(portfolio_repo, investment_repo,stock_repo)
 
     @staticmethod
     def create_consolidated_balance_service() -> ConsolidatedPortfolioService:

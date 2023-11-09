@@ -2,6 +2,7 @@ from typing import List, Union
 from decimal import Decimal
 from enum import Enum
 
+from constants import SUCCESS_RESULT
 from investment.domains import InvestmentModel, PortfolioConsolidationModel, InvestmentError, PortfolioError, \
     PortfolioModel, PortfolioOverviewModel
 from investment.repository.investment_db_repository import InvestmentRepo
@@ -9,9 +10,10 @@ from investment.repository.portfolio_db_repository import PortfolioRepo
 
 
 class InvestmentService:
-    def __init__(self, portfolio_repo: PortfolioRepo, investment_repo: InvestmentRepo):
+    def __init__(self, portfolio_repo: PortfolioRepo, investment_repo: InvestmentRepo, stock_repo):
         self.portfolio_repo: PortfolioRepo = portfolio_repo
         self.investment_repo: InvestmentRepo = investment_repo
+        self.stock_repo = stock_repo
 
     def create_investment(self, new_investment: InvestmentModel) -> Union[InvestmentModel, InvestmentError]:
         result = self.portfolio_repo.find_by_code(new_investment.portfolio_code)
@@ -110,3 +112,15 @@ class InvestmentService:
         if result == PortfolioError.PortfolioNotFound:
             return PortfolioError.PortfolioNotFound
         return self.investment_repo.get_diversification_portfolio(portfolio_code)
+
+    def update_stock_price(self, portfolio_code: str):
+        result = self.find_all_investments(portfolio_code)
+        if result == PortfolioError.PortfolioNotFound:
+            return PortfolioError.PortfolioNotFound
+        investments = result
+        for investment in investments:
+            symbol = investment.ticker
+            current_price = self.stock_repo.get_price(symbol)
+            investment.current_average_price = current_price
+            self.update_investment(portfolio_code, investment.code, investment)
+        return SUCCESS_RESULT

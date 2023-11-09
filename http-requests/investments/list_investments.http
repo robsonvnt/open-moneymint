@@ -1,2 +1,7 @@
 ### Lista todos os investimentos
-GET http://localhost:8000/portfolios/8791a08015/investments/ HTTP/1.1
+GET http://localhost:8000/portfolios/b185557eda/investments/ HTTP/1.1
+
+
+#PETR4 34.88
+
+Antigo: 34,92

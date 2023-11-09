@@ -1,9 +1,12 @@
+from http.client import HTTPResponse
+
 from fastapi import HTTPException, status, APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
 import constants
+from constants import SUCCESS_RESULT
 from investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioConsolidationModel, \
     PortfolioOverviewModel
 from investment.services.investment_service import InvestmentService
@@ -125,3 +128,15 @@ async def get_portfolio_consolidation(portfolio_code: str):
     if portfolio_overview is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Portfolio not found.")
     return portfolio_overview
+
+
+@router.put("/{portfolio_code}/investments-prices")
+async def update_investments_prices(portfolio_code: str):
+    result = investment_service.update_stock_price(portfolio_code)
+    match result:
+        case constants.SUCCESS_RESULT:
+            return {"message": "Investment price updated successfully"}
+        case InvestmentError.InvestmentNotFound | PortfolioError.PortfolioNotFound:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=result.value)
+        case _:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
