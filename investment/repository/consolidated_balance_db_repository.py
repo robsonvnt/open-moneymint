@@ -1,15 +1,16 @@
+from datetime import date
 from typing import List, Optional, Union
 from sqlalchemy import Column, Integer, String, Float, Date, create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
-from investment.domains import ConsolidatedPortfolioModel, ConsolidatedBalancePortfolioError
+from investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError
 
 Base = declarative_base()
 
 
 # Modelo para representar os dados consolidados do portfolio
-class ConsolidatedBalancePortfolio(Base):
+class ConsolidatedPortfolio(Base):
     __tablename__ = 'consolidated_balance_portfolios'
     id = Column(Integer, primary_key=True)
     portfolio_code = Column(String)
@@ -19,12 +20,12 @@ class ConsolidatedBalancePortfolio(Base):
 
 
 # Function to convert domain model to database model
-def to_database(cbp_model: ConsolidatedPortfolioModel) -> ConsolidatedBalancePortfolio:
-    return ConsolidatedBalancePortfolio(**cbp_model.dict())
+def to_database(cbp_model: ConsolidatedPortfolioModel) -> ConsolidatedPortfolio:
+    return ConsolidatedPortfolio(id=None, **cbp_model.dict())
 
 
 # Function to convert database model to domain model
-def to_model(cbp: ConsolidatedBalancePortfolio) -> ConsolidatedPortfolioModel:
+def to_model(cbp: ConsolidatedPortfolio) -> ConsolidatedPortfolioModel:
     return ConsolidatedPortfolioModel(**cbp.__dict__)
 
 
@@ -38,45 +39,75 @@ class ConsolidatedBalanceRepo:
             portfolio_code: str,
             start_date: Optional[Date] = None,
             end_date: Optional[Date] = None
-    ) -> Union[List[ConsolidatedPortfolioModel], ConsolidatedBalancePortfolioError]:
+    ) -> Union[List[ConsolidatedPortfolioModel], ConsolidatedPortfolioError]:
         """
         Filters the ConsolidatedBalancePortfolio by date range.
         """
         session = self.session_factory()
         try:
-            query = session.query(ConsolidatedBalancePortfolio).filter(
-                ConsolidatedBalancePortfolio.portfolio_code == portfolio_code
+            query = session.query(ConsolidatedPortfolio).filter(
+                ConsolidatedPortfolio.portfolio_code == portfolio_code
             )
 
             if start_date is not None:
-                query = query.filter(ConsolidatedBalancePortfolio.date >= start_date)
+                query = query.filter(ConsolidatedPortfolio.date >= start_date)
 
             if end_date is not None:
-                query = query.filter(ConsolidatedBalancePortfolio.date <= end_date)
+                query = query.filter(ConsolidatedPortfolio.date <= end_date)
 
-            query = query.order_by(ConsolidatedBalancePortfolio.date.asc())
+            query = query.order_by(ConsolidatedPortfolio.date.asc())
             return [to_model(cbp) for cbp in query.all()]
         except SQLAlchemyError as e:
-            return ConsolidatedBalancePortfolioError.DatabaseError
+            return ConsolidatedPortfolioError.DatabaseError
         except Exception as e:
-            return ConsolidatedBalancePortfolioError.Unexpected
+            return ConsolidatedPortfolioError.Unexpected
         finally:
             session.close()
 
-    def create(
-            self,
-            consolidated_portfolio: ConsolidatedPortfolioModel
-    ) -> ConsolidatedPortfolioModel | ConsolidatedBalancePortfolioError:
+    def __get_consolidated_portfolio(
+            self, portfolio_code: str, date: date
+    ) -> ConsolidatedPortfolio | ConsolidatedPortfolioError:
         session = self.session_factory()
         try:
-            new_consolidated_portfolio = to_database(consolidated_portfolio)
-            session.add(new_consolidated_portfolio)
-            session.commit()
-            session.refresh(new_consolidated_portfolio)
-            return to_model(new_consolidated_portfolio)
-        except SQLAlchemyError as e:
-            return ConsolidatedBalancePortfolioError.DatabaseError
+            consolidated_portfolio = session.query(ConsolidatedPortfolio) \
+                .filter(ConsolidatedPortfolio.date == date) \
+                .filter(ConsolidatedPortfolio.portfolio_code == portfolio_code) \
+                .one()
+            return consolidated_portfolio
+        except NoResultFound:
+            return ConsolidatedPortfolioError.ConsolidatedPortfolioNotFound
         except Exception as e:
-            return ConsolidatedBalancePortfolioError.Unexpected
+            return ConsolidatedPortfolioError.DatabaseError
+        finally:
+            session.close()
+
+    def create_or_update(
+            self,
+            cpm: ConsolidatedPortfolioModel
+    ) -> ConsolidatedPortfolioModel | ConsolidatedPortfolioError:
+        session = self.session_factory()
+        try:
+            result = self.__get_consolidated_portfolio(cpm.portfolio_code, date.today())
+            match result:
+                case ConsolidatedPortfolio():
+                    consolidated_portfolio = result
+                    consolidated_portfolio.balance = cpm.balance
+                    consolidated_portfolio.amount_invested = cpm.amount_invested
+                    session.commit()
+                    session.refresh(consolidated_portfolio)
+                    return to_model(consolidated_portfolio)
+                case ConsolidatedPortfolioError.ConsolidatedPortfolioNotFound:
+                    consolidated_portfolio = to_database(cpm)
+                    session.add(consolidated_portfolio)
+                    session.commit()
+                    to_model(consolidated_portfolio)
+                    session.refresh(consolidated_portfolio)
+                    return to_model(consolidated_portfolio)
+                case _:
+                    return ConsolidatedPortfolioError.Unexpected
+        except SQLAlchemyError as e:
+            return ConsolidatedPortfolioError.DatabaseError
+        except Exception as e:
+            return ConsolidatedPortfolioError.Unexpected
         finally:
             session.close()

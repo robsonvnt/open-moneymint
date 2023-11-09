@@ -15,7 +15,6 @@ from investment.services.consolidated_service import ConsolidatedPortfolioServic
 
 # Helper function to create models
 def create_portfolio_overview() -> PortfolioOverviewModel:
-    today = date.today()
     return PortfolioOverviewModel(
         code='PortfolioOverviewModel',
         name='PortfolioOverviewModel',
@@ -67,11 +66,11 @@ def test_consolidate_portfolio(
     # Arrange
     model = create_portfolio_overview()
     mock_investment_service.get_portfolio_overview.return_value = model
-    mock_cpb_repo.create = Mock(side_effect=mock_function)
+    mock_cpb_repo.create_or_update = Mock(side_effect=mock_function)
     # Act
     consolidated_portfolio = consolidate_portfolio_service.consolidate_portfolio('1234567890')
     # Assert
-    mock_cpb_repo.create.assert_called_once()
+    mock_cpb_repo.create_or_update.assert_called_once()
     assert isinstance(consolidated_portfolio, ConsolidatedPortfolioModel), "my_instance não é uma instância de MyClass"
     assert consolidated_portfolio.portfolio_code == portfolio_code
     assert consolidated_portfolio.amount_invested == amount_invested

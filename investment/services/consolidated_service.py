@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Union
 
-from investment.domains import PortfolioOverviewModel, ConsolidatedPortfolioModel, ConsolidatedBalancePortfolioError, \
+from investment.domains import PortfolioOverviewModel, ConsolidatedPortfolioModel, ConsolidatedPortfolioError, \
     InvestmentError
 from investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo
 from investment.services.investment_service import InvestmentService
@@ -17,7 +17,7 @@ class ConsolidatedPortfolioService:
 
     def consolidate_portfolio(
             self, portfolio_code: str
-    ) -> ConsolidatedPortfolioModel | ConsolidatedBalancePortfolioError:
+    ) -> ConsolidatedPortfolioModel | ConsolidatedPortfolioError:
         result = self.investment_service.get_portfolio_overview(portfolio_code)
         match result:
             case PortfolioOverviewModel():
@@ -27,6 +27,6 @@ class ConsolidatedPortfolioService:
                     balance=result.current_balance,
                     amount_invested=result.amount_invested,
                 )
-                return self.cpb_repo.create(cpm)
+                return self.cpb_repo.create_or_update(cpm)
             case InvestmentError():
-                return ConsolidatedBalancePortfolioError.Unexpected
+                return ConsolidatedPortfolioError.Unexpected
