@@ -65,9 +65,8 @@ class ConsolidatedBalanceRepo:
             session.close()
 
     def __get_consolidated_portfolio(
-            self, portfolio_code: str, date: date
+            self, session, portfolio_code: str, date: date
     ) -> ConsolidatedPortfolio | ConsolidatedPortfolioError:
-        session = self.session_factory()
         try:
             consolidated_portfolio = session.query(ConsolidatedPortfolio) \
                 .filter(ConsolidatedPortfolio.date == date) \
@@ -78,8 +77,6 @@ class ConsolidatedBalanceRepo:
             return ConsolidatedPortfolioError.ConsolidatedPortfolioNotFound
         except Exception as e:
             return ConsolidatedPortfolioError.DatabaseError
-        finally:
-            session.close()
 
     def create_or_update(
             self,
@@ -87,21 +84,18 @@ class ConsolidatedBalanceRepo:
     ) -> ConsolidatedPortfolioModel | ConsolidatedPortfolioError:
         session = self.session_factory()
         try:
-            result = self.__get_consolidated_portfolio(cpm.portfolio_code, date.today())
+            result = self.__get_consolidated_portfolio(session, cpm.portfolio_code, date.today())
             match result:
                 case ConsolidatedPortfolio():
                     consolidated_portfolio = result
                     consolidated_portfolio.balance = cpm.balance
                     consolidated_portfolio.amount_invested = cpm.amount_invested
-                    session.commit()
                     session.refresh(consolidated_portfolio)
                     return to_model(consolidated_portfolio)
                 case ConsolidatedPortfolioError.ConsolidatedPortfolioNotFound:
                     consolidated_portfolio = to_database(cpm)
                     session.add(consolidated_portfolio)
-                    session.commit()
                     to_model(consolidated_portfolio)
-                    session.refresh(consolidated_portfolio)
                     return to_model(consolidated_portfolio)
                 case _:
                     return ConsolidatedPortfolioError.Unexpected
@@ -110,4 +104,5 @@ class ConsolidatedBalanceRepo:
         except Exception as e:
             return ConsolidatedPortfolioError.Unexpected
         finally:
+            session.commit()
             session.close()

@@ -100,8 +100,7 @@ def test_create_success(repo, mock_session_factory):
     assert isinstance(result, ConsolidatedPortfolioModel)
     mock_session_factory.return_value.add.assert_called_once()
     mock_session_factory.return_value.commit.assert_called_once()
-    mock_session_factory.return_value.refresh.assert_called_once()
-    assert mock_session_factory.return_value.close.call_count == 2
+    assert mock_session_factory.return_value.close.call_count == 1
 
 
 # Update method tests
@@ -125,7 +124,7 @@ def test_update_success(repo, mock_session_factory):
     assert mock_session_factory.return_value.add.call_count == 0
     mock_session_factory.return_value.commit.assert_called_once()
     mock_session_factory.return_value.refresh.assert_called_once()
-    assert mock_session_factory.return_value.close.call_count == 2
+    assert mock_session_factory.return_value.close.call_count == 1
 
 
 # Test for the 'create' method when a SQLAlchemyError occurs
@@ -139,13 +138,12 @@ def test_create_or_update_database_error(repo, mock_session_factory):
     )
     mock_session_factory.return_value.query.return_value.filter.return_value.filter.return_value.one.return_value = to_database(
         test_model)
-    mock_session_factory.return_value.commit.side_effect = SQLAlchemyError("Erro Teste")
+    mock_session_factory.return_value.refresh.side_effect = SQLAlchemyError("Erro Teste")
     result = repo.create_or_update(test_model)
 
     # Assert
-    # assert mock_session_factory.return_value.add.call_count == 1
     assert result == ConsolidatedPortfolioError.DatabaseError
-    assert mock_session_factory.return_value.close.call_count == 2
+    assert mock_session_factory.return_value.close.call_count == 1
 
 
 # Test for the 'create' method when an unexpected Exception occurs
@@ -162,4 +160,4 @@ def test_create_or_update_unexpected_error(repo, mock_session_factory):
 
     # Assert
     assert result == ConsolidatedPortfolioError.Unexpected
-    assert mock_session_factory.return_value.close.call_count == 2
+    assert mock_session_factory.return_value.close.call_count == 1
