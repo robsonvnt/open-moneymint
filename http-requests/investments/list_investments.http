@@ -7,30 +7,4 @@ GET http://localhost:8000/portfolios/b185557eda/investments/ HTTP/1.1
 #Antigo: 34,92
 
 
-#!/bin/bash
-
-# URL para buscar os portfólios
-GET_URL="http://127.0.0.1:8000/portfolios"
-
-# URL base para as outras chamadas
-BASE_URL="http://localhost:8000/portfolios"
-
-# Faça um GET request e use jq para extrair os códigos
-codes=$(curl -s "$GET_URL" | jq -r '.[].code')
-
-# Iterar sobre os códigos e fazer um POST e um GET request para cada um
-for code in $codes; do
-    # Monta a URL de destino para POST
-    post_url="${BASE_URL}/${code}/consolidations/consolidate"
-
-    # Fazer o POST request
-    curl -X POST "$post_url" -H "Content-Type: application/json" -d '{}'
-    echo "Consolidação iniciada para o portfólio com código: $code"
-
-    # Monta a URL de destino para GET
-    get_url="${BASE_URL}/${code}/investments/"
-
-    # Fazer o GET request
-    curl -X GET "$get_url"
-    echo "Investimentos solicitados para o portfólio com código: $code"
-done
+sCVwkHdnTRBWoUyrzohNQm
