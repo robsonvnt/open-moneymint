@@ -67,7 +67,7 @@ async def get_investment(portfolio_code: str, investment_code: str):
 
 
 @router.get("/{portfolio_code}/investments", response_model=List[InvestmentModel])
-async def get_all_investments(portfolio_code: str):
+async def get_all_investments(portfolio_code: str, order_by: str = None):
     result = investment_service.find_all_investments(portfolio_code)
     match result:
         case list():

@@ -1,28 +1,7 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Date, and_, text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
-from sqlalchemy_mixins import AllFeaturesMixin
-
-# Configuração do banco de dados
+from sqlalchemy import text
 from investment.domains import InvestmentError, InvestmentModel
 from investment.helpers import generate_code
-
-Base = declarative_base()
-
-
-# Modelo de Investment
-class Investment(Base, AllFeaturesMixin):
-    __tablename__ = 'investments'
-    id = Column(Integer, primary_key=True, index=True)
-    code = Column(String, index=True)
-    portfolio_code = Column(String, index=True)
-    asset_type = Column(String)
-    ticker = Column(String)
-    quantity = Column(Float)
-    purchase_price = Column(Float)
-    current_average_price = Column(Float)
-    purchase_date = Column(Date)
+from investment.repository.db_entities import Investment
 
 
 def to_database(investment_model: InvestmentModel) -> Investment:
@@ -35,16 +14,15 @@ def to_model(investment: Investment) -> InvestmentModel:
 
 # Repositório de Investment
 class InvestmentRepo:
-    def __init__(self, db_url):
-        self.engine = create_engine(db_url)
-        self.Session = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+    def __init__(self, session_factory):
+        self.session_factory = session_factory
 
     def create(self, new_investment_data):
-        session = self.Session()
-        code = generate_code()
-        new_investment = Investment(id=None, **new_investment_data.dict())
-        new_investment.code = code
+        session = self.session_factory()
         try:
+            code = generate_code()
+            new_investment = Investment(id=None, **new_investment_data.dict())
+            new_investment.code = code
             session.add(new_investment)
             session.commit()
             session.refresh(new_investment)
@@ -58,25 +36,45 @@ class InvestmentRepo:
             session.close()
 
     def find_by_code(self, portfolio_code: str, investment_code):
-        session = self.Session()
-        investment = session.query(Investment).filter(
-            Investment.code == investment_code,
-            Investment.portfolio_code == portfolio_code,
-        ).first()
-        if investment is None:
-            return InvestmentError.InvestmentNotFound
-        return to_model(investment)
+        session = self.session_factory()
+        try:
+            investment = session.query(Investment).filter(
+                Investment.code == investment_code,
+                Investment.portfolio_code == portfolio_code,
+            ).first()
+            if investment is None:
+                return InvestmentError.InvestmentNotFound
+            return to_model(investment)
+        except Exception as e:
+            return InvestmentError.DatabaseError
+        finally:
+            session.close()
 
-    def find_all_by_portfolio_code(self, portfolio_code: str):
-        session = self.Session()
-        investments = session.query(Investment).filter(
-            Investment.portfolio_code == portfolio_code,
-        ).all()
-        return [to_model(inv) for inv in investments]
+    def find_all_by_portfolio_code(self, portfolio_code: str, order_by: str = None):
+        session = self.session_factory()
+        try:
+            query = session.query(Investment).filter(
+                Investment.portfolio_code == portfolio_code,
+            )
+            if order_by:
+                order_by_parts = order_by.strip().split('.')
+                column_name = order_by_parts[0]
+                try:
+                    column = getattr(Investment, column_name)
+                except AttributeError:
+                    return InvestmentError.ColumnDoesNotExist
+                if len(order_by_parts) > 1 and order_by_parts[1].lower() == 'desc':
+                    column = column.desc()
+                query = query.order_by(column)
+            return [to_model(inv) for inv in query.all()]
+        except Exception as e:
+            return InvestmentError.DatabaseError
+        finally:
+            session.close()
 
     def delete(self, portfolio_code: str, investment_code: str):
+        session = self.session_factory()
         try:
-            session = self.Session()
             investment = session.query(Investment).filter(
                 Investment.portfolio_code == portfolio_code,
                 Investment.code == investment_code
@@ -88,24 +86,31 @@ class InvestmentRepo:
             return True
         except Exception as e:
             return InvestmentError.DatabaseError
+        finally:
+            session.close()
 
     def update(self, portfolio_code: str, investment_code, updated_investment_data: InvestmentModel):
-        session = self.Session()
-        investment = session.query(Investment).filter(
-            Investment.portfolio_code == portfolio_code,
-            Investment.code == investment_code
-        ).first()
-        if investment is None:
-            return InvestmentError.InvestmentNotFound
-        tmp = updated_investment_data.model_dump()
-        for key, value in updated_investment_data.model_dump().items():
-            setattr(investment, key, value)
-        session.commit()
-        session.refresh(investment)
-        return to_model(investment)
+        session = self.session_factory()
+        try:
+            investment = session.query(Investment).filter(
+                Investment.portfolio_code == portfolio_code,
+                Investment.code == investment_code
+            ).first()
+            if investment is None:
+                return InvestmentError.InvestmentNotFound
+            tmp = updated_investment_data.model_dump()
+            for key, value in updated_investment_data.model_dump().items():
+                setattr(investment, key, value)
+            session.commit()
+            session.refresh(investment)
+            return to_model(investment)
+        except Exception as e:
+            return InvestmentError.DatabaseError
+        finally:
+            session.close()
 
     def get_diversification_portfolio(self, portfolio_code):
-        session = self.Session()
+        session = self.session_factory()
         try:
             query = text(
                 "SELECT asset_type, SUM(quantity * current_average_price) AS total_weight "
@@ -118,3 +123,5 @@ class InvestmentRepo:
             return diversification_portfolio
         except Exception as e:
             return InvestmentError.DatabaseError
+        finally:
+            session.close()

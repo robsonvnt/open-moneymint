@@ -29,7 +29,7 @@ class InvestmentService:
         except Exception as e:
             return InvestmentError.DatabaseError
 
-    def find_all_investments(self, portfolio_code: str) -> List[InvestmentModel]:
+    def find_all_investments(self, portfolio_code: str, order_by: str = None) -> List[InvestmentModel]:
         """
         Retrieves all investments associated with a specific portfolio identified by its code.
 
@@ -50,7 +50,7 @@ class InvestmentService:
         result = self.portfolio_repo.find_by_code(portfolio_code)
         match result:
             case PortfolioModel():
-                return self.investment_repo.find_all_by_portfolio_code(portfolio_code)
+                return self.investment_repo.find_all_by_portfolio_code(portfolio_code, order_by)
             case PortfolioError.PortfolioNotFound:
                 return PortfolioError.PortfolioNotFound
             case InvestmentError.Unexpected:

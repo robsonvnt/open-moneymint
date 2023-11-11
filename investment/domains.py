@@ -41,6 +41,7 @@ class PortfolioError(Enum):
 class InvestmentError(Enum):
     AlreadyExists = "Investment already exists"
     InvestmentNotFound = "Investment not found"
+    ColumnDoesNotExist = "Column does not exist"
     DatabaseError = "Database error"
     Unexpected = "Unexpected error"
     NoAssetsFound = "No Assets Found error"
