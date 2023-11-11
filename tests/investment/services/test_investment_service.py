@@ -22,10 +22,15 @@ def mock_investment_repo():
     return Mock()
 
 
+@pytest.fixture
+def mock_stock_repot_repo():
+    return Mock()
+
+
 # Fixture for the investment service
 @pytest.fixture
-def investment_service(mock_portfolio_repo, mock_investment_repo):
-    return InvestmentService(mock_portfolio_repo, mock_investment_repo)
+def investment_service(mock_portfolio_repo, mock_investment_repo, mock_stock_repot_repo):
+    return InvestmentService(mock_portfolio_repo, mock_investment_repo, mock_stock_repot_repo)
 
 
 # Test for consolidating a portfolio
@@ -44,7 +49,6 @@ def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo,
     assert result.portfolio_yield == 11.4
     assert result.portfolio_gross_nominal_yield == 80.0
 
-
     # Testando sem nenhum investimento cadastrado
     mock_investment_repo.find_all_by_portfolio_code.return_value = []
 
@@ -54,6 +58,5 @@ def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo,
     assert result.portfolio_yield == 0
     assert result.portfolio_gross_nominal_yield == 0.0
     print(result)
-
 
 # Add more tests as needed for full coverage

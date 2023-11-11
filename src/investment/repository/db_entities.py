@@ -1,6 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Date, and_, text
+from sqlalchemy import Column, Float, Date, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy_mixins import AllFeaturesMixin
 
 Base = declarative_base()
@@ -18,3 +17,20 @@ class Investment(Base, AllFeaturesMixin):
     purchase_price = Column(Float)
     current_average_price = Column(Float)
     purchase_date = Column(Date)
+
+
+class ConsolidatedPortfolio(Base, AllFeaturesMixin):
+    __tablename__ = 'consolidated_balance_portfolios'
+    id = Column(Integer, primary_key=True)
+    portfolio_code = Column(String)
+    date = Column(Date)
+    balance = Column(Float)
+    amount_invested = Column(Float)
+
+
+class Portfolio(Base, AllFeaturesMixin):
+    __tablename__ = 'portfolios'
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    code = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
+    description = Column(Text, nullable=True)

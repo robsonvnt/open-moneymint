@@ -14,11 +14,11 @@ def to_model(investment: Investment) -> InvestmentModel:
 
 # Repositório de Investment
 class InvestmentRepo:
-    def __init__(self, session_factory):
-        self.session_factory = session_factory
+    def __init__(self, session):
+        self.session = session
 
     def create(self, new_investment_data):
-        session = self.session_factory()
+        session = self.session
         try:
             code = generate_code()
             new_investment = Investment(id=None, **new_investment_data.dict())
@@ -36,7 +36,7 @@ class InvestmentRepo:
             session.close()
 
     def find_by_code(self, portfolio_code: str, investment_code):
-        session = self.session_factory()
+        session = self.session
         try:
             investment = session.query(Investment).filter(
                 Investment.code == investment_code,
@@ -51,7 +51,7 @@ class InvestmentRepo:
             session.close()
 
     def find_all_by_portfolio_code(self, portfolio_code: str, order_by: str = None):
-        session = self.session_factory()
+        session = self.session
         try:
             query = session.query(Investment).filter(
                 Investment.portfolio_code == portfolio_code,
@@ -73,7 +73,7 @@ class InvestmentRepo:
             session.close()
 
     def delete(self, portfolio_code: str, investment_code: str):
-        session = self.session_factory()
+        session = self.session
         try:
             investment = session.query(Investment).filter(
                 Investment.portfolio_code == portfolio_code,
@@ -90,7 +90,7 @@ class InvestmentRepo:
             session.close()
 
     def update(self, portfolio_code: str, investment_code, updated_investment_data: InvestmentModel):
-        session = self.session_factory()
+        session = self.session
         try:
             investment = session.query(Investment).filter(
                 Investment.portfolio_code == portfolio_code,
@@ -110,7 +110,7 @@ class InvestmentRepo:
             session.close()
 
     def get_diversification_portfolio(self, portfolio_code):
-        session = self.session_factory()
+        session = self.session
         try:
             query = text(
                 "SELECT asset_type, SUM(quantity * current_average_price) AS total_weight "

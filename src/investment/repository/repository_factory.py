@@ -12,16 +12,24 @@ db_url = os.environ.get('DATABASE_URL')
 class RepositoryFactory:
 
     @staticmethod
-    def create_portfolio_repo() -> PortfolioRepo:
-        return PortfolioRepo(db_url)
+    def create_portfolio_repo(session=None) -> PortfolioRepo:
+        if session:
+            return PortfolioRepo(session)
+        session = get_db_session(db_url)
+        return PortfolioRepo(session)
+
 
     @staticmethod
-    def create_investment_repo() -> InvestmentRepo:
+    def create_investment_repo(session=None) -> InvestmentRepo:
+        if session:
+            return InvestmentRepo(session)
         session = get_db_session(db_url)
         return InvestmentRepo(session)
 
     @staticmethod
-    def consolidated_balance_repo() -> ConsolidatedBalanceRepo:
+    def consolidated_balance_repo(session=None) -> ConsolidatedBalanceRepo:
+        if session:
+            return ConsolidatedBalanceRepo(session)
         session = get_db_session(db_url)
         return ConsolidatedBalanceRepo(session)
 

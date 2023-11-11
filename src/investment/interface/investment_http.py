@@ -1,16 +1,15 @@
-from fastapi import HTTPException, status, APIRouter
+from fastapi import HTTPException, status, APIRouter, Depends
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
 from src import constants
 from src.investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioOverviewModel
+from src.investment.repository.db_connection import get_db_session
 from src.investment.services.investment_service import InvestmentService
 from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()
-
-investment_service: InvestmentService = ServiceFactory.create_investment_service()
 
 
 class NewInvestmentInput(BaseModel):
@@ -29,7 +28,11 @@ class AssetTypeValue(BaseModel):
 
 
 @router.post("/{portfolio_code}/investments", response_model=InvestmentModel)
-async def create_investment(portfolio_code, input: NewInvestmentInput):
+async def create_investment(
+        portfolio_code, input: NewInvestmentInput,
+        db_session=Depends(get_db_session)
+):
+    investment_service = ServiceFactory.create_investment_service(db_session)
     if not portfolio_code == input.portfolio_code:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Portfolio code does not match.")
@@ -49,7 +52,12 @@ async def create_investment(portfolio_code, input: NewInvestmentInput):
 
 
 @router.get("/{portfolio_code}/investments/{investment_code}", response_model=InvestmentModel)
-async def get_investment(portfolio_code: str, investment_code: str):
+async def get_investment(
+        portfolio_code: str,
+        investment_code: str,
+        db_session=Depends(get_db_session)
+):
+    investment_service = ServiceFactory.create_investment_service(db_session)
     result = investment_service.find_investment_by_code(portfolio_code, investment_code)
 
     match result:
@@ -63,7 +71,11 @@ async def get_investment(portfolio_code: str, investment_code: str):
 
 
 @router.get("/{portfolio_code}/investments", response_model=List[InvestmentModel])
-async def get_all_investments(portfolio_code: str, order_by: str = None):
+async def get_all_investments(
+        portfolio_code: str,
+        order_by: str = None,
+        db_session=Depends(get_db_session)
+):
     """
     Recupera todos os investimentos associados a um determinado código de portfólio.
 
@@ -85,6 +97,7 @@ async def get_all_investments(portfolio_code: str, order_by: str = None):
     Exceções são tratadas para identificar portfólios não encontrados, colunas de ordenação inválidas e erros gerais de servidor,
     proporcionando uma resposta apropriada ao cliente.
     """
+    investment_service = ServiceFactory.create_investment_service(db_session)
     result = investment_service.find_all_investments(portfolio_code, order_by)
     match result:
         case list():
@@ -100,7 +113,12 @@ async def get_all_investments(portfolio_code: str, order_by: str = None):
 
 
 @router.delete("/{portfolio_code}/investments/{investment_code}")
-async def delete_investment(portfolio_code: str, investment_code: str):
+async def delete_investment(
+        portfolio_code: str,
+        investment_code: str,
+        db_session=Depends(get_db_session)
+):
+    investment_service = ServiceFactory.create_investment_service(db_session)
     result = investment_service.delete_investment(portfolio_code, investment_code)
     match result:
         case constants.SUCCESS_RESULT:
@@ -112,7 +130,13 @@ async def delete_investment(portfolio_code: str, investment_code: str):
 
 
 @router.put("/{portfolio_code}/investments/{investment_code}", response_model=InvestmentModel)
-async def update_investment(portfolio_code: str, investment_code: str, input: InvestmentModel):
+async def update_investment(
+        portfolio_code: str,
+        investment_code: str,
+        input: InvestmentModel,
+        db_session=Depends(get_db_session)
+):
+    investment_service = ServiceFactory.create_investment_service(db_session)
     result = investment_service.update_investment(portfolio_code, investment_code, input)
     match result:
         case InvestmentModel():
@@ -124,9 +148,14 @@ async def update_investment(portfolio_code: str, investment_code: str, input: In
 
 
 @router.get("/{portfolio_code}/investments-diversification", response_model=List[AssetTypeValue])
-async def get_diversification_portfolio(portfolio_code: str):
+async def get_diversification_portfolio(
+        portfolio_code: str,
+        db_session=Depends(get_db_session)
+):
+    investment_service = ServiceFactory.create_investment_service(db_session)
     result = investment_service.get_diversification_portfolio(portfolio_code)
 
+    investment_service = ServiceFactory.create_investment_service(db_session)
     match result:
         case dict():
             return [AssetTypeValue(asset_type=asset, value=value) for asset, value in result.items()]
@@ -143,7 +172,11 @@ async def get_diversification_portfolio(portfolio_code: str):
 
 
 @router.get("/portfolio-consolidation/{portfolio_code}", response_model=PortfolioOverviewModel)
-async def get_portfolio_consolidation(portfolio_code: str):
+async def get_portfolio_consolidation(
+        portfolio_code: str,
+        db_session=Depends(get_db_session)
+):
+    investment_service = ServiceFactory.create_investment_service(db_session)
     portfolio_overview = investment_service.get_portfolio_overview(portfolio_code)
     if portfolio_overview is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Portfolio not found.")
@@ -151,7 +184,11 @@ async def get_portfolio_consolidation(portfolio_code: str):
 
 
 @router.put("/{portfolio_code}/investments-prices")
-async def update_investments_prices(portfolio_code: str):
+async def update_investments_prices(
+        portfolio_code: str,
+        db_session=Depends(get_db_session)
+):
+    investment_service = ServiceFactory.create_investment_service(db_session)
     result = investment_service.update_stock_price(portfolio_code)
     match result:
         case constants.SUCCESS_RESULT:
