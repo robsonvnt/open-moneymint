@@ -68,12 +68,36 @@ async def get_investment(portfolio_code: str, investment_code: str):
 
 @router.get("/{portfolio_code}/investments", response_model=List[InvestmentModel])
 async def get_all_investments(portfolio_code: str, order_by: str = None):
-    result = investment_service.find_all_investments(portfolio_code)
+    """
+    Recupera todos os investimentos associados a um determinado código de portfólio.
+
+    Este endpoint permite a recuperação de uma lista de investimentos filtrada pelo código do portfólio.
+    Os investimentos podem ser ordenados com base em qualquer coluna disponível, de forma ascendente ou descendente.
+
+    Parâmetros:
+    - portfolio_code (str): O código do portfólio para o qual os investimentos são buscados.
+    - order_by (str, opcional): Parâmetro de ordenação para os resultados.
+      Deve ser o nome da coluna pelo qual ordenar. Para ordenação ascendente, forneça apenas o nome da coluna.
+      Para ordenação descendente, adicione ".desc" após o nome da coluna (por exemplo, "purchase_date.desc").
+
+    Retornos:
+    - Lista de InvestmentModel: Uma lista de modelos de investimento correspondentes ao código do portfólio fornecido.
+    - HTTP 404 Not Found: Erro levantado se o portfólio especificado não for encontrado.
+    - HTTP 400 Bad Request: Erro levantado se o parâmetro 'order_by' especificar uma coluna que não existe.
+    - HTTP 500 Internal Server Error: Erro levantado para qualquer outra falha no servidor.
+
+    Exceções são tratadas para identificar portfólios não encontrados, colunas de ordenação inválidas e erros gerais de servidor,
+    proporcionando uma resposta apropriada ao cliente.
+    """
+    result = investment_service.find_all_investments(portfolio_code, order_by)
     match result:
         case list():
             return result
         case PortfolioError.PortfolioNotFound:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=result.value)
+        case InvestmentError.ColumnDoesNotExist:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail=result.value)
         case _:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
