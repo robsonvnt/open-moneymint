@@ -17,7 +17,8 @@ class RepositoryFactory:
 
     @staticmethod
     def create_investment_repo() -> InvestmentRepo:
-        return InvestmentRepo(db_url)
+        session = get_db_session(db_url)
+        return InvestmentRepo(session)
 
     @staticmethod
     def consolidated_balance_repo() -> ConsolidatedBalanceRepo:

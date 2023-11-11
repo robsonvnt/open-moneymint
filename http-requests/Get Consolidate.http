@@ -1,2 +1,2 @@
-GET http://localhost:8000/portfolios/6a267bfca6/consolidated-balance?end_date=2023-04-01 HTTP/1.1
+GET http://localhost:8001/portfolios/portfolio-consolidation/b185557eda/ HTTP/1.1
 Content-Type: application/json
