@@ -5,8 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
-from investment.domains import PortfolioError, PortfolioModel
-from investment.helpers import generate_code
+from src.investment.domains import PortfolioError, PortfolioModel
+from src.investment.helpers import generate_code
 
 Base = declarative_base()
 

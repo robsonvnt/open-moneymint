@@ -1,10 +1,10 @@
 import os
 
-from investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo
-from investment.repository.db_connection import get_db_session
-from investment.repository.investment_db_repository import InvestmentRepo
-from investment.repository.portfolio_db_repository import PortfolioRepo
-from investment.repository.stock_repository import BrApiDevRepository
+from src.investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo
+from src.investment.repository.db_connection import get_db_session
+from src.investment.repository.investment_db_repository import InvestmentRepo
+from src.investment.repository.portfolio_db_repository import PortfolioRepo
+from src.investment.repository.stock_repository import BrApiDevRepository
 
 db_url = os.environ.get('DATABASE_URL')
 

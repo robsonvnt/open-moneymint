@@ -1,12 +1,7 @@
-import os
-
-from investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo
-from investment.repository.investment_db_repository import InvestmentRepo
-from investment.repository.portfolio_db_repository import PortfolioRepo
-from investment.repository.repository_factory import RepositoryFactory
-from investment.services.consolidated_service import ConsolidatedPortfolioService
-from investment.services.investment_service import InvestmentService
-from investment.services.portfolio import PortfolioService
+from src.investment.repository.repository_factory import RepositoryFactory
+from src.investment.services.consolidated_service import ConsolidatedPortfolioService
+from src.investment.services.investment_service import InvestmentService
+from src.investment.services.portfolio import PortfolioService
 
 class ServiceFactory:
     @staticmethod

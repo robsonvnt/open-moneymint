@@ -3,9 +3,9 @@ from datetime import date
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from investment.domains import InvestmentError
-from investment.repository.db_entities import Base
-from investment.repository.investment_db_repository import InvestmentRepo, Investment
+from src.investment.domains import InvestmentError
+from src.investment.repository.db_entities import Base
+from src.investment.repository.investment_db_repository import InvestmentRepo, Investment
 
 engine = create_engine('sqlite:///:memory:')  # Banco de dados SQLite em memória
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -74,7 +74,7 @@ def test_find_all_by_portfolio_code_with_order_by(db_session, investment_repo):
 
 def test_find_all_by_portfolio_code_with_order_by_non_existent_column(db_session, investment_repo):
     """
-    Testa se a função retorna erro por não existir a coluna a ser ordenada.
+    Testa se a função retorna erro por não existir a coluna a src ordenada.
     """
     # Adicionar dados de teste
     add_investments(db_session)

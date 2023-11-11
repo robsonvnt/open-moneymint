@@ -1,14 +1,13 @@
-from datetime import datetime, date
+from datetime import date
 
 import pytest
 from unittest.mock import Mock
 
-from investment.domains import (
+from src.investment.domains import (
     InvestmentModel,
-    PortfolioConsolidationModel,
     PortfolioModel
 )
-from investment.services.investment_service import InvestmentService
+from src.investment.services.investment_service import InvestmentService
 
 
 # Fixture for the portfolio repository mock

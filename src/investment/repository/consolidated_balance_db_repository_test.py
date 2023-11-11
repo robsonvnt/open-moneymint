@@ -1,15 +1,14 @@
 import pytest
-from unittest.mock import create_autospec, Mock, patch
+from unittest.mock import Mock
 
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
-from sqlalchemy.orm import sessionmaker
 from datetime import date, timedelta
 
-from investment.domains import (
+from src.investment.domains import (
     ConsolidatedPortfolioModel,
     ConsolidatedPortfolioError
 )
-from investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo, \
+from src.investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo, \
     ConsolidatedPortfolio, to_database
 
 

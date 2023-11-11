@@ -1,16 +1,11 @@
-from typing import Tuple
 import pytest
-from unittest.mock import Mock, call
+from unittest.mock import Mock
 from datetime import date
 
-from pydantic import BaseModel
-
-from investment.domains import (
-    InvestmentModel,
-    PortfolioConsolidationModel,
-    PortfolioModel, PortfolioOverviewModel, ConsolidatedPortfolioModel
+from src.investment.domains import (
+    PortfolioOverviewModel, ConsolidatedPortfolioModel
 )
-from investment.services.consolidated_service import ConsolidatedPortfolioService
+from src.investment.services.consolidated_service import ConsolidatedPortfolioService
 
 
 # Helper function to create models

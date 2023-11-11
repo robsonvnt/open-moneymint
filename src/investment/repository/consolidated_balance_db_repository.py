@@ -1,10 +1,10 @@
 from datetime import date
 from typing import List, Optional, Union
-from sqlalchemy import Column, Integer, String, Float, Date, create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy import Column, Integer, String, Float, Date
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
-from investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError
+from src.investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError
 
 Base = declarative_base()
 

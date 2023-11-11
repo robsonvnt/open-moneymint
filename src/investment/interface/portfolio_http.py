@@ -3,9 +3,9 @@ from pydantic import BaseModel
 from typing import List, Optional
 from fastapi.responses import JSONResponse
 
-from investment.domains import PortfolioModel, PortfolioConsolidationModel, PortfolioError
-from investment.services.portfolio import PortfolioService
-from investment.services.service_factory import ServiceFactory
+from src.investment.domains import PortfolioModel, PortfolioError
+from src.investment.services.portfolio import PortfolioService
+from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()
 

@@ -2,9 +2,9 @@ from fastapi import APIRouter, status, Query, HTTPException
 from typing import Optional
 from datetime import date
 
-from investment.domains import ConsolidatedPortfolioModel
-from investment.services.consolidated_service import ConsolidatedPortfolioService
-from investment.services.service_factory import ServiceFactory
+from src.investment.domains import ConsolidatedPortfolioModel
+from src.investment.services.consolidated_service import ConsolidatedPortfolioService
+from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()
 

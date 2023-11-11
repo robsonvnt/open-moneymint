@@ -1,16 +1,12 @@
-from http.client import HTTPResponse
-
 from fastapi import HTTPException, status, APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
-import constants
-from constants import SUCCESS_RESULT
-from investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioConsolidationModel, \
-    PortfolioOverviewModel
-from investment.services.investment_service import InvestmentService
-from investment.services.service_factory import ServiceFactory
+from src import constants
+from src.investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioOverviewModel
+from src.investment.services.investment_service import InvestmentService
+from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()
 
@@ -72,12 +68,12 @@ async def get_all_investments(portfolio_code: str, order_by: str = None):
     Recupera todos os investimentos associados a um determinado código de portfólio.
 
     Este endpoint permite a recuperação de uma lista de investimentos filtrada pelo código do portfólio.
-    Os investimentos podem ser ordenados com base em qualquer coluna disponível, de forma ascendente ou descendente.
+    Os investimentos podem src ordenados com base em qualquer coluna disponível, de forma ascendente ou descendente.
 
     Parâmetros:
     - portfolio_code (str): O código do portfólio para o qual os investimentos são buscados.
     - order_by (str, opcional): Parâmetro de ordenação para os resultados.
-      Deve ser o nome da coluna pelo qual ordenar. Para ordenação ascendente, forneça apenas o nome da coluna.
+      Deve src o nome da coluna pelo qual ordenar. Para ordenação ascendente, forneça apenas o nome da coluna.
       Para ordenação descendente, adicione ".desc" após o nome da coluna (por exemplo, "purchase_date.desc").
 
     Retornos:
