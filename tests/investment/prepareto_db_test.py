@@ -39,8 +39,8 @@ def client(db_session):
 
 
 def add_portfolio(session):
-    session.add(Portfolio(code="PORT100", name="Portfolio Name", description=""))
-    session.add(Portfolio(code="PORT101", name="Portfolio Name", description=""))
+    session.add(Portfolio(code="PORT100", name="Portfolio Name 100", description=""))
+    session.add(Portfolio(code="PORT101", name="Portfolio Name 101", description=""))
     session.commit()
 
 
