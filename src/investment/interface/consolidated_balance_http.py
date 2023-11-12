@@ -3,8 +3,7 @@ from typing import Optional
 from datetime import date
 
 from src.investment.domains import ConsolidatedPortfolioModel
-from src.investment.repository.db_connection import get_db_session
-from src.investment.services.consolidated_service import ConsolidatedPortfolioService
+from src.investment.repository.db.db_connection import get_db_session
 from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()

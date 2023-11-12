@@ -5,7 +5,7 @@ from datetime import date
 
 from src import constants
 from src.investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioOverviewModel, AssetType
-from src.investment.repository.db_connection import get_db_session
+from src.investment.repository.db.db_connection import get_db_session
 from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()

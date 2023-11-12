@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 
 from src.investment.domains import PortfolioError, PortfolioModel
 from src.investment.helpers import generate_code
-from src.investment.repository.db_entities import Portfolio
+from src.investment.repository.db.db_entities import Portfolio
 
 
 def to_database(portfolio_model: PortfolioModel) -> Portfolio:

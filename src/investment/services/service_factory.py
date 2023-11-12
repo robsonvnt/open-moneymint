@@ -1,7 +1,7 @@
-from src.investment.repository.repository_factory import RepositoryFactory
+from src.investment.repository.factory import RepositoryFactory
 from src.investment.services.consolidated_service import ConsolidatedPortfolioService
 from src.investment.services.investment_service import InvestmentService
-from src.investment.services.portfolio import PortfolioService
+from src.investment.services.portfolio_service import PortfolioService
 
 
 class ServiceFactory:

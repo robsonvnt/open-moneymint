@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Float, Date, Integer, String, Text
+from sqlalchemy import Column, Float, Date, Integer, String, Text, Enum as SQLEnum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_mixins import AllFeaturesMixin
+
+from src.investment.domains import TransactionType
 
 Base = declarative_base()
 
@@ -34,3 +36,16 @@ class Portfolio(Base, AllFeaturesMixin):
     code = Column(String, unique=True, index=True)
     name = Column(String, index=True)
     description = Column(Text, nullable=True)
+
+
+class Transaction(Base, AllFeaturesMixin):
+    __tablename__ = 'transactions'
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    code = Column(String(10), index=True)
+    investment_code = Column(String(10), index=True)
+    type = Column(String)
+    date = Column(Date, index=True)
+    quantity = Column(Integer)
+    price = Column(Float)
+
+

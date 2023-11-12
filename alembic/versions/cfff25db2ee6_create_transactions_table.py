@@ -21,13 +21,12 @@ def upgrade():
     op.create_table(
         'transactions',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('portfolio_id', sa.Integer(), sa.ForeignKey('portfolios.id'), nullable=False),
-        sa.Column('ticker', sa.String(), nullable=False),
-        sa.Column('transaction_type', sa.String(), nullable=False),
-        sa.Column('date', sa.Date(), nullable=False),
+        sa.Column('code', sa.String(length=10), nullable=False, unique=True),
+        sa.Column('investment_code', sa.String(length=10), nullable=False),
+        sa.Column('type', sa.String(), nullable=False),
         sa.Column('quantity', sa.Float(), nullable=False),
-        sa.Column('price_per_unit', sa.Float(), nullable=False),
-        sa.Column('fees', sa.Float(), nullable=True),
+        sa.Column('price', sa.Float(), nullable=False),
+        sa.Column('date', sa.Date(), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
 

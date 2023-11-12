@@ -19,13 +19,14 @@ def test_create_investment(client, db_session):
 
     new_investment_data = {
         "portfolio_code": "PORT100",
-        "asset_type": "Stock",
+        "asset_type": "STOCK",
         "ticker": "AAPL",
         "quantity": 50,
         "purchase_price": 500.00,
         "current_average_price": 110.00,
         "purchase_date": "2023-01-01"
     }
+
     response = client.post("/portfolios/PORT100/investments", json=new_investment_data)
     assert response.status_code == 200
     json_result = response.json()
@@ -61,7 +62,7 @@ def test_update_investment(client, db_session):
     updated_data = {
         "code": "INV102",
         "portfolio_code": "PORT100",
-        "asset_type": "Stock",
+        "asset_type": "STOCK",
         "ticker": "ticker_test",
         "quantity": 50,
         "purchase_price": 500.00,
@@ -87,7 +88,7 @@ def test_get_diversification_portfolio(client, db_session):
     response = client.get("/portfolios/PORT100/investments-diversification")
     assert response.status_code == 200
 
-    assert response.json()[0]["asset_type"] == "Fixed Income"
+    assert response.json()[0]["asset_type"] == "FIXED_INCOME"
     assert response.json()[0]["value"] == 6075.00
     assert response.json()[1]["asset_type"] == "STOCK"
     assert response.json()[1]["value"] == 18200.0

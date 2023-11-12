@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from src.investment.domains import InvestmentError, InvestmentModel
 from src.investment.helpers import generate_code
-from src.investment.repository.db_entities import Investment
+from src.investment.repository.db.db_entities import Investment
 
 
 def to_database(investment_model: InvestmentModel) -> Investment:

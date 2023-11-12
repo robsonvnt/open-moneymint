@@ -1,7 +1,7 @@
 import os
 
 from src.investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo
-from src.investment.repository.db_connection import get_db_session
+from src.investment.repository.db.db_connection import get_db_session
 from src.investment.repository.investment_db_repository import InvestmentRepo
 from src.investment.repository.portfolio_db_repository import PortfolioRepo
 from src.investment.repository.stock_repository import BrApiDevRepository

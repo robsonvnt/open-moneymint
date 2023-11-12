@@ -4,7 +4,7 @@ from sqlalchemy import Date
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
 from src.investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError
-from src.investment.repository.db_entities import ConsolidatedPortfolio
+from src.investment.repository.db.db_entities import ConsolidatedPortfolio
 
 
 # Function to convert domain model to database model

@@ -38,9 +38,9 @@ def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo,
     mock_portfolio_repo.find_by_code.return_value = PortfolioModel(code='001', name='test', description='test')
     mock_investment_repo.find_all_by_portfolio_code.return_value = [
         InvestmentModel(code='code1', purchase_price=100, quantity=2, current_average_price=110, portfolio_code='001',
-                        asset_type='stock', ticker='AAPL', purchase_date=date.today()),
-        InvestmentModel(code='code1', purchase_price=50, quantity=10, current_average_price=56, portfolio_code='001',
-                        asset_type='stock', ticker='MSFT', purchase_date=date.today()),
+                        asset_type='STOCK', ticker='AAPL', purchase_date=date.today()),
+        InvestmentModel(code='code2', purchase_price=50, quantity=10, current_average_price=56, portfolio_code='001',
+                        asset_type='STOCK', ticker='MSFT', purchase_date=date.today()),
     ]
 
     result = investment_service.get_portfolio_overview('001')

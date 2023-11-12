@@ -55,6 +55,13 @@ class AssetType(str, Enum):
     FIXED_INCOME = "FIXED_INCOME"
 
 
+class TransactionError(Enum):
+    TransactionNotFound = "Transaction not found"
+    DatabaseError = "Database error"
+    Unexpected = "Unexpected error"
+    OperationNotPermitted = "Operation not permitted"
+
+
 class InvestmentModel(BaseModel):
     code: Optional[str]
     portfolio_code: str
@@ -66,15 +73,22 @@ class InvestmentModel(BaseModel):
     purchase_date: date
 
 
-class Transaction(BaseModel):
-    id: int
-    portfolio_id: int
-    ticker: str
-    transaction_type: str
+class TransactionType(Enum):
+    BUY = "BUY"
+    SELL = "SELL"
+    DIVIDEND = "DIVIDEND"
+    INTEREST = "INTEREST"
+    TRANSFER = "TRANSFER"
+    WITHDRAWAL = "WITHDRAWAL"
+
+
+class TransactionModel(BaseModel):
+    code: Optional[str]
+    investment_code: str
+    type: TransactionType
     date: date
-    quantity: float
-    price_per_unit: float
-    fees: Optional[float]
+    quantity: int
+    price: float
 
 
 class ConsolidatedPortfolioError(Enum):

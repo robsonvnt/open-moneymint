@@ -1,2 +1,0 @@
-### Exclui um investimento
-DELETE http://localhost:8000/portfolios/6a267bfca6/investments/472d809512 HTTP/1.1

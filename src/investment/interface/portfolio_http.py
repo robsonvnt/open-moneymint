@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi import Depends
 
 from src.investment.domains import PortfolioModel, PortfolioError
-from src.investment.repository.db_connection import get_db_session
+from src.investment.repository.db.db_connection import get_db_session
 from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()

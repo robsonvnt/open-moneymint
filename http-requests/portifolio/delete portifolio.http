@@ -1,5 +1,0 @@
-### Exclui um portfólio pelo ID
-DELETE http://localhost:8000/portfolios/71789df56b
-Accept: application/json
-
-###

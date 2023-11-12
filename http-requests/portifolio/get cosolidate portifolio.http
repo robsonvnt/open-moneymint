@@ -1,5 +1,0 @@
-### Obtém os detalhes de um portfólio específico pelo ID
-GET http://localhost:8000/portfolios/portfolio-consolidation/6a267bfca6
-Accept: application/json
-
-###
