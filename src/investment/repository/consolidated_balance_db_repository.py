@@ -1,7 +1,6 @@
 from datetime import date
 from typing import List, Optional, Union
-from sqlalchemy import Column, Integer, String, Float, Date
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Date
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
 from src.investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError

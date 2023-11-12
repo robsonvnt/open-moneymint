@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from datetime import date
 
 from src.investment.repository.db_connection import get_db_session
-from src.investment.repository.db_entities import Base, Portfolio
+from src.investment.repository.db_entities import Base, Portfolio, ConsolidatedPortfolio
 from src.investment.repository.investment_db_repository import Investment
 from fastapi.testclient import TestClient
 
@@ -33,13 +33,34 @@ def client(db_session):
     mock_get_price.return_value.get_price.return_value = 99.99
 
     with patch('src.investment.repository.repository_factory.RepositoryFactory.create_stock_repo', new=mock_get_price):
-        from src.main import app
+        from tests.main_test import app
         app.dependency_overrides[get_db_session] = override_get_db
         yield TestClient(app)
 
 
 def add_portfolio(session):
     session.add(Portfolio(code="PORT100", name="Portfolio Name", description=""))
+    session.add(Portfolio(code="PORT101", name="Portfolio Name", description=""))
+    session.commit()
+
+
+def add_consolidated_portfolio(session):
+    session.add(ConsolidatedPortfolio(
+        portfolio_code="PORT100", date=date(2023, 1, 1),
+        balance=30.0, amount_invested=30.0
+    ))
+    session.add(ConsolidatedPortfolio(
+        portfolio_code="PORT100", date=date(2023, 2, 1),
+        balance=30.0, amount_invested=30.0
+    ))
+    session.add(ConsolidatedPortfolio(
+        portfolio_code="PORT100", date=date(2023, 3, 1),
+        balance=30.0, amount_invested=30.0
+    ))
+    session.add(ConsolidatedPortfolio(
+        portfolio_code="PORT100", date=date(2023, 4, 1),
+        balance=30.0, amount_invested=30.0
+    ))
     session.commit()
 
 
@@ -61,7 +82,11 @@ def add_investments(session):
         purchase_price=200.00, current_average_price=405.00, purchase_date=date(2023, 4, 1))
     )
     session.add(Investment(
-        code="INV104", portfolio_code="PORT101", asset_type="Fixed Income", ticker="CDB", quantity=10,
+        code="INV104", portfolio_code="PORT101", asset_type="Fixed Income", ticker="CDB", quantity=15,
         purchase_price=100.00, current_average_price=510.00, purchase_date=date(2023, 5, 1))
+    )
+    session.add(Investment(
+        code="INV104", portfolio_code="PORT101", asset_type="STOCK", ticker="PETR4", quantity=10,
+        purchase_price=100.00, current_average_price=525.00, purchase_date=date(2023, 5, 1))
     )
     session.commit()
