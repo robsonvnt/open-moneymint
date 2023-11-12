@@ -34,7 +34,9 @@ class PortfolioRepo:
         try:
             code = generate_code()
             portfolio = Portfolio(
-                code=code, name=new_portfolio.name, description=new_portfolio.description
+                code=code,
+                name=new_portfolio.name,
+                description=new_portfolio.description
             )
             session.add(portfolio)
             session.commit()
@@ -71,7 +73,7 @@ class PortfolioRepo:
             session.rollback()
             raise e
 
-    def find_by_code(self, portfolio_code) -> PortfolioModel:
+    def find_by_code(self, portfolio_code) -> PortfolioModel | PortfolioError:
         session = self.session
         try:
             portfolio = session.query(Portfolio).filter(Portfolio.code == portfolio_code).one()

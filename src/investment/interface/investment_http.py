@@ -6,7 +6,7 @@ from datetime import date
 from src import constants
 from src.investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioOverviewModel
 from src.investment.repository.db_connection import get_db_session
-from src.investment.services.investment_service import InvestmentService
+from src.investment.repository.repository_factory import RepositoryFactory
 from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()
@@ -29,15 +29,16 @@ class AssetTypeValue(BaseModel):
 
 @router.post("/{portfolio_code}/investments", response_model=InvestmentModel)
 async def create_investment(
-        portfolio_code, input: NewInvestmentInput,
+        portfolio_code,
+        new_investment_form_data: NewInvestmentInput,
         db_session=Depends(get_db_session)
 ):
     investment_service = ServiceFactory.create_investment_service(db_session)
-    if not portfolio_code == input.portfolio_code:
+    if not portfolio_code == new_investment_form_data.portfolio_code:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Portfolio code does not match.")
 
-    investment_model = InvestmentModel(code=None, **input.model_dump())
+    investment_model = InvestmentModel(code=None, **new_investment_form_data.model_dump())
     result = investment_service.create_investment(investment_model)
 
     match result:
@@ -94,7 +95,8 @@ async def get_all_investments(
     - HTTP 400 Bad Request: Erro levantado se o parâmetro 'order_by' especificar uma coluna que não existe.
     - HTTP 500 Internal Server Error: Erro levantado para qualquer outra falha no servidor.
 
-    Exceções são tratadas para identificar portfólios não encontrados, colunas de ordenação inválidas e erros gerais de servidor,
+    Exceções são tratadas para identificar portfólios não encontrados, colunas de ordenação inválidas e erros gerais de
+     servidor,
     proporcionando uma resposta apropriada ao cliente.
     """
     investment_service = ServiceFactory.create_investment_service(db_session)
@@ -102,12 +104,12 @@ async def get_all_investments(
     match result:
         case list():
             return result
-        case PortfolioError.PortfolioNotFound:
+        case PortfolioError.PortfolioNotFound as error:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=result.value)
-        case InvestmentError.ColumnDoesNotExist:
+                                detail=error.value)
+        case InvestmentError.ColumnDoesNotExist as error:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail=result.value)
+                                detail=error.value)
         case _:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -133,16 +135,18 @@ async def delete_investment(
 async def update_investment(
         portfolio_code: str,
         investment_code: str,
-        input: InvestmentModel,
+        investment_data: InvestmentModel,
         db_session=Depends(get_db_session)
 ):
     investment_service = ServiceFactory.create_investment_service(db_session)
-    result = investment_service.update_investment(portfolio_code, investment_code, input)
+    result = investment_service.update_investment(portfolio_code, investment_code, investment_data)
     match result:
         case InvestmentModel():
             return result
         case InvestmentError.InvestmentNotFound | PortfolioError.PortfolioNotFound:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=result.value)
+        case PortfolioError.OperationNotPermitted:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=result.value)
         case _:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -154,8 +158,6 @@ async def get_diversification_portfolio(
 ):
     investment_service = ServiceFactory.create_investment_service(db_session)
     result = investment_service.get_diversification_portfolio(portfolio_code)
-
-    investment_service = ServiceFactory.create_investment_service(db_session)
     match result:
         case dict():
             return [AssetTypeValue(asset_type=asset, value=value) for asset, value in result.items()]

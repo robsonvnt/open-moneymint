@@ -36,6 +36,7 @@ class PortfolioError(Enum):
     PortfolioNotFound = "Portfolio not found"
     DatabaseError = "Database error"
     Unexpected = "Unexpected error"
+    OperationNotPermitted = "Operation not permitted"
 
 
 class InvestmentError(Enum):
@@ -45,6 +46,7 @@ class InvestmentError(Enum):
     DatabaseError = "Database error"
     Unexpected = "Unexpected error"
     NoAssetsFound = "No Assets Found error"
+    OperationNotPermitted = "Operation not permitted"
 
 
 class InvestmentModel(BaseModel):

@@ -3,6 +3,7 @@ from src.investment.services.consolidated_service import ConsolidatedPortfolioSe
 from src.investment.services.investment_service import InvestmentService
 from src.investment.services.portfolio import PortfolioService
 
+
 class ServiceFactory:
     @staticmethod
     def create_portfolio_service(session=None) -> PortfolioService:

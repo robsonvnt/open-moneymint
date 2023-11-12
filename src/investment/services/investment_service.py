@@ -65,6 +65,8 @@ class InvestmentService:
         result = self.portfolio_repo.find_by_code(portfolio_code)
         if result == PortfolioError.PortfolioNotFound:
             return PortfolioError.PortfolioNotFound
+        if investment_code != updated_investment.code:
+            return PortfolioError.OperationNotPermitted
         return self.investment_repo.update(portfolio_code, investment_code, updated_investment)
 
     def get_portfolio_overview(self, portfolio_code: str) -> PortfolioOverviewModel | InvestmentError:

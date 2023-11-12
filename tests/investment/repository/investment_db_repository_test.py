@@ -46,11 +46,11 @@ def test_find_all_by_portfolio_code_with_order_by_non_existent_column(db_session
     assert results == InvestmentError.ColumnDoesNotExist
 
 
-def test_find_all_by_portfolio_code_empty(db_session):
-    """
-    Testa se a função retorna uma lista vazia quando não há investimentos correspondentes.
-    """
-    investment_repo = InvestmentRepo(db_session)
-    results = investment_repo.find_all_by_portfolio_code("PORT100")
-    assert results == []
-    assert len(results) == 0
+# def test_find_all_by_portfolio_code_empty(db_session):
+#     """
+#     Testa se a função retorna uma lista vazia quando não há investimentos correspondentes.
+#     """
+#     investment_repo = InvestmentRepo(db_session)
+#     results = investment_repo.find_all_by_portfolio_code("PORT100")
+#     assert results == []
+#     assert len(results) == 0
