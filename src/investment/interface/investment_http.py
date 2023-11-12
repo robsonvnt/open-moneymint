@@ -4,9 +4,8 @@ from typing import List, Optional
 from datetime import date
 
 from src import constants
-from src.investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioOverviewModel
+from src.investment.domains import InvestmentModel, PortfolioError, InvestmentError, PortfolioOverviewModel, AssetType
 from src.investment.repository.db_connection import get_db_session
-from src.investment.repository.repository_factory import RepositoryFactory
 from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()
@@ -14,7 +13,7 @@ router = APIRouter()
 
 class NewInvestmentInput(BaseModel):
     portfolio_code: str
-    asset_type: str
+    asset_type: AssetType
     ticker: str
     quantity: float
     purchase_price: float

@@ -49,10 +49,16 @@ class InvestmentError(Enum):
     OperationNotPermitted = "Operation not permitted"
 
 
+class AssetType(str, Enum):
+    STOCK = "STOCK"
+    REIT = "REIT"
+    FIXED_INCOME = "FIXED_INCOME"
+
+
 class InvestmentModel(BaseModel):
     code: Optional[str]
     portfolio_code: str
-    asset_type: str
+    asset_type: AssetType
     ticker: str
     quantity: float
     purchase_price: float

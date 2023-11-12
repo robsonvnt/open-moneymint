@@ -1,5 +1,5 @@
 ### Obtém os detalhes de um portfólio específico pelo ID
-GET http://127.0.0.1:8000/portfolios
+GET http://127.0.0.1:8080/api/portfolios
 Accept: application/json
 
 ###
