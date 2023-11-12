@@ -2,14 +2,14 @@ from fastapi import HTTPException, status, APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
 from fastapi.responses import JSONResponse
+from fastapi import Depends
 
-from investment.domains import PortfolioModel, PortfolioConsolidationModel, PortfolioError
-from investment.services.portfolio import PortfolioService
-from investment.services.service_factory import ServiceFactory
+from src.investment.domains import PortfolioModel, PortfolioError
+from src.investment.repository.db_connection import get_db_session
+from src.investment.services.portfolio import PortfolioService
+from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()
-
-portfolio_service: PortfolioService = ServiceFactory.create_portfolio_service()
 
 
 class NewPortfolioInput(BaseModel):
@@ -18,7 +18,10 @@ class NewPortfolioInput(BaseModel):
 
 
 @router.get("", response_model=List[PortfolioModel])
-async def get_all_portfolios():
+async def get_all_portfolios(
+        db_session=Depends(get_db_session)
+):
+    portfolio_service = ServiceFactory.create_portfolio_service(db_session)
     result = portfolio_service.find_all_portfolios()
     match result:
         case list():
@@ -31,7 +34,11 @@ async def get_all_portfolios():
 
 
 @router.get("/{portfolio_code}", response_model=PortfolioModel)
-async def get_portfolio(portfolio_code: str):
+async def get_portfolio(
+        portfolio_code: str,
+        db_session=Depends(get_db_session)
+):
+    portfolio_service = ServiceFactory.create_portfolio_service(db_session)
     result = portfolio_service.find_portfolio_by_code(portfolio_code)
 
     match result:
@@ -50,7 +57,11 @@ async def get_portfolio(portfolio_code: str):
 
 
 @router.post("", response_model=PortfolioModel)
-async def create_portfolio(input: NewPortfolioInput):
+async def create_portfolio(
+        input: NewPortfolioInput,
+        db_session=Depends(get_db_session)
+):
+    portfolio_service = ServiceFactory.create_portfolio_service(db_session)
     try:
         portfolio_model = PortfolioModel(code=None, name=input.name, description=input.description)
         result = portfolio_service.create_portfolio(portfolio_model)
@@ -69,7 +80,12 @@ async def create_portfolio(input: NewPortfolioInput):
 
 
 @router.put("/{portfolio_code}", response_model=PortfolioModel)
-async def update_portfolio(portfolio_code: str, input: PortfolioModel):
+async def update_portfolio(
+        portfolio_code: str,
+        input: PortfolioModel,
+        db_session=Depends(get_db_session)
+):
+    portfolio_service = ServiceFactory.create_portfolio_service(db_session)
     try:
         result = portfolio_service.update_portfolio(portfolio_code, input)
     except Exception as e:
@@ -84,7 +100,11 @@ async def update_portfolio(portfolio_code: str, input: PortfolioModel):
 
 
 @router.delete("/{portfolio_code}")
-async def delete_portfolio(portfolio_code: str):
+async def delete_portfolio(
+        portfolio_code: str,
+        db_session=Depends(get_db_session)
+):
+    portfolio_service = ServiceFactory.create_portfolio_service(db_session)
     try:
         result = portfolio_service.delete_portfolio(portfolio_code)
     except Exception as e:

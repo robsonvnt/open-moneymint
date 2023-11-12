@@ -1,12 +1,11 @@
 from typing import List, Union
 from decimal import Decimal
-from enum import Enum
 
-from constants import SUCCESS_RESULT
-from investment.domains import InvestmentModel, PortfolioConsolidationModel, InvestmentError, PortfolioError, \
+from src.constants import SUCCESS_RESULT
+from src.investment.domains import InvestmentModel, InvestmentError, PortfolioError, \
     PortfolioModel, PortfolioOverviewModel
-from investment.repository.investment_db_repository import InvestmentRepo
-from investment.repository.portfolio_db_repository import PortfolioRepo
+from src.investment.repository.investment_db_repository import InvestmentRepo
+from src.investment.repository.portfolio_db_repository import PortfolioRepo
 
 
 class InvestmentService:
@@ -66,6 +65,8 @@ class InvestmentService:
         result = self.portfolio_repo.find_by_code(portfolio_code)
         if result == PortfolioError.PortfolioNotFound:
             return PortfolioError.PortfolioNotFound
+        if investment_code != updated_investment.code:
+            return PortfolioError.OperationNotPermitted
         return self.investment_repo.update(portfolio_code, investment_code, updated_investment)
 
     def get_portfolio_overview(self, portfolio_code: str) -> PortfolioOverviewModel | InvestmentError:

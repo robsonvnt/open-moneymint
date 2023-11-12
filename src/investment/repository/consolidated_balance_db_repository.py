@@ -1,22 +1,10 @@
 from datetime import date
 from typing import List, Optional, Union
-from sqlalchemy import Column, Integer, String, Float, Date, create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy import Date
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
-from investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError
-
-Base = declarative_base()
-
-
-# Modelo para representar os dados consolidados do portfolio
-class ConsolidatedPortfolio(Base):
-    __tablename__ = 'consolidated_balance_portfolios'
-    id = Column(Integer, primary_key=True)
-    portfolio_code = Column(String)
-    date = Column(Date)
-    balance = Column(Float)
-    amount_invested = Column(Float)
+from src.investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError
+from src.investment.repository.db_entities import ConsolidatedPortfolio
 
 
 # Function to convert domain model to database model
@@ -31,8 +19,8 @@ def to_model(cbp: ConsolidatedPortfolio) -> ConsolidatedPortfolioModel:
 
 # Repositório para interagir com a tabela consolidated_balance_portfolios
 class ConsolidatedBalanceRepo:
-    def __init__(self, session_factory):
-        self.session_factory = session_factory
+    def __init__(self, session):
+        self.session = session
 
     def filter_by_date_range(
             self,
@@ -43,7 +31,7 @@ class ConsolidatedBalanceRepo:
         """
         Filters the ConsolidatedBalancePortfolio by date range.
         """
-        session = self.session_factory()
+        session = self.session
         try:
             query = session.query(ConsolidatedPortfolio).filter(
                 ConsolidatedPortfolio.portfolio_code == portfolio_code
@@ -82,7 +70,7 @@ class ConsolidatedBalanceRepo:
             self,
             cpm: ConsolidatedPortfolioModel
     ) -> ConsolidatedPortfolioModel | ConsolidatedPortfolioError:
-        session = self.session_factory()
+        session = self.session
         try:
             result = self.__get_consolidated_portfolio(session, cpm.portfolio_code, date.today())
             match result:

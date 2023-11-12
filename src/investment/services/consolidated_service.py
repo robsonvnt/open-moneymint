@@ -1,10 +1,9 @@
 from datetime import date
-from typing import Union
 
-from investment.domains import PortfolioOverviewModel, ConsolidatedPortfolioModel, ConsolidatedPortfolioError, \
+from src.investment.domains import PortfolioOverviewModel, ConsolidatedPortfolioModel, ConsolidatedPortfolioError, \
     InvestmentError
-from investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo
-from investment.services.investment_service import InvestmentService
+from src.investment.repository.consolidated_balance_db_repository import ConsolidatedBalanceRepo
+from src.investment.services.investment_service import InvestmentService
 
 
 class ConsolidatedPortfolioService:
