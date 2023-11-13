@@ -67,7 +67,7 @@ def add_consolidated_portfolio(session):
 def add_investments(session):
     session.add(Investment(
         code="INV100", portfolio_code="PORT100", asset_type="STOCK", ticker="AAPL", quantity=50,
-        purchase_price=500.00, current_average_price=110.00, purchase_date=date(2023, 1, 1))
+        purchase_price=500.00, current_average_price=510.00, purchase_date=date(2023, 1, 1))
     )
     session.add(Investment(
         code="INV101", portfolio_code="PORT100", asset_type="STOCK", ticker="MSFT", quantity=30,

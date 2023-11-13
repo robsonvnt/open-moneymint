@@ -28,7 +28,9 @@ class InvestmentService:
         except Exception as e:
             return InvestmentError.DatabaseError
 
-    def find_all_investments(self, portfolio_code: str, order_by: str = None) -> List[InvestmentModel]:
+    def find_all_investments(
+            self, portfolio_code: str, order_by: str = None
+    ) -> List[InvestmentModel] | InvestmentError | PortfolioError:
         """
         Retrieves all investments associated with a specific portfolio identified by its code.
 
@@ -55,13 +57,20 @@ class InvestmentService:
             case InvestmentError.Unexpected:
                 return InvestmentError.Unexpected
 
-    def delete_investment(self, portfolio_code: str, investment_code: str) -> Union[None, InvestmentError]:
+    def delete_investment(
+            self, portfolio_code: str, investment_code: str
+    ) -> None | InvestmentError | PortfolioError:
         result = self.portfolio_repo.find_by_code(portfolio_code)
         if result == PortfolioError.PortfolioNotFound:
             return PortfolioError.PortfolioNotFound
         return self.investment_repo.delete(portfolio_code, investment_code)
 
-    def update_investment(self, portfolio_code: str, investment_code: str, updated_investment: InvestmentModel):
+    def update_investment(
+            self,
+            portfolio_code: str,
+            investment_code: str,
+            updated_investment: InvestmentModel
+    ) -> InvestmentModel | InvestmentError | PortfolioError:
         result = self.portfolio_repo.find_by_code(portfolio_code)
         if result == PortfolioError.PortfolioNotFound:
             return PortfolioError.PortfolioNotFound

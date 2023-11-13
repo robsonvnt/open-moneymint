@@ -89,7 +89,12 @@ class InvestmentRepo:
         finally:
             session.close()
 
-    def update(self, portfolio_code: str, investment_code, updated_investment_data: InvestmentModel):
+    def update(
+            self,
+            portfolio_code: str,
+            investment_code,
+            updated_investment_data: InvestmentModel
+    ):
         session = self.session
         try:
             investment = session.query(Investment).filter(

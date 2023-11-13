@@ -76,10 +76,9 @@ class InvestmentModel(BaseModel):
 class TransactionType(Enum):
     BUY = "BUY"
     SELL = "SELL"
-    DIVIDEND = "DIVIDEND"
     INTEREST = "INTEREST"
-    TRANSFER = "TRANSFER"
     WITHDRAWAL = "WITHDRAWAL"
+    DEPOSIT = "DEPOSIT"
 
 
 class TransactionModel(BaseModel):
