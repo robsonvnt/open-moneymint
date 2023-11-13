@@ -181,17 +181,6 @@ def test_create_transaction(session, transaction_service):
         .investment_service \
         .find_investment_by_code("PORT100", "INV100")
 
-    # session.add(Investment(
-    #     code="INV100",
-    #     portfolio_code="PORT100",
-    #     asset_type="STOCK",
-    #     ticker="AAPL",
-    #     quantity=50,
-    #     purchase_price=500.00,
-    #     current_average_price=510.00,
-    #     purchase_date=date(2023, 1, 1))
-    # )
-
     assert inv.quantity == 60
     assert inv.current_average_price == 530
     assert inv.purchase_price == 505

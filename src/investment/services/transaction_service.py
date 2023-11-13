@@ -80,22 +80,21 @@ class TransactionService:
             portfolio_code: str,
             new_transaction: TransactionModel
     ) -> TransactionModel | TransactionError | InvestmentError:
-        investment = self.investment_service.find_investment_by_code(
+        find_investment_result = self.investment_service.find_investment_by_code(
             portfolio_code,
             new_transaction.investment_code
         )
-        match investment:
+        match find_investment_result:
             case InvestmentError.InvestmentNotFound:
                 return InvestmentError.InvestmentNotFound
             case InvestmentModel():
+                investment = find_investment_result
                 updated_investment = self.update_investment(investment, new_transaction)
-                result_update = self.investment_service.update_investment(
+                self.investment_service.update_investment(
                     portfolio_code,
                     updated_investment.code,
                     updated_investment
                 )
-                if not isinstance(result_update, InvestmentModel):
-                    return TransactionError.Unexpected
                 return self.transaction_repo.create(new_transaction)
             case _:
                 return TransactionError.Unexpected
