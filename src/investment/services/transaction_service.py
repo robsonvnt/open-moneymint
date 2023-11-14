@@ -93,14 +93,28 @@ class TransactionService:
             )
         return self.transaction_repo.create(new_transaction)
 
-    def delete(
-            self,
-            transaction: TransactionModel
-    ) -> TransactionModel:
+    def delete(self, transaction: TransactionModel):
+        """
+        Deletes a specified transaction and subsequently refreshes the associated investment details.
+
+        This method performs two main actions:
+        1. Deletes the transaction specified by the 'transaction' argument from the transaction repository.
+        2. Refreshes the investment details associated with the investment code of the deleted transaction.
+
+        The refresh operation ensures that the investment details are updated to reflect the state after the transaction's deletion. This is crucial for maintaining the accuracy of investment records.
+
+        Parameters:
+            transaction (TransactionModel): The transaction to be deleted. It must contain the transaction code for deletion and the investment code for refreshing the investment details.
+
+        Returns:
+            None: This method does not return a value.
+
+        Note: The deletion of the transaction is immediately followed by the update of the investment details to ensure data consistency. The method relies on 'transaction_repo' for the deletion operation and 'investment_service' for refreshing investment details.
+        """
+
+        self.transaction_repo.delete(transaction.code)
 
         investment_code = transaction.investment_code
         transactions = self.transaction_repo.find_all_from_investment_code(investment_code)
-
         self.investment_service. \
             refresh_investment_details(investment_code, transactions)
-        return self.transaction_repo.delete(transaction.code)
