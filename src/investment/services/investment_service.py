@@ -5,7 +5,7 @@ from decimal import Decimal
 from src.constants import SUCCESS_RESULT
 from src.investment.domain.investment_errors import OperationNotPermittedError, UnexpectedError, InvestmentError
 from src.investment.domain.models import InvestmentModel, PortfolioOverviewModel, TransactionModel, TransactionType
-from src.investment.domain.transaction_errors import TransactionInvalidType
+from src.investment.domain.transaction_errors import TransactionInvalidType, TransactionOperationNotPermitted
 from src.investment.repository.investment_db_repository import InvestmentRepo
 from src.investment.repository.portfolio_db_repository import PortfolioRepo
 
@@ -160,5 +160,5 @@ class InvestmentService:
         investment.purchase_price = round(average_price * 100) / 100
 
         if investment.quantity < 0:
-            raise UnexpectedError("Quantity cannot be negative")
+            raise TransactionOperationNotPermitted("Quantity cannot be negative")
         return self.update_investment(investment.portfolio_code, investment.code, investment)

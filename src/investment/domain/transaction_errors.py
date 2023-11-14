@@ -27,8 +27,12 @@ class TransactionUnexpectedError(TransactionError):
 class TransactionOperationNotPermitted(TransactionError):
     """Raised when an operation on a transaction is not permitted."""
 
+    def __init__(self, message="Unexpected error"):
+        self.message = message
+        super().__init__(message)
+
     def __str__(self):
-        return "Operation not permitted"
+        return self.message
 
 
 class TransactionInvalidType(TransactionError):

@@ -110,7 +110,7 @@ class TransactionService:
             )
         return self.transaction_repo.create(new_transaction)
 
-    def delete(self, transaction: TransactionModel):
+    def delete(self, portfolio_code, investment_code, transaction: TransactionModel):
         """
         Deletes a specified transaction and subsequently refreshes the associated investment details.
 
@@ -127,11 +127,15 @@ class TransactionService:
             None: This method does not return a value.
 
         Note: The deletion of the transaction is immediately followed by the update of the investment details to ensure data consistency. The method relies on 'transaction_repo' for the deletion operation and 'investment_service' for refreshing investment details.
+        @param transaction:
+        @param investment_code:
+        @param portfolio_code:
         """
-
+        investment = self.investment_service.find_investment_by_code(portfolio_code, investment_code)
+        if investment.code != transaction.investment_code:
+            raise TransactionOperationNotPermitted()
         self.transaction_repo.delete(transaction.code)
 
-        investment_code = transaction.investment_code
-        transactions = self.transaction_repo.find_all_from_investment_code(investment_code)
+        transactions = self.transaction_repo.find_all(portfolio_code, investment.code)
         self.investment_service. \
             refresh_investment_details(investment_code, transactions)

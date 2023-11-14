@@ -98,3 +98,24 @@ def test_create_transaction(client, db_session):
         json=transaction_data.pop("code")
     )
     assert response.status_code == 422
+
+
+def test_delete_transaction(client, db_session):
+    add_portfolio(db_session)
+    add_investments(db_session)
+    add_transactions(db_session)
+
+    response = client.delete("/portfolios/PORT100/investments/INV101/transactions/TRAN102")
+    assert response.status_code == 404
+
+    response = client.delete("/portfolios/PORT100/investments/INV100/transactions/non-existent-code")
+    assert response.status_code == 404
+
+    response = client.delete("/portfolios/non-existent-code/investments/INV100/transactions/TRAN102")
+    assert response.status_code == 404
+
+    response = client.delete("/portfolios/PORT100/investments/non-existent-code/transactions/TRAN102")
+    assert response.status_code == 404
+
+    response = client.delete("/portfolios/PORT100/investments/INV100/transactions/TRAN102")
+    assert response.status_code == 200

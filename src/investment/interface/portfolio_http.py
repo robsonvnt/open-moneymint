@@ -51,6 +51,7 @@ async def create_portfolio(
     try:
         portfolio_service = ServiceFactory.create_portfolio_service(db_session)
         portfolio_model = PortfolioModel(code=None, name=input.name, description=input.description)
+        portfolio_model = PortfolioModel(code=None, name=input.name, description=input.description)
         return portfolio_service.create_portfolio(portfolio_model)
     except PortfolioAlreadyExists as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
