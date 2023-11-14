@@ -3,7 +3,7 @@ from datetime import date
 import pytest
 from unittest.mock import Mock
 
-from src.investment.domains import (
+from src.investment.domain.models import (
     InvestmentModel,
     PortfolioModel
 )

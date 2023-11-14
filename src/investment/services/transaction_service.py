@@ -1,5 +1,5 @@
-from src.investment.domains import TransactionModel, TransactionError, AssetType, TransactionType, InvestmentModel, \
-    InvestmentError
+from src.investment.domain.models import TransactionModel, AssetType, TransactionType, \
+    InvestmentModel
 from src.investment.repository.transaction_db_repository import TransactionRepo
 from src.investment.services.investment_service import InvestmentService
 
@@ -9,8 +9,8 @@ class TransactionService:
         self.transaction_repo: TransactionRepo = transaction_repo
         self.investment_service = investment_service
 
-    def calc_avg_purchase_price(self, old_quantity: int, old_price: float,
-                                new_quantity: int, new_price: float) -> float:
+    def _calc_avg_purchase_price(self, old_quantity: int, old_price: float,
+                                 new_quantity: int, new_price: float) -> float:
         """
         Calcula o preço médio de compra.
 
@@ -34,8 +34,8 @@ class TransactionService:
                 new_quantity = new_transaction.quantity
                 new_price = new_transaction.price
 
-                avg_price = self.calc_avg_purchase_price(old_quantity, old_avg_price,
-                                                         new_quantity, new_price)
+                avg_price = self._calc_avg_purchase_price(old_quantity, old_avg_price,
+                                                          new_quantity, new_price)
                 investment.quantity += new_quantity
                 investment.current_average_price = new_price
                 investment.purchase_price = avg_price
@@ -57,7 +57,7 @@ class TransactionService:
                 investment.purchase_price -= new_transaction.price
         return investment
 
-    def update_investment(
+    def _update_investment(
             self,
             investment: InvestmentModel,
             new_transaction: TransactionModel
@@ -70,31 +70,46 @@ class TransactionService:
         :return: Investimento atualizado.
         """
         if investment.asset_type == AssetType.FIXED_INCOME:
-            self._update_fixed_income(investment, new_transaction)
+            return self._update_fixed_income(investment, new_transaction)
         else:
             return self._update_stocks(investment, new_transaction)
-        return investment
 
     def create(
             self,
             portfolio_code: str,
-            new_transaction: TransactionModel
-    ) -> TransactionModel | TransactionError | InvestmentError:
-        find_investment_result = self.investment_service.find_investment_by_code(
+            new_transaction: TransactionModel,
+            update_investment=True
+    ) -> TransactionModel:
+        if update_investment:
+            investment = self.investment_service.find_investment_by_code(
+                portfolio_code,
+                new_transaction.investment_code
+            )
+            updated_investment = self._update_investment(investment, new_transaction)
+            self.investment_service.update_investment(
+                portfolio_code,
+                updated_investment.code,
+                updated_investment
+            )
+        return self.transaction_repo.create(new_transaction)
+
+    def delete(
+            self,
+            portfolio_code: str,
+            transaction: TransactionModel
+    ) -> TransactionModel:
+        investment = self.investment_service.find_investment_by_code(
             portfolio_code,
-            new_transaction.investment_code
+            transaction.investment_code
         )
-        match find_investment_result:
-            case InvestmentError.InvestmentNotFound:
-                return InvestmentError.InvestmentNotFound
-            case InvestmentModel():
-                investment = find_investment_result
-                updated_investment = self.update_investment(investment, new_transaction)
-                self.investment_service.update_investment(
-                    portfolio_code,
-                    updated_investment.code,
-                    updated_investment
-                )
-                return self.transaction_repo.create(new_transaction)
-            case _:
-                return TransactionError.Unexpected
+        if investment.asset_type == AssetType.FIXED_INCOME:
+            investment.purchase_price -= transaction.price
+            investment.current_average_price -= transaction.price
+        else:
+            investment.quantity -= transaction.quantity
+            investment.quantity -= transaction.quantity
+
+        self.investment_service.update_investment(
+            portfolio_code, investment.code, investment
+        )
+        return self.transaction_repo.delete(transaction.code)

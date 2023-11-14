@@ -1,7 +1,8 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
-from src.investment.domains import TransactionModel, TransactionError
+from src.investment.domain.models import TransactionModel
+from src.investment.domain.transaction_errors import TransactionNotFound, TransactionUnexpectedError
 from src.investment.helpers import generate_code
 from src.investment.repository.db.db_entities import Transaction
 
@@ -49,8 +50,9 @@ class TransactionRepo:
             session.commit()
             session.refresh(transaction)
             return to_model(transaction)
-        except Exception as e:
-            return TransactionError.DatabaseError
+        except Exception:
+            session.rollback()
+            raise TransactionUnexpectedError()
 
     def update(self, transaction_code, updated_transaction_model: TransactionModel):
         session = self.session
@@ -68,10 +70,10 @@ class TransactionRepo:
             return to_model(transaction)
         except NoResultFound as e:
             session.rollback()
-            return TransactionError.TransactionNotFound
+            raise TransactionNotFound()
         except SQLAlchemyError as e:
             session.rollback()
-            raise e
+            raise TransactionUnexpectedError()
 
     def find_all_from_investment_code(self, investment_code):
         session = self.session
@@ -80,20 +82,17 @@ class TransactionRepo:
                 filter(Transaction.investment_code == investment_code).all()
             return [to_model(transaction) for transaction in transactions]
         except SQLAlchemyError as e:
-            session.rollback()
-            raise e
+            raise TransactionUnexpectedError()
 
-    def find_by_code(self, transaction_code) -> TransactionModel | TransactionError:
+    def find_by_code(self, transaction_code) -> TransactionModel:
         session = self.session
         try:
             transaction = session.query(Transaction).filter(Transaction.code == transaction_code).one()
             return to_model(transaction)
         except NoResultFound as e:
-            session.rollback()
-            return TransactionError.TransactionNotFound
-        except Exception as e:
-            session.rollback()
-            raise e
+            raise TransactionNotFound()
+        except SQLAlchemyError as e:
+            raise TransactionUnexpectedError()
 
     def delete(self, transaction_code):
         session = self.session
@@ -103,7 +102,7 @@ class TransactionRepo:
             session.commit()
         except (NoResultFound, MultipleResultsFound) as e:
             session.rollback()
-            return TransactionError.TransactionNotFound
+            raise TransactionNotFound()
         except SQLAlchemyError as e:
             session.rollback()
-            raise e
+            raise TransactionUnexpectedError()

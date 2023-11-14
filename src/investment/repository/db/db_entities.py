@@ -1,8 +1,6 @@
-from sqlalchemy import Column, Float, Date, Integer, String, Text, Enum as SQLEnum
+from sqlalchemy import Column, Float, Date, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_mixins import AllFeaturesMixin
-
-from src.investment.domains import TransactionType
 
 Base = declarative_base()
 

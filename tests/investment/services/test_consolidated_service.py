@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 from datetime import date
 
-from src.investment.domains import (
+from src.investment.domain.models import (
     PortfolioOverviewModel, ConsolidatedPortfolioModel
 )
 from src.investment.services.consolidated_service import ConsolidatedPortfolioService

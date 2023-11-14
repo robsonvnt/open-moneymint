@@ -1,4 +1,4 @@
-from src.investment.domains import InvestmentError
+from src.investment.domain.investment_errors import InvestmentNotFound, ColumnDoesNotExistError
 from src.investment.repository.investment_db_repository import InvestmentRepo
 from tests.investment.prepareto_db_test import *
 
@@ -42,8 +42,8 @@ def test_find_all_by_portfolio_code_with_order_by_non_existent_column(db_session
     add_investments(db_session)
     investment_repo = InvestmentRepo(db_session)
 
-    results = investment_repo.find_all_by_portfolio_code("PORT100", order_by="non-existent column")
-    assert results == InvestmentError.ColumnDoesNotExist
+    with pytest.raises(ColumnDoesNotExistError):
+        investment_repo.find_all_by_portfolio_code("PORT100", order_by="non-existent column")
 
 
 # def test_find_all_by_portfolio_code_empty(db_session):

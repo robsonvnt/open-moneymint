@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Query, HTTPException, Depends
 from typing import Optional
 from datetime import date
 
-from src.investment.domains import ConsolidatedPortfolioModel
+from src.investment.domain.models import ConsolidatedPortfolioModel
 from src.investment.repository.db.db_connection import get_db_session
 from src.investment.services.service_factory import ServiceFactory
 
@@ -34,13 +34,11 @@ async def consolidate_balance(
         portfolio_code: str,
         db_session=Depends(get_db_session)
 ):
-    consolidated_balance_service = ServiceFactory.create_consolidated_balance_service(db_session)
-    result = consolidated_balance_service.consolidate_portfolio(portfolio_code)
-    match result:
-        case ConsolidatedPortfolioModel():
-            return result
-        case _:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected error occurred."
-            )
+    try:
+        consolidated_balance_service = ServiceFactory.create_consolidated_balance_service(db_session)
+        return consolidated_balance_service.consolidate_portfolio(portfolio_code)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred."
+        )
