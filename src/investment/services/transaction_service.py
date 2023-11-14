@@ -95,20 +95,12 @@ class TransactionService:
 
     def delete(
             self,
-            portfolio_code: str,
             transaction: TransactionModel
     ) -> TransactionModel:
-        investment = self.investment_service.find_investment_by_code(
-            portfolio_code,
-            transaction.investment_code
-        )
-        if investment.asset_type == AssetType.FIXED_INCOME:
-            investment.purchase_price -= transaction.price
-            investment.current_average_price -= transaction.price
-        else:
-            investment.quantity -= transaction.quantity
 
-        self.investment_service.update_investment(
-            portfolio_code, investment.code, investment
-        )
+        investment_code = transaction.investment_code
+        transactions = self.transaction_repo.find_all_from_investment_code(investment_code)
+
+        self.investment_service. \
+            refresh_investment_details(investment_code, transactions)
         return self.transaction_repo.delete(transaction.code)
