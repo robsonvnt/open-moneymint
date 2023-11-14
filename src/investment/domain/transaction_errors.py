@@ -29,3 +29,10 @@ class TransactionOperationNotPermittedError(TransactionError):
 
     def __str__(self):
         return "Operation not permitted"
+
+
+class TransactionInvalidType(TransactionError):
+    """Raised when a transaction type is not appropriate for the specific investment."""
+
+    def __str__(self):
+        return "The transaction type is invalid for this specific investment. Please ensure the transaction type aligns with the investment's requirements."

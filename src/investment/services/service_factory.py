@@ -23,5 +23,4 @@ class ServiceFactory:
         consolidated_balance_repo = RepositoryFactory.consolidated_balance_repo(session)
         investment_service = ServiceFactory.create_investment_service(session)
         return ConsolidatedPortfolioService(consolidated_balance_repo, investment_service)
-# Uso:
-# portfolio_service = PortfolioServiceFactory.create()
+

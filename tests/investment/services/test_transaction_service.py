@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.investment.domain.models import InvestmentModel, AssetType, TransactionModel, TransactionType
-from src.investment.repository.db.db_entities import Base
+from src.investment.repository.db.db_entities import Base, Investment
 from src.investment.repository.investment_db_repository import InvestmentRepo
 from src.investment.repository.portfolio_db_repository import PortfolioRepo
 from src.investment.repository.transaction_db_repository import TransactionRepo
@@ -209,22 +209,22 @@ def test_create_no_investment_update_transaction(session, transaction_service):
     transaction_repo.create.assert_called_once()
 
 
-# def test_delete_transaction(session, transaction_service):
-#     transaction_repo = Mock()
-#     investment_service = Mock()
-#     transaction = TransactionModel(
-#         code="TRAN101", investment_code="INV100", type=TransactionType.BUY,
-#         date=date.today(), quantity=10, price=530
-#     )
-#     investment = Investment(
-#         code="INV100", portfolio_code="PORT100", asset_type="STOCK", ticker="AAPL",
-#         quantity=50, purchase_price=500.00, current_average_price=510.00, purchase_date=date(2023, 1, 1)
-#     )
-#
-#     investment_service.find_investment_by_code.return_value = investment
-#     transaction_repo.delete.return_value = transaction
-#
-#     transaction_service = TransactionService(transaction_repo, investment_service)
-#     transaction_service.delete("PORT100", transaction)
-#
-#     assert investment.quantity == 40
+def test_delete_transaction(session, transaction_service):
+    transaction_repo = Mock()
+    investment_service = Mock()
+    transaction = TransactionModel(
+        code="TRAN101", investment_code="INV100", type=TransactionType.BUY,
+        date=date.today(), quantity=10, price=530
+    )
+    investment = Investment(
+        code="INV100", portfolio_code="PORT100", asset_type="STOCK", ticker="AAPL",
+        quantity=50, purchase_price=500.00, current_average_price=510.00, purchase_date=date(2023, 1, 1)
+    )
+
+    investment_service.find_investment_by_code.return_value = investment
+    transaction_repo.delete.return_value = transaction
+
+    transaction_service = TransactionService(transaction_repo, investment_service)
+    transaction_service.delete("PORT100", transaction)
+
+    assert investment.quantity == 40

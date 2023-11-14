@@ -107,7 +107,6 @@ class TransactionService:
             investment.current_average_price -= transaction.price
         else:
             investment.quantity -= transaction.quantity
-            investment.quantity -= transaction.quantity
 
         self.investment_service.update_investment(
             portfolio_code, investment.code, investment

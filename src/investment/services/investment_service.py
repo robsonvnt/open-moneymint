@@ -3,8 +3,9 @@ from typing import List
 from decimal import Decimal
 
 from src.constants import SUCCESS_RESULT
-from src.investment.domain.investment_errors import OperationNotPermittedError, UnexpectedError
-from src.investment.domain.models import InvestmentModel, PortfolioOverviewModel, TransactionModel
+from src.investment.domain.investment_errors import OperationNotPermittedError, UnexpectedError, InvestmentError
+from src.investment.domain.models import InvestmentModel, PortfolioOverviewModel, TransactionModel, TransactionType
+from src.investment.domain.transaction_errors import TransactionInvalidType
 from src.investment.repository.investment_db_repository import InvestmentRepo
 from src.investment.repository.portfolio_db_repository import PortfolioRepo
 
@@ -106,26 +107,34 @@ class InvestmentService:
             self.update_investment(portfolio_code, investment.code, investment)
         return SUCCESS_RESULT
 
-    def calculate_investment_details(
+    def refresh_investment_details(
             self, investment_code: str, transactions: List[TransactionModel]
-    ) -> dict:
+    ) -> InvestmentModel:
         total_quantity = 0
+        total_sold = 0
         total_cost = 0
         latest_price = 0
         latest_date = date.min
 
         for transaction in transactions:
-            if transaction.investment_code == investment_code:
+            if transaction.type == TransactionType.BUY:
                 total_quantity += transaction.quantity
                 total_cost += transaction.quantity * transaction.price
+            elif transaction.type == TransactionType.SELL:
+                total_sold += transaction.quantity
+            else:
+                raise TransactionInvalidType()
 
-                if transaction.date > latest_date:
-                    latest_date = transaction.date
-                    latest_price = transaction.price
+            if transaction.date > latest_date:
+                latest_date = transaction.date
+                latest_price = transaction.price
 
         average_price = total_cost / total_quantity if total_quantity > 0 else 0
-        investment = self.investment_repo.find_by_code(investment_code)
+        investment: InvestmentModel = self.investment_repo.find_by_code(investment_code)
         investment.current_average_price = latest_price
-        investment.quantity = total_quantity
-        investment.purchase_price = average_price
+        investment.quantity = total_quantity - total_sold
+        investment.purchase_price = round(average_price * 100) / 100
+
+        if investment.quantity < 0:
+            raise UnexpectedError("Quantity cannot be negative")
         return self.update_investment(investment.portfolio_code, investment.code, investment)

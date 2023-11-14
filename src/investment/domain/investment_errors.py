@@ -34,8 +34,12 @@ class DatabaseError(InvestmentError):
 class UnexpectedError(InvestmentError):
     """Raised for unexpected errors."""
 
+    def __init__(self, message="Unexpected error"):
+        self.message = message
+        super().__init__(message)
+
     def __str__(self):
-        return "Unexpected error"
+        return self.message
 
 
 class NoAssetsFound(InvestmentError):
