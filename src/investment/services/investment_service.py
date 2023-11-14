@@ -110,6 +110,29 @@ class InvestmentService:
     def refresh_investment_details(
             self, investment_code: str, transactions: List[TransactionModel]
     ) -> InvestmentModel:
+        """
+            Updates the details of an investment based on the provided transactions.
+
+            This method processes a list of transactions, calculating the total quantity and
+            average purchase price of the investment. It updates the corresponding investment
+            model with the current average price (based on the most recent transaction),
+            the total quantity (adjusted for sell transactions), and the average purchase price.
+
+            Parameters:
+                investment_code (str): The code of the investment to be updated.
+                transactions (List[TransactionModel]): A list of transactions associated with the investment.
+
+            Returns:
+                InvestmentModel: The updated investment model.
+
+            Exceptions:
+                TransactionInvalidType: If a transaction with an invalid type is encountered.
+                UnexpectedError: If the final quantity of the investment is negative.
+
+            Note: This method assumes that the investment repository and update function
+            are available and correctly configured.
+        """
+
         total_quantity = 0
         total_sold = 0
         total_cost = 0
