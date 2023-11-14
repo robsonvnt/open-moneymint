@@ -91,7 +91,7 @@ def test_get_diversification_portfolio(client, db_session):
     assert response.json()[0]["asset_type"] == "FIXED_INCOME"
     assert response.json()[0]["value"] == 6075.00
     assert response.json()[1]["asset_type"] == "STOCK"
-    assert response.json()[1]["value"] == 18200.0
+    assert response.json()[1]["value"] == 38200.0
 
 
 def test_update_investments_prices(client, db_session):

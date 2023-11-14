@@ -1,9 +1,11 @@
 from datetime import date
-from typing import List, Optional, Union
+from typing import List, Optional
 from sqlalchemy import Date
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
-from src.investment.domains import ConsolidatedPortfolioModel, ConsolidatedPortfolioError
+from src.investment.domain.consolidated_balance_errors import ConsolidatedPortfolioDatabaseError, \
+    ConsolidatedPortfolioUnexpectedError, ConsolidatedPortfolioNotFound
+from src.investment.domain.models import ConsolidatedPortfolioModel
 from src.investment.repository.db.db_entities import ConsolidatedPortfolio
 
 
@@ -27,7 +29,7 @@ class ConsolidatedBalanceRepo:
             portfolio_code: str,
             start_date: Optional[Date] = None,
             end_date: Optional[Date] = None
-    ) -> Union[List[ConsolidatedPortfolioModel], ConsolidatedPortfolioError]:
+    ) -> List[ConsolidatedPortfolioModel]:
         """
         Filters the ConsolidatedBalancePortfolio by date range.
         """
@@ -45,16 +47,14 @@ class ConsolidatedBalanceRepo:
 
             query = query.order_by(ConsolidatedPortfolio.date.asc())
             return [to_model(cbp) for cbp in query.all()]
-        except SQLAlchemyError as e:
-            return ConsolidatedPortfolioError.DatabaseError
-        except Exception as e:
-            return ConsolidatedPortfolioError.Unexpected
-        finally:
-            session.close()
+        except SQLAlchemyError:
+            raise ConsolidatedPortfolioDatabaseError()
+        except Exception:
+            raise ConsolidatedPortfolioUnexpectedError()
 
     def __get_consolidated_portfolio(
             self, session, portfolio_code: str, date: date
-    ) -> ConsolidatedPortfolio | ConsolidatedPortfolioError:
+    ) -> ConsolidatedPortfolio:
         try:
             consolidated_portfolio = session.query(ConsolidatedPortfolio) \
                 .filter(ConsolidatedPortfolio.date == date) \
@@ -62,35 +62,32 @@ class ConsolidatedBalanceRepo:
                 .one()
             return consolidated_portfolio
         except NoResultFound:
-            return ConsolidatedPortfolioError.ConsolidatedPortfolioNotFound
-        except Exception as e:
-            return ConsolidatedPortfolioError.DatabaseError
+            raise ConsolidatedPortfolioNotFound()
+        except SQLAlchemyError:
+            raise ConsolidatedPortfolioDatabaseError()
+        except Exception:
+            raise ConsolidatedPortfolioUnexpectedError()
 
     def create_or_update(
             self,
             cpm: ConsolidatedPortfolioModel
-    ) -> ConsolidatedPortfolioModel | ConsolidatedPortfolioError:
+    ) -> ConsolidatedPortfolioModel:
         session = self.session
         try:
             result = self.__get_consolidated_portfolio(session, cpm.portfolio_code, date.today())
-            match result:
-                case ConsolidatedPortfolio():
-                    consolidated_portfolio = result
-                    consolidated_portfolio.balance = cpm.balance
-                    consolidated_portfolio.amount_invested = cpm.amount_invested
-                    session.refresh(consolidated_portfolio)
-                    return to_model(consolidated_portfolio)
-                case ConsolidatedPortfolioError.ConsolidatedPortfolioNotFound:
-                    consolidated_portfolio = to_database(cpm)
-                    session.add(consolidated_portfolio)
-                    to_model(consolidated_portfolio)
-                    return to_model(consolidated_portfolio)
-                case _:
-                    return ConsolidatedPortfolioError.Unexpected
-        except SQLAlchemyError as e:
-            return ConsolidatedPortfolioError.DatabaseError
+            consolidated_portfolio = result
+            consolidated_portfolio.balance = cpm.balance
+            consolidated_portfolio.amount_invested = cpm.amount_invested
+            session.refresh(consolidated_portfolio)
+            return to_model(consolidated_portfolio)
+        except ConsolidatedPortfolioNotFound:
+            consolidated_portfolio = to_database(cpm)
+            session.add(consolidated_portfolio)
+            to_model(consolidated_portfolio)
+            return to_model(consolidated_portfolio)
+        except SQLAlchemyError:
+            raise ConsolidatedPortfolioDatabaseError()
         except Exception as e:
-            return ConsolidatedPortfolioError.Unexpected
+            raise ConsolidatedPortfolioUnexpectedError
         finally:
             session.commit()
-            session.close()

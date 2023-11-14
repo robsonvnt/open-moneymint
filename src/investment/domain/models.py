@@ -31,35 +31,10 @@ class PortfolioOverviewModel(BaseModel):
     portfolio_gross_nominal_yield: float
 
 
-class PortfolioError(Enum):
-    AlreadyExists = "Portfolio already exists"
-    PortfolioNotFound = "Portfolio not found"
-    DatabaseError = "Database error"
-    Unexpected = "Unexpected error"
-    OperationNotPermitted = "Operation not permitted"
-
-
-class InvestmentError(Enum):
-    AlreadyExists = "Investment already exists"
-    InvestmentNotFound = "Investment not found"
-    ColumnDoesNotExist = "Column does not exist"
-    DatabaseError = "Database error"
-    Unexpected = "Unexpected error"
-    NoAssetsFound = "No Assets Found error"
-    OperationNotPermitted = "Operation not permitted"
-
-
 class AssetType(str, Enum):
     STOCK = "STOCK"
     REIT = "REIT"
     FIXED_INCOME = "FIXED_INCOME"
-
-
-class TransactionError(Enum):
-    TransactionNotFound = "Transaction not found"
-    DatabaseError = "Database error"
-    Unexpected = "Unexpected error"
-    OperationNotPermitted = "Operation not permitted"
 
 
 class InvestmentModel(BaseModel):
@@ -76,10 +51,9 @@ class InvestmentModel(BaseModel):
 class TransactionType(Enum):
     BUY = "BUY"
     SELL = "SELL"
-    DIVIDEND = "DIVIDEND"
     INTEREST = "INTEREST"
-    TRANSFER = "TRANSFER"
     WITHDRAWAL = "WITHDRAWAL"
+    DEPOSIT = "DEPOSIT"
 
 
 class TransactionModel(BaseModel):
@@ -89,12 +63,6 @@ class TransactionModel(BaseModel):
     date: date
     quantity: int
     price: float
-
-
-class ConsolidatedPortfolioError(Enum):
-    DatabaseError = "Database error"
-    ConsolidatedPortfolioNotFound = "ConsolidatedPortfolio Not Found."
-    Unexpected = "Unexpected error"
 
 
 class ConsolidatedPortfolioModel(BaseModel):

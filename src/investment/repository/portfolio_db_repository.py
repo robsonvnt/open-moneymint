@@ -2,7 +2,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
-from src.investment.domains import PortfolioError, PortfolioModel
+from src.investment.domain.models import PortfolioModel
+from src.investment.domain.portfolio_erros import PortfolioNotFound, PortfolioUnexpectedError
 from src.investment.helpers import generate_code
 from src.investment.repository.db.db_entities import Portfolio
 
@@ -43,10 +44,7 @@ class PortfolioRepo:
             session.refresh(portfolio)
             return to_model(portfolio)
         except Exception as e:
-            if 'unique constraint' in str(e).lower():
-                return PortfolioError.AlreadyExists
-            else:
-                return PortfolioError.DatabaseError
+            raise PortfolioUnexpectedError()
 
     def update(self, portfolio_code, updated_portfolio: PortfolioModel):
         session = self.session
@@ -57,33 +55,30 @@ class PortfolioRepo:
             session.commit()
             session.refresh(portfolio)
             return to_model(portfolio)
-        except NoResultFound as e:
+        except NoResultFound:
             session.rollback()
-            return PortfolioError.PortfolioNotFound
-        except SQLAlchemyError as e:
+            raise PortfolioNotFound()
+        except SQLAlchemyError:
             session.rollback()
-            raise e
+            raise PortfolioUnexpectedError()
 
     def find_all(self):
         session = self.session
         try:
             portfolios = session.query(Portfolio).all()
             return [to_model(portfolio) for portfolio in portfolios]
-        except SQLAlchemyError as e:
-            session.rollback()
-            raise e
+        except SQLAlchemyError:
+            raise PortfolioUnexpectedError()
 
-    def find_by_code(self, portfolio_code) -> PortfolioModel | PortfolioError:
+    def find_by_code(self, portfolio_code) -> PortfolioModel:
         session = self.session
         try:
             portfolio = session.query(Portfolio).filter(Portfolio.code == portfolio_code).one()
             return to_model(portfolio)
         except NoResultFound as e:
-            session.rollback()
-            return PortfolioError.PortfolioNotFound
+            raise PortfolioNotFound()
         except Exception as e:
-            session.rollback()
-            raise e
+            raise PortfolioUnexpectedError()
 
     def delete(self, portfolio_code):
         session = self.session
@@ -91,9 +86,7 @@ class PortfolioRepo:
             portfolio = session.query(Portfolio).filter(Portfolio.code == portfolio_code).one()
             session.delete(portfolio)
             session.commit()
-        except (NoResultFound, MultipleResultsFound) as e:
-            session.rollback()
-            return PortfolioError.PortfolioNotFound
+        except NoResultFound :
+            raise PortfolioNotFound()
         except SQLAlchemyError as e:
-            session.rollback()
-            raise e
+            raise PortfolioUnexpectedError()

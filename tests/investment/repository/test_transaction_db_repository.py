@@ -3,11 +3,12 @@ from datetime import date
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.exc import NoResultFound
 
-from src.investment.domains import TransactionModel, TransactionType, TransactionError
+from src.investment.domain.models import TransactionModel, TransactionType
+from src.investment.domain.transaction_errors import TransactionNotFound
 from src.investment.repository.db.db_entities import Base, Transaction
 from src.investment.repository.transaction_db_repository import TransactionRepo
+from tests.investment.prepareto_db_test import add_portfolio, add_investments
 
 
 # Configuração do banco de dados de teste
@@ -15,8 +16,8 @@ from src.investment.repository.transaction_db_repository import TransactionRepo
 def session():
     engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
     Base.metadata.create_all(bind=engine)
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)
-    db = TestingSessionLocal()
+    testing_session_local = sessionmaker(autocommit=False, autoflush=True, bind=engine)
+    db = testing_session_local()
     try:
         yield db
     finally:
@@ -92,18 +93,21 @@ def test_update_transaction_not_found(session):
     )
 
     # Teste para transação não encontrada
-    result = repo.update("NON_EXISTENT_CODE", updated_transaction)
-    assert result == TransactionError.TransactionNotFound
+    with pytest.raises(TransactionNotFound) as excinfo:
+        repo.update("NON_EXISTENT_CODE", updated_transaction)
+    assert "Transaction not found" in str(excinfo.value)
 
 
 def test_find_all_from_investment_code(session):
+    add_portfolio(session)
+    add_investments(session)
     repo = TransactionRepo(session)
 
     # Criando transações de teste
     for i in range(4):
         transaction = TransactionModel(
             code=None,
-            investment_code="INV123" if i != 2 else "INV321",
+            investment_code="INV100" if i != 2 else "INV321",
             type=TransactionType.BUY,
             date=date.today(),
             quantity=10 + i,
@@ -112,9 +116,9 @@ def test_find_all_from_investment_code(session):
         repo.create(transaction)
 
     # Testando a busca por todas as transações para um código de investimento específico
-    transactions = repo.find_all_from_investment_code("INV123")
+    transactions = repo.find_all("PORT100", "INV100")
     assert len(transactions) == 3
-    assert all(t.investment_code == "INV123" for t in transactions)
+    assert all(t.investment_code == "INV100" for t in transactions)
 
 
 def test_find_by_code_success(session):
@@ -138,6 +142,6 @@ def test_find_by_code_success(session):
 def test_find_by_code_not_found(session):
     repo = TransactionRepo(session)
 
-    # Testando a busca por uma transação inexistente
-    result = repo.find_by_code("NON_EXISTENT_CODE")
-    assert result == TransactionError.TransactionNotFound
+    with pytest.raises(TransactionNotFound) as excinfo:
+        repo.find_by_code("NON_EXISTENT_CODE")
+    assert "Transaction not found" in str(excinfo.value)

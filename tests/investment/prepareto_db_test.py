@@ -5,8 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import date
 
+from src.investment.domain.models import TransactionModel, TransactionType
 from src.investment.repository.db.db_connection import get_db_session
-from src.investment.repository.db.db_entities import Base, Portfolio, ConsolidatedPortfolio
+from src.investment.repository.db.db_entities import Base, Portfolio, ConsolidatedPortfolio, Transaction
 from src.investment.repository.investment_db_repository import Investment
 from fastapi.testclient import TestClient
 
@@ -67,7 +68,7 @@ def add_consolidated_portfolio(session):
 def add_investments(session):
     session.add(Investment(
         code="INV100", portfolio_code="PORT100", asset_type="STOCK", ticker="AAPL", quantity=50,
-        purchase_price=500.00, current_average_price=110.00, purchase_date=date(2023, 1, 1))
+        purchase_price=500.00, current_average_price=510.00, purchase_date=date(2023, 1, 1))
     )
     session.add(Investment(
         code="INV101", portfolio_code="PORT100", asset_type="STOCK", ticker="MSFT", quantity=30,
@@ -89,4 +90,18 @@ def add_investments(session):
         code="INV104", portfolio_code="PORT101", asset_type="STOCK", ticker="PETR4", quantity=10,
         purchase_price=100.00, current_average_price=525.00, purchase_date=date(2023, 5, 1))
     )
+    session.commit()
+
+
+def add_transactions(session):
+    session.add(Transaction(
+        code="TRAN101", investment_code="INV100", type="BUY",
+        date=date.today(), quantity=10, price=530
+    ))
+
+    session.add(Transaction(
+        code="TRAN102", investment_code="INV100", type="SELL",
+        date=date.today(), quantity=5, price=530
+    ))
+
     session.commit()
