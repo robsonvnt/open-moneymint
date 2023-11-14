@@ -8,6 +8,7 @@ from src.investment.domain.models import TransactionModel, TransactionType
 from src.investment.domain.transaction_errors import TransactionNotFound
 from src.investment.repository.db.db_entities import Base, Transaction
 from src.investment.repository.transaction_db_repository import TransactionRepo
+from tests.investment.prepareto_db_test import add_portfolio, add_investments
 
 
 # Configuração do banco de dados de teste
@@ -98,13 +99,15 @@ def test_update_transaction_not_found(session):
 
 
 def test_find_all_from_investment_code(session):
+    add_portfolio(session)
+    add_investments(session)
     repo = TransactionRepo(session)
 
     # Criando transações de teste
     for i in range(4):
         transaction = TransactionModel(
             code=None,
-            investment_code="INV123" if i != 2 else "INV321",
+            investment_code="INV100" if i != 2 else "INV321",
             type=TransactionType.BUY,
             date=date.today(),
             quantity=10 + i,
@@ -113,9 +116,9 @@ def test_find_all_from_investment_code(session):
         repo.create(transaction)
 
     # Testando a busca por todas as transações para um código de investimento específico
-    transactions = repo.find_all_from_investment_code("INV123")
+    transactions = repo.find_all("PORT100", "INV100")
     assert len(transactions) == 3
-    assert all(t.investment_code == "INV123" for t in transactions)
+    assert all(t.investment_code == "INV100" for t in transactions)
 
 
 def test_find_by_code_success(session):

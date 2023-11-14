@@ -225,6 +225,6 @@ def test_delete_transaction(session, transaction_service):
     transaction_repo.delete.return_value = transaction
 
     transaction_service = TransactionService(transaction_repo, investment_service)
-    transaction_service.delete("PORT100", transaction)
+    transaction_service.delete(transaction)
 
-    assert investment.quantity == 40
+    investment_service.refresh_investment_details.assert_called_once()

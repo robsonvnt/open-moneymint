@@ -21,7 +21,8 @@ class InvestmentService:
         return self.investment_repo.create(new_investment)
 
     def find_investment_by_code(self, portfolio_code: str, code: str) -> InvestmentModel:
-        return self.investment_repo.find_by_portf_investment_code(portfolio_code, code)
+        portfolio = self.portfolio_repo.find_by_code(portfolio_code)
+        return self.investment_repo.find_by_portf_investment_code(portfolio.code, code)
 
     def find_all_investments(
             self, portfolio_code: str, order_by: str = None

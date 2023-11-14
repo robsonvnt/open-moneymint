@@ -24,7 +24,7 @@ class TransactionUnexpectedError(TransactionError):
         return "Unexpected error"
 
 
-class TransactionOperationNotPermittedError(TransactionError):
+class TransactionOperationNotPermitted(TransactionError):
     """Raised when an operation on a transaction is not permitted."""
 
     def __str__(self):

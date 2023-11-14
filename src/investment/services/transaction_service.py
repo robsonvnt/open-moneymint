@@ -1,5 +1,8 @@
+from typing import List
+
 from src.investment.domain.models import TransactionModel, AssetType, TransactionType, \
     InvestmentModel
+from src.investment.domain.transaction_errors import TransactionNotFound, TransactionOperationNotPermitted
 from src.investment.repository.transaction_db_repository import TransactionRepo
 from src.investment.services.investment_service import InvestmentService
 
@@ -8,6 +11,17 @@ class TransactionService:
     def __init__(self, transaction_repo: TransactionRepo, investment_service: InvestmentService):
         self.transaction_repo: TransactionRepo = transaction_repo
         self.investment_service = investment_service
+
+    def find_all(self, portfolio_code, investment_code) -> List[TransactionModel]:
+        return self.transaction_repo.find_all(portfolio_code, investment_code)
+
+    def find_by_code(self, portfolio_code, investment_code, trasaction_code) -> TransactionModel:
+        investment = self.investment_service.find_investment_by_code(portfolio_code, investment_code)
+        transaction = self.transaction_repo.find_by_code(trasaction_code)
+        if investment.code == transaction.investment_code:
+            return transaction
+        else:
+            raise TransactionNotFound()
 
     def _calc_avg_purchase_price(self, old_quantity: int, old_price: float,
                                  new_quantity: int, new_price: float) -> float:
@@ -77,13 +91,16 @@ class TransactionService:
     def create(
             self,
             portfolio_code: str,
+            investment_code: str,
             new_transaction: TransactionModel,
             update_investment=True
     ) -> TransactionModel:
+        if investment_code != new_transaction.investment_code:
+            raise TransactionOperationNotPermitted()
         if update_investment:
             investment = self.investment_service.find_investment_by_code(
                 portfolio_code,
-                new_transaction.investment_code
+                investment_code
             )
             updated_investment = self._update_investment(investment, new_transaction)
             self.investment_service.update_investment(

@@ -5,6 +5,7 @@ from src.investment.domain.models import TransactionModel
 from src.investment.domain.transaction_errors import TransactionNotFound, TransactionUnexpectedError
 from src.investment.helpers import generate_code
 from src.investment.repository.db.db_entities import Transaction
+from src.investment.repository.investment_db_repository import InvestmentRepo
 
 
 def to_database(transaction_model: TransactionModel) -> Transaction:
@@ -75,11 +76,13 @@ class TransactionRepo:
             session.rollback()
             raise TransactionUnexpectedError()
 
-    def find_all_from_investment_code(self, investment_code):
+    def find_all(self, portfolio_code, investment_code):
         session = self.session
         try:
-            transactions = session.query(Transaction). \
-                filter(Transaction.investment_code == investment_code).all()
+            inv = InvestmentRepo(session).find_by_portf_investment_code(portfolio_code, investment_code)
+            transactions = session.query(Transaction).filter(
+                Transaction.investment_code == inv.code,
+            ).all()
             return [to_model(transaction) for transaction in transactions]
         except SQLAlchemyError as e:
             raise TransactionUnexpectedError()
