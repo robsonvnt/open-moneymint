@@ -16,7 +16,6 @@ def to_model(investment: Investment) -> InvestmentModel:
     return InvestmentModel(**investment.to_dict())
 
 
-# Repositório de Investment
 class InvestmentRepo:
     def __init__(self, session):
         self.session = session
@@ -46,7 +45,7 @@ class InvestmentRepo:
             return to_model(investment)
         except NoResultFound:
             raise InvestmentNotFound()
-        except Exception as e:
+        except Exception:
             raise UnexpectedError()
 
     def find_by_portf_investment_code(self, portfolio_code: str, investment_code):
@@ -89,7 +88,7 @@ class InvestmentRepo:
             session.delete(investment)
             session.commit()
             return True
-        except Exception as e:
+        except Exception:
             raise DatabaseError()
         finally:
             session.close()
@@ -111,9 +110,9 @@ class InvestmentRepo:
             session.commit()
             session.refresh(investment)
             return to_model(investment)
-        except NoResultFound as e:
+        except NoResultFound:
             raise InvestmentNotFound()
-        except Exception as e:
+        except Exception:
             raise UnexpectedError()
         finally:
             session.close()
@@ -122,15 +121,15 @@ class InvestmentRepo:
         session = self.session
         try:
             query = text(
-                "SELECT asset_type, SUM(quantity * current_average_price) AS total_weight "
-                "FROM investments WHERE portfolio_code = :portfolio_code GROUP BY asset_type"
+                'SELECT asset_type, SUM(quantity * current_average_price) AS total_weight '
+                'FROM investments WHERE portfolio_code = :portfolio_code GROUP BY asset_type'
             )
             result = session.execute(query, {"portfolio_code": portfolio_code}).fetchall()
             if not result:
                 raise NoAssetsFound()
             diversification_portfolio = {row[0]: row[1] for row in result}
             return diversification_portfolio
-        except Exception as e:
+        except Exception:
             raise DatabaseError()
         finally:
             session.close()

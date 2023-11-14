@@ -7,6 +7,9 @@ Base = declarative_base()
 
 # Modelo de Investment
 class Investment(Base, AllFeaturesMixin):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     __tablename__ = 'investments'
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, index=True)
@@ -45,5 +48,3 @@ class Transaction(Base, AllFeaturesMixin):
     date = Column(Date, index=True)
     quantity = Column(Integer)
     price = Column(Float)
-
-
