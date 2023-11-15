@@ -84,7 +84,9 @@ class TransactionRepo:
                 Transaction.investment_code == inv.code,
             ).order_by(Transaction.date.desc()).all()
             return [to_model(transaction) for transaction in transactions]
-        except SQLAlchemyError as e:
+        except NoResultFound:
+            []
+        except SQLAlchemyError:
             raise TransactionUnexpectedError()
 
     def find_by_code(self, transaction_code) -> TransactionModel:
