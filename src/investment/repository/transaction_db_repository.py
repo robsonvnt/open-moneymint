@@ -85,7 +85,7 @@ class TransactionRepo:
             ).order_by(Transaction.date.desc()).all()
             return [to_model(transaction) for transaction in transactions]
         except NoResultFound:
-            []
+            return []
         except SQLAlchemyError:
             raise TransactionUnexpectedError()
 
