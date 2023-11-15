@@ -1,8 +1,8 @@
-POST http://localhost:8000/portfolios/6a267bfca6/investments
+POST http://localhost:8000/portfolios/gBxgZAxenA/investments
 Content-Type: application/json
 
 {
-  "portfolio_code": "6a267bfca6",
+  "portfolio_code": "gBxgZAxenA",
   "asset_type": "STOCK",
   "ticker": "PETR6",
   "quantity": 400,

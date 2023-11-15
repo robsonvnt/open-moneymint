@@ -4,21 +4,40 @@ from decimal import Decimal
 
 from src.constants import SUCCESS_RESULT
 from src.investment.domain.investment_errors import OperationNotPermittedError, UnexpectedError, InvestmentError
-from src.investment.domain.models import InvestmentModel, PortfolioOverviewModel, TransactionModel, TransactionType
+from src.investment.domain.models import InvestmentModel, PortfolioOverviewModel, TransactionModel, TransactionType, \
+    AssetType
 from src.investment.domain.transaction_errors import TransactionInvalidType, TransactionOperationNotPermitted
 from src.investment.repository.investment_db_repository import InvestmentRepo
 from src.investment.repository.portfolio_db_repository import PortfolioRepo
+from src.investment.repository.transaction_db_repository import TransactionRepo
 
 
 class InvestmentService:
-    def __init__(self, portfolio_repo: PortfolioRepo, investment_repo: InvestmentRepo, stock_repo):
+    def __init__(self, portfolio_repo: PortfolioRepo, investment_repo: InvestmentRepo,
+                 stock_repo, transaction_repo: TransactionRepo = None):
         self.portfolio_repo: PortfolioRepo = portfolio_repo
         self.investment_repo: InvestmentRepo = investment_repo
         self.stock_repo = stock_repo
+        self.transaction_repo: TransactionRepo = transaction_repo
 
     def create_investment(self, new_investment: InvestmentModel) -> InvestmentModel:
         self.portfolio_repo.find_by_code(new_investment.portfolio_code)
-        return self.investment_repo.create(new_investment)
+        created_investment = self.investment_repo.create(new_investment)
+
+        # Criar transaction
+        # Todo create test case
+        if self.transaction_repo:
+            transaction_type = TransactionType.BUY
+            if created_investment.asset_type == AssetType.FIXED_INCOME:
+                transaction_type = TransactionType.DEPOSIT
+            transaction = TransactionModel(
+                code=None, investment_code=created_investment.code, type=transaction_type,
+                date=created_investment.purchase_date, quantity=created_investment.quantity,
+                price=created_investment.purchase_price
+            )
+            self.transaction_repo.create(transaction)
+
+        return created_investment
 
     def find_investment_by_code(self, portfolio_code: str, code: str) -> InvestmentModel:
         portfolio = self.portfolio_repo.find_by_code(portfolio_code)
