@@ -74,7 +74,7 @@ class InvestmentService:
                 if investment.current_average_price:
                     current_balance += Decimal(investment.current_average_price * investment.quantity)
 
-            if len(investments) > 0:
+            if len(investments) > 0 and amount_invested > 0:
                 portfolio_yield = (current_balance - amount_invested) / amount_invested * 100
                 portfolio_gross_nominal_yield = current_balance - amount_invested
 

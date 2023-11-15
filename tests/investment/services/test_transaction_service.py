@@ -176,7 +176,7 @@ def test_create_transaction(session, transaction_service):
         price=530
     )
 
-    transaction_service.create("PORT100", transaction)
+    transaction_service.create("PORT100", "INV100", transaction)
     inv = transaction_service \
         .investment_service \
         .find_investment_by_code("PORT100", "INV100")
@@ -203,7 +203,7 @@ def test_create_no_investment_update_transaction(session, transaction_service):
     transaction_repo.create.return_value = transaction
 
     transaction_service = TransactionService(transaction_repo, investment_service)
-    transaction_service.create("PORT100", transaction, False)
+    transaction_service.create("PORT100", "INV100", transaction, False)
 
     # asserts
     transaction_repo.create.assert_called_once()
@@ -225,6 +225,6 @@ def test_delete_transaction(session, transaction_service):
     transaction_repo.delete.return_value = transaction
 
     transaction_service = TransactionService(transaction_repo, investment_service)
-    transaction_service.delete(transaction)
+    transaction_service.delete("PORT100", "INV100", transaction)
 
     investment_service.refresh_investment_details.assert_called_once()

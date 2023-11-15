@@ -1,2 +1,4 @@
-GET http://localhost:8000/portfolios/portfolio-consolidation/b185557eda/ HTTP/1.1
+GET http://localhost:8080/api/portfolios/fddfd/investments/ HTTP/1.1
+#GET http://localhost:8080/api/portfolios/fddfd/investments/cjIPBZRGe4/transactions HTTP/1.1
+
 Content-Type: application/json

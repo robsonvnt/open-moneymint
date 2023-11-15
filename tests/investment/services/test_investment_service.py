@@ -8,7 +8,7 @@ from src.investment.domain.models import (
     InvestmentModel,
     PortfolioModel, TransactionModel, AssetType, TransactionType
 )
-from src.investment.domain.transaction_errors import TransactionInvalidType
+from src.investment.domain.transaction_errors import TransactionInvalidType, TransactionOperationNotPermitted
 from src.investment.services.investment_service import InvestmentService
 
 
@@ -69,6 +69,22 @@ def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo,
     assert result.portfolio_yield == 0
     assert result.portfolio_gross_nominal_yield == 0.0
     print(result)
+
+
+def test_get_portfolio_overview_with_0_values_success(investment_service, mock_portfolio_repo, mock_investment_repo):
+    mock_portfolio_repo.find_by_code.return_value = PortfolioModel(code='001', name='test', description='test')
+    mock_investment_repo.find_all_by_portfolio_code.return_value = [
+        InvestmentModel(code='code1', purchase_price=0, quantity=0, current_average_price=0, portfolio_code='001',
+                        asset_type='STOCK', ticker='AAPL', purchase_date=date.today()),
+        InvestmentModel(code='code2', purchase_price=0, quantity=0, current_average_price=0, portfolio_code='001',
+                        asset_type='STOCK', ticker='MSFT', purchase_date=date.today()),
+    ]
+
+    result = investment_service.get_portfolio_overview('001')
+
+    assert result.amount_invested == 0
+    assert result.portfolio_yield == 0
+    assert result.portfolio_gross_nominal_yield == 0
 
 
 def test_calculate_investment_details(mock_investment_model, investment_service, mock_investment_repo):
@@ -157,7 +173,7 @@ def test_refresh_with_negative_quantity(mock_investment_model, investment_servic
                          date=date.today() + timedelta(days=1), quantity=40, price=110)
     ]
 
-    with pytest.raises(UnexpectedError):
+    with pytest.raises(TransactionOperationNotPermitted):
         investment_service.refresh_investment_details("inv123", transactions)
 
 
