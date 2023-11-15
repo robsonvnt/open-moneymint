@@ -13,7 +13,11 @@ def test_get_all_transactions(client, db_session):
 
     assert response.status_code == 200
     assert isinstance(json_result, list)
-    assert len(json_result) == 2
+    assert len(json_result) == 3
+
+    assert json_result[0]["date"] == "2023-08-02"
+    assert json_result[1]["date"] == "2023-05-02"
+    assert json_result[2]["date"] == "2023-02-02"
 
 
 def test_get_all_transactions_portfolio_not_fount(client, db_session):
@@ -43,7 +47,7 @@ def test_get_transaction(client, db_session):
     assert result["code"] == "TRAN101"
     assert result["investment_code"] == "INV100"
     assert result["type"] == "BUY"
-    assert result["date"] == str(date.today())
+    assert result["date"] == str(date.fromisoformat("2023-05-02"))
     assert result["quantity"] == 10
     assert result["price"] == 530
 

@@ -6,11 +6,10 @@ from typing import List
 from fastapi import Depends
 
 from src.investment.domain.investment_errors import InvestmentNotFound
-from src.investment.domain.models import PortfolioModel, TransactionType, TransactionModel
-from src.investment.domain.portfolio_erros import PortfolioNotFound, PortfolioAlreadyExists
+from src.investment.domain.models import TransactionType, TransactionModel
+from src.investment.domain.portfolio_erros import PortfolioNotFound
 from src.investment.domain.transaction_errors import TransactionNotFound, TransactionOperationNotPermitted
 from src.investment.repository.db.db_connection import get_db_session
-from src.investment.repository.db.db_entities import Investment
 from src.investment.services.service_factory import ServiceFactory
 
 router = APIRouter()

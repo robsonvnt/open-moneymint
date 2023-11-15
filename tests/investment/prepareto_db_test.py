@@ -5,7 +5,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import date
 
-from src.investment.domain.models import TransactionModel, TransactionType
 from src.investment.repository.db.db_connection import get_db_session
 from src.investment.repository.db.db_entities import Base, Portfolio, ConsolidatedPortfolio, Transaction
 from src.investment.repository.investment_db_repository import Investment
@@ -96,12 +95,17 @@ def add_investments(session):
 def add_transactions(session):
     session.add(Transaction(
         code="TRAN101", investment_code="INV100", type="BUY",
-        date=date.today(), quantity=10, price=530
+        date=date.fromisoformat("2023-05-02"), quantity=10, price=530
     ))
 
     session.add(Transaction(
         code="TRAN102", investment_code="INV100", type="SELL",
-        date=date.today(), quantity=5, price=530
+        date=date.fromisoformat("2023-02-02"), quantity=5, price=530
+    ))
+
+    session.add(Transaction(
+        code="TRAN103", investment_code="INV100", type="BUY",
+        date=date.fromisoformat("2023-08-02"), quantity=5, price=530
     ))
 
     session.commit()
