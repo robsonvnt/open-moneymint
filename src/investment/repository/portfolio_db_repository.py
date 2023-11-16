@@ -1,6 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm.exc import MultipleResultsFound
 
 from src.investment.domain.models import PortfolioModel
 from src.investment.domain.portfolio_erros import PortfolioNotFound, PortfolioUnexpectedError
@@ -86,7 +85,7 @@ class PortfolioRepo:
             portfolio = session.query(Portfolio).filter(Portfolio.code == portfolio_code).one()
             session.delete(portfolio)
             session.commit()
-        except NoResultFound :
+        except NoResultFound:
             raise PortfolioNotFound()
         except SQLAlchemyError as e:
             raise PortfolioUnexpectedError()
