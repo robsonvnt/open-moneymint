@@ -27,7 +27,7 @@ def user_service(mock_user_repository, mock_password_service):
 
 
 def test_create_user(user_service, mock_user_repository):
-    user = UserModel(name="Test", code="123", login="test_login", password="password", created_at=None)
+    user = UserModel(name="Test", code="123", user_name="test_login", password="password", created_at=None)
     created_user = user_service.create(user)
 
     mock_user_repository.create.assert_called_once()
@@ -35,7 +35,7 @@ def test_create_user(user_service, mock_user_repository):
 
 
 def test_get_user_by_code_found(user_service, mock_user_repository):
-    mock_user_repository.get_user_by_code.return_value = UserModel(name="Test", code="123", login="test_login",
+    mock_user_repository.get_user_by_code.return_value = UserModel(name="Test", code="123", user_name="test_login",
                                                                    password="password", created_at=None)
     user = user_service.get_user_by_code("123")
     assert user.code == "123"
@@ -49,7 +49,7 @@ def test_get_user_by_code_not_found(user_service, mock_user_repository):
 
 
 def test_update_user(user_service, mock_user_repository):
-    updated_user = UserModel(name="Updated", code="123", login="test_login",
+    updated_user = UserModel(name="Updated", code="123", user_name="test_login",
                              password="password", created_at=None)
     mock_user_repository.update.return_value = updated_user
 
@@ -59,7 +59,7 @@ def test_update_user(user_service, mock_user_repository):
 
 
 def test_update_user_not_found(user_service, mock_user_repository):
-    updated_user = UserModel(name="Updated", code="123", login="test_login",
+    updated_user = UserModel(name="Updated", code="123", user_name="test_login",
                              password="password", created_at=None)
     mock_user_repository.update.side_effect = UserNotFound()
 

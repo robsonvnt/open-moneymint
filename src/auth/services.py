@@ -13,6 +13,21 @@ class PasswordService:
         return bcrypt.checkpw(plain_password.encode('utf-8'), protected_password.encode('utf-8'))
 
 
+class AuthenticationUserService:
+    def __init__(self, user_repository: UserRepository, password_service: PasswordService):
+        self.user_repository = user_repository
+        self.password_service = password_service
+
+    def authenticate_user(self, user_name: str, password: str) -> UserModel:
+        user = self.user_repository.get_by_user_name(user_name)
+        is_password_valid = self.password_service.verify_password(password, user.password)
+        match is_password_valid:
+            case True:
+                return user
+            case False:
+                raise UserNotFound(f"User with login {user_name} not found")
+
+
 class UserService:
     def __init__(self, user_repository: UserRepository, password_service: PasswordService):
         self.user_repository = user_repository
@@ -24,8 +39,6 @@ class UserService:
 
     def get_user_by_code(self, user_code: str) -> UserModel:
         user = self.user_repository.get_user_by_code(user_code)
-        if not user:
-            raise UserNotFound(f"User with code {user_code} not found")
         return user
 
     def update(self, updated_user: UserModel) -> UserModel:
@@ -33,3 +46,9 @@ class UserService:
 
     def delete(self, user_code: str) -> None:
         self.user_repository.delete(user_code)
+
+
+class UserServiceFactory:
+    @staticmethod
+    def create_investment_service(db_session) -> UserService:
+        return UserService(UserRepository(db_session), PasswordService())

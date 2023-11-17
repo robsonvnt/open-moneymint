@@ -20,7 +20,7 @@ class User(Base, AllFeaturesMixin):
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, index=True, unique=True)
     name = Column(String)
-    login = Column(String, index=True, unique=True)
+    user_name = Column(String, index=True, unique=True)
     password = Column(String)
     created_at = Column(Date)
 
@@ -52,9 +52,9 @@ class UserRepository:
         except NoResultFound:
             raise UserNotFound(f"User with code {user_code} not found")
 
-    def get_user_by_login(self, login: str):
+    def get_by_user_name(self, login: str):
         try:
-            user = self.session.query(User).filter(User.login == login).one()
+            user = self.session.query(User).filter(User.user_name == login).one()
             return to_model(user)
         except NoResultFound:
             raise UserNotFound(f"User with login {login} not found")
@@ -76,4 +76,3 @@ class UserRepository:
             self.session.commit()
         except NoResultFound:
             raise UserNotFound(f"User with code {user_code} not found")
-

@@ -6,6 +6,7 @@ from src.investment.interface.portfolio_http import router as portfolio_router
 from src.investment.interface.investment_http import router as investment_router
 from src.investment.interface.consolidated_balance_http import router as consolidated_balance_router
 from src.investment.interface.transaction_http import router as transaction_router
+from src.auth.interface.user_http import router as user_router
 
 
 class NormalizePathMiddleware(BaseHTTPMiddleware):
@@ -30,3 +31,5 @@ def prepare_router(app):
     app.include_router(investment_router, prefix="/portfolios")
     app.include_router(consolidated_balance_router, prefix="/portfolios")
     app.include_router(transaction_router, prefix="/portfolios")
+
+    app.include_router(user_router, prefix="")

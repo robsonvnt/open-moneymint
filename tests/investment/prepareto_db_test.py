@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import date
 
-
 from src.investment.repository.db.db_connection import get_db_session
 from src.investment.repository.db.db_entities import Base, Portfolio, ConsolidatedPortfolio, Transaction
 from src.investment.repository.investment_db_repository import Investment

@@ -23,12 +23,12 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('code', sa.String(length=10), nullable=False, unique=True),
         sa.Column('name', sa.String(length=200), nullable=False),
-        sa.Column('login', sa.String(length=30), nullable=False, unique=True),
+        sa.Column('user_name', sa.String(length=30), nullable=False, unique=True),
         sa.Column('password', sa.String(length=60), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_code'), 'users', ['code'], unique=True)
-    op.create_index(op.f('ix_users_login'), 'users', ['login'], unique=True)
+    op.create_index(op.f('ix_users_login'), 'users', ['user_name'], unique=True)
 
 
 def downgrade():
