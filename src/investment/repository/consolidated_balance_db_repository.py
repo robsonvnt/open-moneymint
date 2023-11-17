@@ -82,7 +82,7 @@ class ConsolidatedBalanceRepo:
             return to_model(consolidated_portfolio)
         except ConsolidatedPortfolioNotFound:
             consolidated_portfolio = to_database(cpm)
-            session.create(consolidated_portfolio)
+            session.add(consolidated_portfolio)
             to_model(consolidated_portfolio)
             return to_model(consolidated_portfolio)
         except SQLAlchemyError:

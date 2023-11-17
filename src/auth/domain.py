@@ -1,14 +1,15 @@
 from datetime import date
+from typing import Optional
 
 from pydantic import BaseModel
 
 
-class User(BaseModel):
-    code: str
+class UserModel(BaseModel):
+    code:  Optional[str]
     name: str
     login: str
     password: str
-    created_at: date
+    created_at: Optional[date]
 
 
 class UserDatabaseError(Exception):
