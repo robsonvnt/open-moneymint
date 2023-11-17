@@ -1,9 +1,12 @@
 from unittest.mock import Mock, patch
+import tempfile
+import os
 
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import date
+
 
 from src.investment.repository.db.db_connection import get_db_session
 from src.investment.repository.db.db_entities import Base, Portfolio, ConsolidatedPortfolio, Transaction
@@ -13,7 +16,12 @@ from fastapi.testclient import TestClient
 
 @pytest.fixture(scope="function")
 def db_session():
-    engine = create_engine("sqlite:///.db_test.sqlite", connect_args={"check_same_thread": False})
+    db_file = tempfile.NamedTemporaryFile(suffix='.sqlite', delete=False)
+    db_file_path = db_file.name
+    db_file.close()
+
+    # engine = create_engine("sqlite:///.db_test.sqlite", connect_args={"check_same_thread": False})
+    engine = create_engine(f"sqlite:///{db_file_path}", connect_args={"check_same_thread": False})
     Base.metadata.create_all(bind=engine)
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)
     db = TestingSessionLocal()
@@ -22,6 +30,7 @@ def db_session():
     finally:
         db.close()
         Base.metadata.drop_all(bind=engine)
+        os.remove(db_file_path)
 
 
 @pytest.fixture(scope="function")
