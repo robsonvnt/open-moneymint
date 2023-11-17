@@ -39,7 +39,7 @@ class PortfolioRepo:
                 name=new_portfolio.name,
                 description=new_portfolio.description
             )
-            session.create(portfolio)
+            session.add(portfolio)
             session.commit()
             session.refresh(portfolio)
             return to_model(portfolio)

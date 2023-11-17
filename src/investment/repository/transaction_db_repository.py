@@ -47,7 +47,7 @@ class TransactionRepo:
                 quantity=new_transaction.quantity,
                 price=new_transaction.price
             )
-            session.create(transaction)
+            session.add(transaction)
             session.commit()
             session.refresh(transaction)
             return to_model(transaction)

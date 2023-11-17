@@ -26,7 +26,7 @@ class InvestmentRepo:
             code = generate_code()
             new_investment = Investment(id=None, **new_investment_data.dict())
             new_investment.code = code
-            session.create(new_investment)
+            session.add(new_investment)
             session.commit()
             session.refresh(new_investment)
             return to_model(new_investment)

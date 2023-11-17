@@ -39,25 +39,25 @@ def client(db_session):
 
 
 def add_portfolio(session):
-    session.create(Portfolio(code="PORT100", name="Portfolio Name 100", description=""))
-    session.create(Portfolio(code="PORT101", name="Portfolio Name 101", description=""))
+    session.add(Portfolio(code="PORT100", name="Portfolio Name 100", description=""))
+    session.add(Portfolio(code="PORT101", name="Portfolio Name 101", description=""))
     session.commit()
 
 
 def add_consolidated_portfolio(session):
-    session.create(ConsolidatedPortfolio(
+    session.add(ConsolidatedPortfolio(
         portfolio_code="PORT100", date=date(2023, 1, 1),
         balance=30.0, amount_invested=30.0
     ))
-    session.create(ConsolidatedPortfolio(
+    session.add(ConsolidatedPortfolio(
         portfolio_code="PORT100", date=date(2023, 2, 1),
         balance=30.0, amount_invested=30.0
     ))
-    session.create(ConsolidatedPortfolio(
+    session.add(ConsolidatedPortfolio(
         portfolio_code="PORT100", date=date(2023, 3, 1),
         balance=30.0, amount_invested=30.0
     ))
-    session.create(ConsolidatedPortfolio(
+    session.add(ConsolidatedPortfolio(
         portfolio_code="PORT100", date=date(2023, 4, 1),
         balance=30.0, amount_invested=30.0
     ))
@@ -65,27 +65,27 @@ def add_consolidated_portfolio(session):
 
 
 def add_investments(session):
-    session.create(Investment(
+    session.add(Investment(
         code="INV100", portfolio_code="PORT100", asset_type="STOCK", ticker="AAPL", quantity=50,
         purchase_price=500.00, current_average_price=510.00, purchase_date=date(2023, 1, 1))
     )
-    session.create(Investment(
+    session.add(Investment(
         code="INV101", portfolio_code="PORT100", asset_type="STOCK", ticker="MSFT", quantity=30,
         purchase_price=400.00, current_average_price=210.00, purchase_date=date(2023, 2, 1))
     )
-    session.create(Investment(
+    session.add(Investment(
         code="INV102", portfolio_code="PORT100", asset_type="STOCK", ticker="GOOG", quantity=20,
         purchase_price=300.00, current_average_price=320.00, purchase_date=date(2023, 3, 1))
     )
-    session.create(Investment(
+    session.add(Investment(
         code="INV103", portfolio_code="PORT100", asset_type="FIXED_INCOME", ticker="AMZN", quantity=15,
         purchase_price=200.00, current_average_price=405.00, purchase_date=date(2023, 4, 1))
     )
-    session.create(Investment(
+    session.add(Investment(
         code="INV104", portfolio_code="PORT101", asset_type="FIXED_INCOME", ticker="CDB", quantity=15,
         purchase_price=100.00, current_average_price=510.00, purchase_date=date(2023, 5, 1))
     )
-    session.create(Investment(
+    session.add(Investment(
         code="INV104", portfolio_code="PORT101", asset_type="STOCK", ticker="PETR4", quantity=10,
         purchase_price=100.00, current_average_price=525.00, purchase_date=date(2023, 5, 1))
     )
@@ -93,17 +93,17 @@ def add_investments(session):
 
 
 def add_transactions(session):
-    session.create(Transaction(
+    session.add(Transaction(
         code="TRAN101", investment_code="INV100", type="BUY",
         date=date.fromisoformat("2023-05-02"), quantity=10, price=530
     ))
 
-    session.create(Transaction(
+    session.add(Transaction(
         code="TRAN102", investment_code="INV100", type="SELL",
         date=date.fromisoformat("2023-02-02"), quantity=5, price=530
     ))
 
-    session.create(Transaction(
+    session.add(Transaction(
         code="TRAN103", investment_code="INV100", type="BUY",
         date=date.fromisoformat("2023-08-02"), quantity=5, price=530
     ))
