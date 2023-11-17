@@ -1,8 +1,7 @@
-from datetime import date
-
 import pytest
 
-from src.auth.domain import UserModel, UserNotFound
+from src.auth.domain.models import UserModel
+from src.auth.domain.user_erros import UserNotFound
 from src.auth.repository.user_db_repository import UserRepository
 from src.auth.services import UserService, PasswordService
 

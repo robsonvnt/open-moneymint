@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_mixins import AllFeaturesMixin
 
-from src.auth.domain import UserNotFound, UserModel
+from src.auth.domain.models import UserModel
+from src.auth.domain.user_erros import UserNotFound
 from src.investment.helpers import generate_code
 
 Base = declarative_base()

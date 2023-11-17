@@ -2,7 +2,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.auth.domain import UserNotFound, UserModel
+from src.auth.domain.models import UserModel
+from src.auth.domain.user_erros import UserNotFound
 from src.auth.repository.user_db_repository import Base, UserRepository, User
 
 

@@ -1,8 +1,10 @@
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 
-from src.auth.domain import UserModel, UserNotFound
+from src.auth.domain.auth_erros import InvalidToken, ExpiredToken
+from src.auth.domain.models import UserModel
+from src.auth.domain.user_erros import UserNotFound
 from src.auth.repository.user_db_repository import UserRepository
 from src.auth.services import PasswordService, AuthenticationUserService
 
@@ -23,13 +25,18 @@ def mock_password_service(mocker):
 
 @pytest.fixture
 def authentication_user_service(mock_user_repository, mock_password_service):
-    return AuthenticationUserService(mock_user_repository, mock_password_service)
+    secret_key = "secret_key"
+    return AuthenticationUserService(mock_user_repository, mock_password_service, secret_key)
 
 
-def test_authenticate_user(authentication_user_service, mock_user_repository, mock_password_service):
-    user_name, password = "test_login", "password"
-    user = UserModel(name="User Test", code="123", user_name="test_login",
+@pytest.fixture
+def user():
+    return UserModel(name="User Test", code="123", user_name="test_login",
                      password="hashed_password", created_at=date.today())
+
+
+def test_authenticate_user(authentication_user_service, mock_user_repository, mock_password_service, user):
+    user_name, password = "test_login", "password"
     mock_user_repository.get_by_user_name.return_value = user
     mock_password_service.verify_password.return_value = True
 
@@ -53,12 +60,48 @@ def test_authenticate_user_not_found(authentication_user_service, mock_user_repo
         authentication_user_service.authenticate_user(user_name, password)
 
 
-def test_authenticate_user_wrong_password(authentication_user_service, mock_user_repository, mock_password_service):
+def test_authenticate_user_wrong_password(authentication_user_service, mock_user_repository, mock_password_service,
+                                          user):
     user_name, password = "test_login", "password"
-    user = UserModel(name="User Test", code="123", user_name="test_login",
-                     password="hashed_password", created_at=date.today())
     mock_user_repository.get_by_user_name.return_value = user
     mock_password_service.verify_password.return_value = False
 
     with pytest.raises(UserNotFound):
         authentication_user_service.authenticate_user(user_name, password)
+
+
+def test_create_access_token(authentication_user_service, user):
+    time_delta = timedelta(days=1)
+    token = authentication_user_service.create_access_token(user, time_delta)
+    assert isinstance(token, str)
+    assert len(token) > 0
+
+
+def test_get_username_from_access_token(authentication_user_service, user):
+    time_delta = timedelta(days=1)
+    token = authentication_user_service.create_access_token(user, time_delta)
+
+    result = authentication_user_service.get_username_from_access_token(token)
+    assert result == user.user_name
+
+
+def test_get_username_from_access_token_invalid_token(authentication_user_service, user):
+    user = UserModel(name="User Test", code="123", user_name="test_login",
+                     password="hashed_password", created_at=date.today())
+    time_delta = timedelta(days=1)
+    token = authentication_user_service.create_access_token(user, time_delta)
+
+    other_sk_auth_service = AuthenticationUserService(mock_user_repository, mock_password_service, "other_secret_key")
+
+    with pytest.raises(InvalidToken):
+        other_sk_auth_service.get_username_from_access_token(token)
+
+
+def test_get_username_from_access_token_expired_token(authentication_user_service, user):
+    user = UserModel(name="User Test", code="123", user_name="test_login",
+                     password="hashed_password", created_at=date.today())
+    time_delta = timedelta(days=-1)
+    token = authentication_user_service.create_access_token(user, time_delta)
+
+    with pytest.raises(ExpiredToken):
+        authentication_user_service.get_username_from_access_token(token)

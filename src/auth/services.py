@@ -1,4 +1,10 @@
-from src.auth.domain import UserModel, UserNotFound
+from datetime import timedelta, datetime
+from typing import Optional
+import jwt
+
+from src.auth.domain.auth_erros import ExpiredToken, InvalidToken
+from src.auth.domain.models import UserModel
+from src.auth.domain.user_erros import UserNotFound
 from src.auth.repository.user_db_repository import UserRepository
 import bcrypt
 
@@ -14,9 +20,11 @@ class PasswordService:
 
 
 class AuthenticationUserService:
-    def __init__(self, user_repository: UserRepository, password_service: PasswordService):
+    def __init__(self, user_repository: UserRepository, password_service: PasswordService, secret_key: str):
         self.user_repository = user_repository
         self.password_service = password_service
+        self.SECRET_KEY = secret_key
+        self.ALGORITHM = "HS256"
 
     def authenticate_user(self, user_name: str, password: str) -> UserModel:
         user = self.user_repository.get_by_user_name(user_name)
@@ -26,6 +34,27 @@ class AuthenticationUserService:
                 return user
             case False:
                 raise UserNotFound(f"User with login {user_name} not found")
+
+    def create_access_token(self, user: UserModel, expires_delta: Optional[timedelta] = None):
+        data = {"user_name": user.user_name}
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.utcnow() + expires_delta
+        else:
+            expire = datetime.utcnow() + timedelta(minutes=15)
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        return encoded_jwt
+
+    def get_username_from_access_token(self, token):
+        try:
+            decoded_token = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+            return decoded_token["user_name"]
+        except jwt.ExpiredSignatureError:
+            raise ExpiredToken()
+        except jwt.InvalidTokenError:
+            raise InvalidToken()
+
 
 
 class UserService:

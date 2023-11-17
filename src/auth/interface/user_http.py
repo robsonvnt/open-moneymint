@@ -1,9 +1,10 @@
 from fastapi import HTTPException, status, APIRouter, Depends
 from pydantic import BaseModel
 
-from src.auth.domain import UserModel, UserNotFound, UsernameAlreadyRegistered
+from src.auth.domain.models import UserModel
+from src.auth.domain.user_erros import UsernameAlreadyRegistered
 from src.auth.repository.db_connection import get_db_session
-from src.auth.services import UserService, UserServiceFactory
+from src.auth.services import UserServiceFactory
 
 router = APIRouter()
 
