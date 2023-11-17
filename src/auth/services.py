@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from typing import Optional
 import jwt
 
-from src.auth.domain.auth_erros import ExpiredToken, InvalidToken
+from src.auth.domain.auth_erros import ExpiredToken, InvalidToken, SecretKeyNotSet
 from src.auth.domain.models import UserModel
 from src.auth.domain.user_erros import UserNotFound
 from src.auth.repository.user_db_repository import UserRepository
@@ -35,6 +35,10 @@ class AuthenticationUserService:
             case False:
                 raise UserNotFound(f"User with login {user_name} not found")
 
+    def get_user_from_token(self, token: str) -> UserModel:
+        user_name = self.get_username_from_access_token(token)
+        return self.user_repository.get_by_user_name(user_name)
+
     def create_access_token(self, user: UserModel, expires_delta: Optional[timedelta] = None):
         data = {"user_name": user.user_name}
         to_encode = data.copy()
@@ -54,7 +58,6 @@ class AuthenticationUserService:
             raise ExpiredToken()
         except jwt.InvalidTokenError:
             raise InvalidToken()
-
 
 
 class UserService:
@@ -79,5 +82,15 @@ class UserService:
 
 class UserServiceFactory:
     @staticmethod
-    def create_investment_service(db_session) -> UserService:
+    def create_user_service(db_session) -> UserService:
         return UserService(UserRepository(db_session), PasswordService())
+
+    @staticmethod
+    def create_authentication_user_service(db_session) -> AuthenticationUserService:
+        import os
+        secret_key = os.getenv("SECRET_KEY", None)
+        if secret_key is None:
+            import sys
+            sys.exit("Encerrando pois SECRET_KEY não está definido.")
+
+        return AuthenticationUserService(UserRepository(db_session), PasswordService(), secret_key)
