@@ -171,7 +171,8 @@ async def get_diversification_portfolio(
 @router.get("/portfolio-consolidation/{portfolio_code}", response_model=PortfolioOverviewModel)
 async def get_portfolio_consolidation(
         portfolio_code: str,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
 ):
     investment_service = ServiceFactory.create_investment_service(db_session)
     portfolio_overview = investment_service.get_portfolio_overview(portfolio_code)
