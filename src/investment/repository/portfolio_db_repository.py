@@ -18,10 +18,10 @@ def to_database(portfolio_model: PortfolioModel) -> Portfolio:
 
 def to_model(portfolio: Portfolio) -> PortfolioModel:
     return PortfolioModel(
-        id=portfolio.id,
         code=portfolio.code,
         name=portfolio.name,
-        description=portfolio.description
+        description=portfolio.description,
+        user_code=portfolio.user_code
     )
 
 
@@ -29,14 +29,15 @@ class PortfolioRepo:
     def __init__(self, session):
         self.session = session
 
-    def create(self, new_portfolio: PortfolioModel):
+    def create(self, user_code: str, new_portfolio: PortfolioModel):
         session = self.session
         try:
             code = generate_code()
             portfolio = Portfolio(
                 code=code,
                 name=new_portfolio.name,
-                description=new_portfolio.description
+                description=new_portfolio.description,
+                user_code=user_code
             )
             session.add(portfolio)
             session.commit()
@@ -45,10 +46,13 @@ class PortfolioRepo:
         except Exception as e:
             raise PortfolioUnexpectedError()
 
-    def update(self, portfolio_code, updated_portfolio: PortfolioModel):
+    def update(self, user_code: str, portfolio_code, updated_portfolio: PortfolioModel):
         session = self.session
         try:
-            portfolio = session.query(Portfolio).filter(Portfolio.code == portfolio_code).one()
+            portfolio = session.query(Portfolio).filter(
+                Portfolio.code == portfolio_code,
+                Portfolio.user_code == user_code
+            ).one()
             portfolio.name = updated_portfolio.name
             portfolio.description = updated_portfolio.description
             session.commit()
@@ -61,28 +65,35 @@ class PortfolioRepo:
             session.rollback()
             raise PortfolioUnexpectedError()
 
-    def find_all(self):
+    def find_all(self, user_code: str):
         session = self.session
         try:
-            portfolios = session.query(Portfolio).all()
+            portfolios = session.query(Portfolio) \
+                .filter(Portfolio.user_code == user_code).all()
             return [to_model(portfolio) for portfolio in portfolios]
         except SQLAlchemyError:
             raise PortfolioUnexpectedError()
 
-    def find_by_code(self, portfolio_code) -> PortfolioModel:
+    def find_by_code(self, user_code: str, portfolio_code) -> PortfolioModel:
         session = self.session
         try:
-            portfolio = session.query(Portfolio).filter(Portfolio.code == portfolio_code).one()
+            portfolio = session.query(Portfolio).filter(
+                Portfolio.code == portfolio_code,
+                Portfolio.user_code == user_code
+            ).one()
             return to_model(portfolio)
         except NoResultFound as e:
             raise PortfolioNotFound()
         except Exception as e:
             raise PortfolioUnexpectedError()
 
-    def delete(self, portfolio_code):
+    def delete(self, user_code: str, portfolio_code):
         session = self.session
         try:
-            portfolio = session.query(Portfolio).filter(Portfolio.code == portfolio_code).one()
+            portfolio = session.query(Portfolio).filter(
+                Portfolio.code == portfolio_code,
+                Portfolio.user_code == user_code
+            ).one()
             session.delete(portfolio)
             session.commit()
         except NoResultFound:
