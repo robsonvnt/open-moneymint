@@ -36,6 +36,11 @@ def investment_service(mock_portfolio_repo, mock_investment_repo, mock_stock_rep
 
 
 @pytest.fixture
+def portfolio():
+    return PortfolioModel(code='001', name='test', description='test', user_code='001')
+
+
+@pytest.fixture
 def mock_investment_model():
     return InvestmentModel(
         code="INV123", portfolio_code="PORT456", asset_type=AssetType.STOCK,
@@ -45,8 +50,8 @@ def mock_investment_model():
 
 
 # Test for consolidating a portfolio
-def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo, mock_investment_repo):
-    mock_portfolio_repo.find_by_code.return_value = PortfolioModel(code='001', name='test', description='test')
+def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo, mock_investment_repo, portfolio):
+    mock_portfolio_repo.find_by_code.return_value = portfolio
     mock_investment_repo.find_all_by_portfolio_code.return_value = [
         InvestmentModel(code='code1', purchase_price=100, quantity=2, current_average_price=110, portfolio_code='001',
                         asset_type='STOCK', ticker='AAPL', purchase_date=date.today()),
@@ -54,7 +59,7 @@ def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo,
                         asset_type='STOCK', ticker='MSFT', purchase_date=date.today()),
     ]
 
-    result = investment_service.get_portfolio_overview('001')
+    result = investment_service.get_portfolio_overview('001', '001')
 
     assert result.amount_invested == 700.0
     assert result.portfolio_yield == 11.4
@@ -63,7 +68,7 @@ def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo,
     # Testando sem nenhum investimento cadastrado
     mock_investment_repo.find_all_by_portfolio_code.return_value = []
 
-    result = investment_service.get_portfolio_overview('001')
+    result = investment_service.get_portfolio_overview('001', '001')
 
     assert result.amount_invested == 0
     assert result.portfolio_yield == 0
@@ -72,7 +77,8 @@ def test_get_portfolio_overview_success(investment_service, mock_portfolio_repo,
 
 
 def test_get_portfolio_overview_with_0_values_success(investment_service, mock_portfolio_repo, mock_investment_repo):
-    mock_portfolio_repo.find_by_code.return_value = PortfolioModel(code='001', name='test', description='test')
+    mock_portfolio_repo.find_by_code.return_value = PortfolioModel(code='001', name='test', description='test',
+                                                                   user_code='001')
     mock_investment_repo.find_all_by_portfolio_code.return_value = [
         InvestmentModel(code='code1', purchase_price=0, quantity=0, current_average_price=0, portfolio_code='001',
                         asset_type='STOCK', ticker='AAPL', purchase_date=date.today()),
@@ -80,7 +86,7 @@ def test_get_portfolio_overview_with_0_values_success(investment_service, mock_p
                         asset_type='STOCK', ticker='MSFT', purchase_date=date.today()),
     ]
 
-    result = investment_service.get_portfolio_overview('001')
+    result = investment_service.get_portfolio_overview('001', '001')
 
     assert result.amount_invested == 0
     assert result.portfolio_yield == 0
@@ -89,7 +95,7 @@ def test_get_portfolio_overview_with_0_values_success(investment_service, mock_p
 
 def test_calculate_investment_details(mock_investment_model, investment_service, mock_investment_repo):
     mock_investment_repo.find_by_code.return_value = mock_investment_model
-    investment_service.update_investment = Mock(return_value=mock_investment_model)
+    investment_service.update = Mock(return_value=mock_investment_model)
 
     transactions = [
         TransactionModel(
@@ -111,7 +117,7 @@ def test_calculate_investment_details(mock_investment_model, investment_service,
     # (2000 + 475 + 550 + 1050) / 40 = 101,875
     # (0 + 475 + 550 + 1050) / 20 = 101,875
 
-    investment_result = investment_service.refresh_investment_details("code123", transactions)
+    investment_result = investment_service.refresh_investment_details('001', "code123", transactions)
 
     assert investment_result.purchase_price == 101.88
     assert investment_result.quantity == 20
@@ -120,7 +126,7 @@ def test_calculate_investment_details(mock_investment_model, investment_service,
 # Teste para transações de compra
 def test_refresh_with_buy_transactions(mock_investment_model, investment_service, mock_investment_repo):
     mock_investment_repo.find_by_code.return_value = mock_investment_model
-    investment_service.update_investment = Mock(return_value=mock_investment_model)
+    investment_service.update = Mock(return_value=mock_investment_model)
     transactions = [
         TransactionModel(code="code1", investment_code="inv123", type=TransactionType.BUY, date=date.today(),
                          quantity=10, price=100),
@@ -129,7 +135,7 @@ def test_refresh_with_buy_transactions(mock_investment_model, investment_service
     ]
 
     result = investment_service. \
-        refresh_investment_details("inv123", transactions)
+        refresh_investment_details('001', "inv123", transactions)
     assert result.quantity == 30  # 10 + 20
     assert result.purchase_price == 106.67  # Média ponderada dos preços
 
@@ -137,7 +143,7 @@ def test_refresh_with_buy_transactions(mock_investment_model, investment_service
 # Teste para transações de venda
 def test_refresh_with_sell_transactions(mock_investment_model, investment_service, mock_investment_repo):
     mock_investment_repo.find_by_code.return_value = mock_investment_model
-    investment_service.update_investment = Mock(return_value=mock_investment_model)
+    investment_service.update = Mock(return_value=mock_investment_model)
     transactions = [
         TransactionModel(code="code1", investment_code="inv123", type=TransactionType.BUY, date=date.today(),
                          quantity=30, price=100),
@@ -145,27 +151,27 @@ def test_refresh_with_sell_transactions(mock_investment_model, investment_servic
                          date=date.today() + timedelta(days=1), quantity=10, price=110)
     ]
 
-    result = investment_service.refresh_investment_details("inv123", transactions)
+    result = investment_service.refresh_investment_details('001', "inv123", transactions)
     assert result.quantity == 20  # 30 - 10
 
 
 # Teste para transação com tipo inválido
 def test_refresh_with_invalid_transaction_type(mock_investment_model, investment_service, mock_investment_repo):
     mock_investment_repo.find_by_code.return_value = mock_investment_model
-    investment_service.update_investment = Mock(return_value=mock_investment_model)
+    investment_service.update = Mock(return_value=mock_investment_model)
     transactions = [
         TransactionModel(code="code1", investment_code="inv123", type=TransactionType.DEPOSIT,
                          date=date.today(), quantity=10, price=100)
     ]
 
     with pytest.raises(TransactionInvalidType):
-        investment_service.refresh_investment_details("inv123", transactions)
+        investment_service.refresh_investment_details('001', "inv123", transactions)
 
 
 # Teste para quantidade negativa
 def test_refresh_with_negative_quantity(mock_investment_model, investment_service, mock_investment_repo):
     mock_investment_repo.find_by_code.return_value = mock_investment_model
-    investment_service.update_investment = Mock(return_value=mock_investment_model)
+    investment_service.update = Mock(return_value=mock_investment_model)
     transactions = [
         TransactionModel(code="code1", investment_code="inv123", type=TransactionType.BUY, date=date.today(),
                          quantity=30, price=100),
@@ -174,13 +180,13 @@ def test_refresh_with_negative_quantity(mock_investment_model, investment_servic
     ]
 
     with pytest.raises(TransactionOperationNotPermitted):
-        investment_service.refresh_investment_details("inv123", transactions)
+        investment_service.refresh_investment_details('001', "inv123", transactions)
 
 
 # Teste para atualização correta de InvestmentModel
 def test_correct_update_of_investment_model(mock_investment_model, investment_service, mock_investment_repo):
     mock_investment_repo.find_by_code.return_value = mock_investment_model
-    investment_service.update_investment = Mock(return_value=mock_investment_model)
+    investment_service.update = Mock(return_value=mock_investment_model)
     yesterday = datetime.now() - timedelta(days=1)
     transactions = [
         TransactionModel(code="code1", investment_code="inv123", type=TransactionType.BUY,
@@ -189,6 +195,6 @@ def test_correct_update_of_investment_model(mock_investment_model, investment_se
                          quantity=20, price=110)
     ]
 
-    result = investment_service.refresh_investment_details("inv123", transactions)
+    result = investment_service.refresh_investment_details('001', "inv123", transactions)
     assert result.current_average_price == 110  # Preço da transação mais recente
     assert result.purchase_price == 106.67  # Média ponderada dos preços

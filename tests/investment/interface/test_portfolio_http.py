@@ -47,7 +47,8 @@ def test_update_portfolio(client, db_session):
     updated_data = {
         "code": "PORT100",
         "name": "Updated Portfolio",
-        "description": "Updated Description"
+        "description": "Updated Description",
+        "user_code": "001"
     }
     response = client.put("/portfolios/PORT100", json=updated_data)
 

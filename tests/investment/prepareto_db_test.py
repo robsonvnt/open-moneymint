@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import date
 
+from src.auth.user import User, get_current_user
 from src.investment.repository.db.db_connection import get_db_session
 from src.investment.repository.db.db_entities import Base, Portfolio, ConsolidatedPortfolio, Transaction
 from src.investment.repository.investment_db_repository import Investment
@@ -36,6 +37,8 @@ def db_session():
 def client(db_session):
     def override_get_db():
         yield db_session
+    def override_get_current_user():
+        return User(name="test", user_name="test", code="001")
 
     mock_get_price = Mock()
     mock_get_price.return_value.get_price.return_value = 99.99
@@ -43,12 +46,14 @@ def client(db_session):
     with patch('src.investment.repository.factory.RepositoryFactory.create_stock_repo', new=mock_get_price):
         from tests.main_test import app
         app.dependency_overrides[get_db_session] = override_get_db
+        app.dependency_overrides[get_current_user] = override_get_current_user
+
         yield TestClient(app)
 
 
 def add_portfolio(session):
-    session.add(Portfolio(code="PORT100", name="Portfolio Name 100", description=""))
-    session.add(Portfolio(code="PORT101", name="Portfolio Name 101", description=""))
+    session.add(Portfolio(code="PORT100", name="Portfolio Name 100", description="", user_code="001"))
+    session.add(Portfolio(code="PORT101", name="Portfolio Name 101", description="", user_code="001"))
     session.commit()
 
 

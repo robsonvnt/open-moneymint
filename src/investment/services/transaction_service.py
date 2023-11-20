@@ -15,8 +15,8 @@ class TransactionService:
     def find_all(self, portfolio_code, investment_code) -> List[TransactionModel]:
         return self.transaction_repo.find_all(portfolio_code, investment_code)
 
-    def find_by_code(self, portfolio_code, investment_code, trasaction_code) -> TransactionModel:
-        investment = self.investment_service.find_investment_by_code(portfolio_code, investment_code)
+    def find_by_code(self, user_code: str, portfolio_code, investment_code, trasaction_code) -> TransactionModel:
+        investment = self.investment_service.find_by_code(user_code, portfolio_code, investment_code)
         transaction = self.transaction_repo.find_by_code(trasaction_code)
         if investment.code == transaction.investment_code:
             return transaction
@@ -90,6 +90,7 @@ class TransactionService:
 
     def create(
             self,
+            user_code: str,
             portfolio_code: str,
             investment_code: str,
             new_transaction: TransactionModel,
@@ -98,19 +99,21 @@ class TransactionService:
         if investment_code != new_transaction.investment_code:
             raise TransactionOperationNotPermitted()
         if update_investment:
-            investment = self.investment_service.find_investment_by_code(
+            investment = self.investment_service.find_by_code(
+                user_code,
                 portfolio_code,
                 investment_code
             )
             updated_investment = self._update_investment(investment, new_transaction)
-            self.investment_service.update_investment(
+            self.investment_service.update(
+                user_code,
                 portfolio_code,
                 updated_investment.code,
                 updated_investment
             )
         return self.transaction_repo.create(new_transaction)
 
-    def delete(self, portfolio_code, investment_code, transaction: TransactionModel):
+    def delete(self, user_code: str, portfolio_code: str, investment_code, transaction: TransactionModel):
         """
         Deletes a specified transaction and subsequently refreshes the associated investment details.
 
@@ -130,12 +133,13 @@ class TransactionService:
         @param transaction:
         @param investment_code:
         @param portfolio_code:
+        @param user_code:
         """
-        investment = self.investment_service.find_investment_by_code(portfolio_code, investment_code)
+        investment = self.investment_service.find_by_code(user_code, portfolio_code, investment_code)
         if investment.code != transaction.investment_code:
             raise TransactionOperationNotPermitted()
         self.transaction_repo.delete(transaction.code)
 
         transactions = self.transaction_repo.find_all(portfolio_code, investment.code)
         self.investment_service. \
-            refresh_investment_details(investment_code, transactions)
+            refresh_investment_details(user_code, investment_code, transactions)

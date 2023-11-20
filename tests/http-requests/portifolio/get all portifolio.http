@@ -1,5 +1,6 @@
 ### Obtém os detalhes de um portfólio específico pelo ID
-GET http://127.0.0.1:8000/portfolios
+GET http://127.0.0.1:8001/portfolios
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJyb2Jzb252bnQiLCJleHAiOjE3MDAzMzg5MjZ9.d69Y5BQWlr9GouBYmFZhTErEJ3J6Ny4KoFzPTjZ1_vU
 
 ###

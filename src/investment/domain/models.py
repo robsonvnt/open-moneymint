@@ -12,6 +12,7 @@ class PortfolioModel(BaseModel):
     code: Optional[str]
     name: str
     description: Optional[str]
+    user_code: str
 
 
 class PortfolioConsolidationModel(BaseModel):

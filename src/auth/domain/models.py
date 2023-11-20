@@ -10,5 +10,3 @@ class UserModel(BaseModel):
     user_name: str
     password: str
     created_at: Optional[date]
-
-

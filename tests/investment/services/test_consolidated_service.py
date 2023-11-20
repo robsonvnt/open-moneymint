@@ -63,7 +63,7 @@ def test_consolidate_portfolio(
     mock_investment_service.get_portfolio_overview.return_value = model
     mock_cpb_repo.create_or_update = Mock(side_effect=mock_function)
     # Act
-    consolidated_portfolio = consolidate_portfolio_service.consolidate_portfolio('1234567890')
+    consolidated_portfolio = consolidate_portfolio_service.consolidate_portfolio("001", '1234567890')
     # Assert
     mock_cpb_repo.create_or_update.assert_called_once()
     assert isinstance(consolidated_portfolio, ConsolidatedPortfolioModel), "my_instance não é uma instância de MyClass"

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
+from src.auth.user import User, get_current_user
 from src.investment.domain.investment_errors import InvestmentNotFound, OperationNotPermittedError, \
     ColumnDoesNotExistError
 from src.investment.domain.models import InvestmentModel, PortfolioOverviewModel, AssetType
@@ -32,7 +33,8 @@ class AssetTypeValue(BaseModel):
 async def create_investment(
         portfolio_code,
         new_investment_form_data: NewInvestmentInput,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user=Depends(get_current_user)
 ):
     try:
         investment_service = ServiceFactory.create_investment_service(db_session)
@@ -40,7 +42,7 @@ async def create_investment(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail="Portfolio code does not match.")
         investment_model = InvestmentModel(code=None, **new_investment_form_data.model_dump())
-        return investment_service.create_investment(investment_model)
+        return investment_service.create(current_user.code, investment_model)
 
     except PortfolioNotFound as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
@@ -54,11 +56,12 @@ async def create_investment(
 async def get_investment(
         portfolio_code: str,
         investment_code: str,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user=Depends(get_current_user)
 ):
     try:
         investment_service = ServiceFactory.create_investment_service(db_session)
-        return investment_service.find_investment_by_code(portfolio_code, investment_code)
+        return investment_service.find_by_code(current_user.code, portfolio_code, investment_code)
     except InvestmentNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=str(e))
@@ -71,7 +74,8 @@ async def get_investment(
 async def get_all_investments(
         portfolio_code: str,
         order_by: str = None,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
 ):
     """
     Recupera todos os investimentos associados a um determinado código de portfólio.
@@ -97,7 +101,7 @@ async def get_all_investments(
     """
     try:
         investment_service = ServiceFactory.create_investment_service(db_session)
-        result = investment_service.find_all_investments(portfolio_code, order_by)
+        result = investment_service.find_all(current_user.code, portfolio_code, order_by)
         return result
     except InvestmentNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -114,11 +118,12 @@ async def get_all_investments(
 async def delete_investment(
         portfolio_code: str,
         investment_code: str,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
 ):
     try:
         investment_service = ServiceFactory.create_investment_service(db_session)
-        investment_service.delete_investment(portfolio_code, investment_code)
+        investment_service.delete(current_user.code, portfolio_code, investment_code)
         return {"message": "Investment deleted successfully"}
     except InvestmentNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -133,11 +138,12 @@ async def update_investment(
         portfolio_code: str,
         investment_code: str,
         investment_data: InvestmentModel,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
 ):
     try:
         investment_service = ServiceFactory.create_investment_service(db_session)
-        return investment_service.update_investment(portfolio_code, investment_code, investment_data)
+        return investment_service.update(current_user.code, portfolio_code, investment_code, investment_data)
     except OperationNotPermittedError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except PortfolioNotFound | InvestmentNotFound as e:
@@ -149,11 +155,12 @@ async def update_investment(
 @router.get("/{portfolio_code}/investments-diversification", response_model=List[AssetTypeValue])
 async def get_diversification_portfolio(
         portfolio_code: str,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
 ):
     try:
         investment_service = ServiceFactory.create_investment_service(db_session)
-        result = investment_service.get_diversification_portfolio(portfolio_code)
+        result = investment_service.get_diversification_portfolio(current_user.code, portfolio_code)
         return [AssetTypeValue(asset_type=asset, value=value) for asset, value in result.items()]
     except PortfolioNotFound | InvestmentNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -176,11 +183,12 @@ async def get_portfolio_consolidation(
 @router.put("/{portfolio_code}/investments-prices")
 async def update_investments_prices(
         portfolio_code: str,
-        db_session=Depends(get_db_session)
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
 ):
     try:
         investment_service = ServiceFactory.create_investment_service(db_session)
-        investment_service.update_stock_price(portfolio_code)
+        investment_service.update_stock_price(current_user.code, portfolio_code)
         return {"message": "Investment price updated successfully"}
     except PortfolioNotFound | InvestmentNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

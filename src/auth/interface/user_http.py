@@ -48,7 +48,7 @@ async def signup(
                             detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="Failed to retrieve investments.")
+                            detail="Failed to retrieve user.")
 
 
 @router.post("/users/signin", response_model=AccessTokenResponse)
@@ -62,9 +62,14 @@ async def signin(
         token = authentication_user_service.create_access_token(user, timedelta(minutes=1))
         return AccessTokenResponse(access_token=token)
 
-    except UserNotFound:
+    except UserNotFound as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Incorrect username or password")
+    except Exception as e:
+        a = 0
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Failed to retrieve user.")
+
 
 
 @router.get("/users/me", response_model=UserResponse)

@@ -37,6 +37,7 @@ class Portfolio(Base, AllFeaturesMixin):
     code = Column(String, unique=True, index=True)
     name = Column(String, index=True)
     description = Column(Text, nullable=True)
+    user_code = Column(Text)
 
 
 class Transaction(Base, AllFeaturesMixin):

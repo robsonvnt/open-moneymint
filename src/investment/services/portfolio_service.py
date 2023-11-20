@@ -10,18 +10,18 @@ class PortfolioService:
         self.portfolio_repo: PortfolioRepo = portfolio_repo
         self.investment_service = investment_service
 
-    def create_portfolio(self, new_portfolio: PortfolioModel) -> PortfolioModel:
-        return self.portfolio_repo.create(new_portfolio)
+    def create(self, user_code: str, new_portfolio: PortfolioModel) -> PortfolioModel:
+        return self.portfolio_repo.create(user_code, new_portfolio)
 
-    def update_portfolio(self, portfolio_code: str, updated_portfolio: PortfolioModel) \
+    def update(self, user_code: str, portfolio_code: str, updated_portfolio: PortfolioModel) \
             -> PortfolioModel:
-        return self.portfolio_repo.update(portfolio_code, updated_portfolio)
+        return self.portfolio_repo.update(user_code, portfolio_code, updated_portfolio)
 
-    def delete_portfolio(self, portfolio_code: str):
-        return self.portfolio_repo.delete(portfolio_code)
+    def delete(self, user_code: str, portfolio_code: str):
+        return self.portfolio_repo.delete(user_code, portfolio_code)
 
-    def find_portfolio_by_code(self, code: str) -> PortfolioModel:
-        return self.portfolio_repo.find_by_code(code)
+    def find_by_code(self, user_code: str, code: str) -> PortfolioModel:
+        return self.portfolio_repo.find_by_code(user_code, code)
 
-    def find_all_portfolios(self) -> List[PortfolioModel]:
-        return self.portfolio_repo.find_all()
+    def find_all(self, user_code) -> List[PortfolioModel]:
+        return self.portfolio_repo.find_all(user_code)

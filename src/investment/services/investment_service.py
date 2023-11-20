@@ -20,8 +20,8 @@ class InvestmentService:
         self.stock_repo = stock_repo
         self.transaction_repo: TransactionRepo = transaction_repo
 
-    def create_investment(self, new_investment: InvestmentModel) -> InvestmentModel:
-        self.portfolio_repo.find_by_code(new_investment.portfolio_code)
+    def create(self, user_code: str, new_investment: InvestmentModel) -> InvestmentModel:
+        self.portfolio_repo.find_by_code(user_code, new_investment.portfolio_code)
         created_investment = self.investment_repo.create(new_investment)
 
         # Criar transaction
@@ -39,12 +39,12 @@ class InvestmentService:
 
         return created_investment
 
-    def find_investment_by_code(self, portfolio_code: str, code: str) -> InvestmentModel:
-        portfolio = self.portfolio_repo.find_by_code(portfolio_code)
+    def find_by_code(self, user_code: str, portfolio_code: str, code: str) -> InvestmentModel:
+        portfolio = self.portfolio_repo.find_by_code(user_code, portfolio_code)
         return self.investment_repo.find_by_portf_investment_code(portfolio.code, code)
 
-    def find_all_investments(
-            self, portfolio_code: str, order_by: str = None
+    def find_all(
+            self, user_code: str, portfolio_code: str, order_by: str = None
     ) -> List[InvestmentModel]:
         """
         Retrieves all investments associated with a specific portfolio identified by its code.
@@ -60,27 +60,28 @@ class InvestmentService:
         - If the portfolio does not exist, it returns an error indicating that the portfolio was not found.
         - If a database error occurs, it returns a generic database error.
         """
-        self.portfolio_repo.find_by_code(portfolio_code)
+        self.portfolio_repo.find_by_code(user_code, portfolio_code)
         return self.investment_repo.find_all_by_portfolio_code(portfolio_code, order_by)
 
-    def delete_investment(self, portfolio_code: str, investment_code: str):
-        self.portfolio_repo.find_by_code(portfolio_code)
+    def delete(self, user_code: str, portfolio_code: str, investment_code: str):
+        self.portfolio_repo.find_by_code(user_code, portfolio_code)
         return self.investment_repo.delete(portfolio_code, investment_code)
 
-    def update_investment(
+    def update(
             self,
+            user_code: str,
             portfolio_code: str,
             investment_code: str,
             updated_investment: InvestmentModel
     ) -> InvestmentModel:
-        self.portfolio_repo.find_by_code(portfolio_code)
+        self.portfolio_repo.find_by_code(user_code, portfolio_code)
         if investment_code != updated_investment.code:
             raise OperationNotPermittedError()
         return self.investment_repo.update(portfolio_code, investment_code, updated_investment)
 
-    def get_portfolio_overview(self, portfolio_code: str) -> PortfolioOverviewModel:
+    def get_portfolio_overview(self, user_code: str, portfolio_code: str) -> PortfolioOverviewModel:
         try:
-            portfolio = self.portfolio_repo.find_by_code(portfolio_code)
+            portfolio = self.portfolio_repo.find_by_code(user_code, portfolio_code)
             investments = self.investment_repo.find_all_by_portfolio_code(portfolio_code)
 
             amount_invested = Decimal(0.0)
@@ -112,23 +113,23 @@ class InvestmentService:
         except Exception as e:
             raise UnexpectedError()
 
-    def get_diversification_portfolio(self, portfolio_code: str):
-        self.portfolio_repo.find_by_code(portfolio_code)
+    def get_diversification_portfolio(self, user_code: str, portfolio_code: str):
+        self.portfolio_repo.find_by_code(user_code, portfolio_code)
         return self.investment_repo.get_diversification_portfolio(portfolio_code)
 
-    def update_stock_price(self, portfolio_code: str):
-        investments = self.find_all_investments(portfolio_code)
+    def update_stock_price(self, user_code: str, portfolio_code: str):
+        investments = self.find_all(user_code, portfolio_code)
         for investment in investments:
             if investment.asset_type != "STOCK":
                 continue
             symbol = investment.ticker
             current_price = self.stock_repo.get_price(symbol)
             investment.current_average_price = current_price
-            self.update_investment(portfolio_code, investment.code, investment)
+            self.update(user_code, portfolio_code, investment.code, investment)
         return SUCCESS_RESULT
 
     def refresh_investment_details(
-            self, investment_code: str, transactions: List[TransactionModel]
+            self, user_code: str, investment_code: str, transactions: List[TransactionModel]
     ) -> InvestmentModel:
         """
             Updates the details of an investment based on the provided transactions.
@@ -180,4 +181,4 @@ class InvestmentService:
 
         if investment.quantity < 0:
             raise TransactionOperationNotPermitted("Quantity cannot be negative")
-        return self.update_investment(investment.portfolio_code, investment.code, investment)
+        return self.update(user_code, investment.portfolio_code, investment.code, investment)
