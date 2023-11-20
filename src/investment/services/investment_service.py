@@ -120,7 +120,7 @@ class InvestmentService:
     def update_stock_price(self, user_code: str, portfolio_code: str):
         investments = self.find_all(user_code, portfolio_code)
         for investment in investments:
-            if investment.asset_type != "STOCK":
+            if investment.asset_type not in (AssetType.STOCK, AssetType.REIT):
                 continue
             symbol = investment.ticker
             current_price = self.stock_repo.get_price(symbol)
