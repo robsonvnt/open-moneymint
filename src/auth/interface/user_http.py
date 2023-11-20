@@ -59,7 +59,7 @@ async def signin(
     try:
         authentication_user_service = UserServiceFactory.create_authentication_user_service(db_session)
         user = authentication_user_service.authenticate_user(login_data.user_name, login_data.password)
-        token = authentication_user_service.create_access_token(user, timedelta(minutes=1))
+        token = authentication_user_service.create_access_token(user, timedelta(days=1))
         return AccessTokenResponse(access_token=token)
 
     except UserNotFound as e:

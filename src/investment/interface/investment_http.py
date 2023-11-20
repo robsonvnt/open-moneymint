@@ -175,7 +175,9 @@ async def get_portfolio_consolidation(
         current_user: User = Depends(get_current_user)
 ):
     investment_service = ServiceFactory.create_investment_service(db_session)
-    portfolio_overview = investment_service.get_portfolio_overview(portfolio_code)
+    portfolio_overview = investment_service.get_portfolio_overview(
+        current_user.code, portfolio_code
+    )
     if portfolio_overview is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Portfolio not found.")
     return portfolio_overview
