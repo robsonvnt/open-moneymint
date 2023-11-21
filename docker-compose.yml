@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    volumes:
+      - "./dev-env/pgdata:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  fastapi:
+    image: python:3.11
+    volumes:
+      - ./backend:/src
+    working_dir: /src
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres:5432/db
+      SECRET_KEY: secret_key
+      PYTHONPATH: /src/app/
+#      BRAPI_DEV: ${BRAPI_DEV}
+    command: sh -c "pip install --no-cache-dir --upgrade -r requirements.txt && alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8001:8000"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  react_app:
+    image: node:20
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    depends_on:
+      - fastapi
+      - react_app
+    volumes:
+      - "./dev-env/nginx-dev.conf:/etc/nginx/nginx.conf"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
