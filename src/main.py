@@ -28,6 +28,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_check():
+    raise Exception("teste")
     return {"status": "ok"}
 
 
