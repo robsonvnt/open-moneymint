@@ -155,3 +155,74 @@ dmypy.json
 cython_debug/
 
 .idea/
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependências
+/frontend/node_modules
+
+# Arquivos de build/runtime
+/frontend/build
+/frontend/dist
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Arquivos do npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos do editor
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+*.bak*
+
+# Arquivos do TypeScript
+*.tsbuildinfo
+
+# Cache do TypeScript
+.tscache/
+
+# Arquivos de configuração do Jest
+/coverage
+
+# Arquivos de configuração do macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Arquivos do Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Diretório Recycle Bin usado no compartilhamento de arquivos
+$RECYCLE.BIN/
+
+# VS Code diretórios
+.vscode/
+
+# Arquivos de log
+*.log
+
+# Diretórios temporários
+/tmp
+/temp
+

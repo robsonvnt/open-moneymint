@@ -1,1 +1,1 @@
-# my-investments-python
+# my-finances
