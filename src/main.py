@@ -15,7 +15,6 @@ sentry_sdk.init(
     profiles_sample_rate=1.0,
 )
 
-
 app = FastAPI()
 
 app.add_middleware(
@@ -26,7 +25,10 @@ app.add_middleware(
     allow_headers=["*"],  # Permite todos os cabeçalhos
 )
 
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+
 prepare_router(app)
-
-
-
