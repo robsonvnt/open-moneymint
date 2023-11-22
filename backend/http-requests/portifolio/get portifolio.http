@@ -1,0 +1,5 @@
+### Obtém os detalhes de um portfólio específico pelo ID
+GET http://localhost:8000/portfolios/381b297a79
+Accept: application/json
+
+###

@@ -1,0 +1,14 @@
+POST http://localhost:8000/portfolios/gBxgZAxenA/investments
+Content-Type: application/json
+
+{
+  "portfolio_code": "gBxgZAxenA",
+  "asset_type": "STOCK",
+  "ticker": "PETR6",
+  "quantity": 400,
+  "purchase_price": 34.23,
+  "purchase_date": "1988-02-05",
+  "current_average_price": 34.23
+}
+
+
