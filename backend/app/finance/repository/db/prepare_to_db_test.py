@@ -125,16 +125,16 @@ def add_categories(session):
             )
         )
 
-        # Adds 3 another categories without parent and USER002
-        for i in range(12, 15):
-            categories.append(
-                Category(
-                    code=f"CAT00{i}",
-                    name=f"Child Category {i}",
-                    user_code="USER002",
-                    parent_category_code=None,
-                    created_at=date.today()
-                )
+    # Adds 3 another categories without parent and USER002
+    for i in range(12, 15):
+        categories.append(
+            Category(
+                code=f"CAT00{i}",
+                name=f"Child Category {i}",
+                user_code="USER002",
+                parent_category_code=None,
+                created_at=date.today()
             )
+        )
     session.add_all(categories)
     session.commit()

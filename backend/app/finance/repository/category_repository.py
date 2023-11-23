@@ -52,7 +52,7 @@ class CategoryRepo:
             return to_model(category)
         except NoResultFound:
             raise CategoryNotFound()
-        except Exception:
+        except Exception as e:
             raise CategoryUnexpectedError()
 
     def update(self, category_code: str, updated_category_data: CategoryModel) -> CategoryModel:
@@ -92,8 +92,9 @@ class CategoryRepo:
         except Exception:
             raise CategoryUnexpectedError()
 
-    def find_categories_by_user_and_parent(self, user_code: str, parent_category_code: str = None) -> List[
-        CategoryModel]:
+    def find_categories_by_user_and_parent(
+            self, user_code: str, parent_category_code: str = None
+    ) -> List[CategoryModel]:
         session = self.session
         try:
             categories = session.query(Category).filter(

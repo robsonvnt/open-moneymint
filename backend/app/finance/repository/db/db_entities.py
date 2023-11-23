@@ -14,7 +14,7 @@ class Account(Base, AllFeaturesMixin):
 
     __tablename__ = 'accounts'
     id = Column(Integer, primary_key=True, index=True)
-    code = Column(String, index=True)
+    code = Column(String, index=True, unique=True)
     name = Column(String, index=True)
     description = Column(String)
     user_code = Column(String, index=True)
@@ -28,8 +28,8 @@ class Category(Base, AllFeaturesMixin):
         super().__init__(**kwargs)
 
     __tablename__ = 'category'
-    id = Column(Integer, primary_key=True, index=True)
-    code = Column(String, index=True)
+    id = Column(Integer, primary_key=True, index=True, unique=True)
+    code = Column(String, index=True, unique=True)
     name = Column(String, index=True)
     user_code = Column(String, index=True)
     parent_category_code = Column(String, index=True)
