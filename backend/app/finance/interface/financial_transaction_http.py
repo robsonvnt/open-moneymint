@@ -8,7 +8,7 @@ from fastapi import Depends
 from auth.user import User, get_current_user
 from finance.domain.account_erros import AccountNotFound
 from finance.domain.financial_transaction_erros import FinancialTransactionNotFound
-from finance.domain.models import TransactionType
+from finance.domain.models import TransactionType, FinancialTransactionModel
 from finance.repository.db.db_connection import get_db_session
 from finance.services.factory import ServiceFactory
 
@@ -82,3 +82,25 @@ async def get_transaction(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccountNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.post("/transactions", response_model=TransactionResponse)
+async def create_transaction(
+        new_transaction_data: TransactionInput,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    try:
+        transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
+        new_transaction = transaction_serv.create(
+            FinancialTransactionModel(**new_transaction_data.model_dump())
+        )
+        account_serv = ServiceFactory.create_account_service(db_session)
+
+        # Validates whether transaction belongs to the logged in user
+        account_serv.get_by_code(current_user.code, new_transaction.account_code)
+        return new_transaction
+    except FinancialTransactionNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except AccountNotFound as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))

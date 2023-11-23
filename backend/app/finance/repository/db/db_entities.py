@@ -2,6 +2,8 @@ from sqlalchemy import Column, Float, Date, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_mixins import AllFeaturesMixin
 
+from finance.domain.models import TransactionType
+
 Base = declarative_base()
 
 
@@ -39,6 +41,8 @@ class Category(Base, AllFeaturesMixin):
 class FinancialTransaction(Base, AllFeaturesMixin):
     def __init__(self, **kwargs):
         kwargs.setdefault('id', None)
+        if isinstance(kwargs.get('type'), TransactionType):
+            kwargs['type'] = kwargs['type'].value
         super().__init__(**kwargs)
 
     __tablename__ = 'finances_transactions'

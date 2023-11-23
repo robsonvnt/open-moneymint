@@ -35,7 +35,7 @@ class FinancialTransactionRepo:
             session.commit()
             session.refresh(new_transaction)
             return to_model(new_transaction)
-        except Exception:
+        except Exception as e:
             raise FinancialTransactionUnexpectedError()
 
     def find_by_code(self, transaction_code: str) -> FinancialTransactionModel:
