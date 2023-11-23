@@ -10,6 +10,13 @@ class AccountModel(BaseModel):
     name: str
     description: Optional[str]
     user_code: str
+    created_at: Optional[date]
+
+    def __init__(self, **data):
+        data.setdefault('code', None)
+        data.setdefault('created_at', None)
+        data.setdefault('description', None)
+        super().__init__(**data)
 
 
 class TransactionType(Enum):
