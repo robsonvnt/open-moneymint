@@ -14,7 +14,7 @@ from finance.services.factory import ServiceFactory
 category_router = APIRouter()
 
 
-class NewCategoryInput(BaseModel):
+class CategoryInput(BaseModel):
     name: str
     parent_category_code: Optional[str]
 
@@ -74,58 +74,59 @@ async def get_category(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
+@category_router.post("/categories", response_model=CategoryResponse)
+async def create_category(
+        input: CategoryInput,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    category_service = ServiceFactory.create_category_service(db_session)
+    category_model = CategoryModel(
+        user_code=current_user.code,
+        **input.model_dump()
+    )
+    return category_service.create(category_model)
+
+
+@category_router.put("/categories/{category_code}", response_model=CategoryResponse)
+async def update_category(
+        category_code: str,
+        category_input: CategoryInput,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    category_service = ServiceFactory.create_category_service(db_session)
+    try:
+        # checks if the rented user is the owner of the category
+        category = category_service.get_by_code(category_code)
+        if category.user_code != current_user.code:
+            raise CategoryNotFound()
+
+        for key, value in category_input.model_dump().items():
+            setattr(category, key, value)
+
+        updated_category = category_service.update(category_code, category)
+        return CategoryResponse(**updated_category.model_dump())
+    except CategoryNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
 #
-#
-# @account_router.get("/accounts/{account_code}", response_model=AccountModel)
-# async def get_account(
-#         account_code: str,
-#         db_session=Depends(get_db_session),
-#         current_user: User = Depends(get_current_user)
-# ):
-#     try:
-#         account_service = ServiceFactory.create_account_service(db_session)
-#         result = account_service.get_by_code(current_user.code, account_code)
-#         return result
-#     except AccountNotFound as e:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-#
-#
-# @account_router.post("/accounts", response_model=AccountModel)
-# async def create_account(
-#         input: NewAccountInput,
-#         db_session=Depends(get_db_session),
-#         current_user: User = Depends(get_current_user)
-# ):
-#     account_service = ServiceFactory.create_account_service(db_session)
-#     account_model = AccountModel(name=input.name, description=input.description, user_code=current_user.code)
-#     return account_service.create(account_model)
-#
-#
-# @account_router.put("/accounts/{account_code}", response_model=AccountModel)
-# async def update_account(
-#         account_code: str,
-#         account_input: AccountModel,
-#         db_session=Depends(get_db_session),
-#         current_user: User = Depends(get_current_user)
-# ):
-#     account_service = ServiceFactory.create_account_service(db_session)
-#     try:
-#         return account_service.update(current_user.code, account_code, account_input)
-#     except AccountNotFound as e:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-#
-#
-# @account_router.delete("/accounts/{account_code}")
-# async def delete_account(
-#         account_code: str,
-#         db_session=Depends(get_db_session),
-#         current_user: User = Depends(get_current_user)
-# ):
-#     try:
-#         account_service = ServiceFactory.create_account_service(db_session)
-#         account_service.delete(current_user.code, account_code)
-#         return {"message": "Account deleted successfully"}
-#     except AccountNotFound as e:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-#     except Exception as e:
-#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+@category_router.delete("/categories/{category_code}")
+async def delete_category(
+        category_code: str,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    try:
+        category_service = ServiceFactory.create_category_service(db_session)
+
+        # checks if the rented user is the owner of the category
+        category = category_service.get_by_code(category_code)
+        if category.user_code != current_user.code:
+            raise CategoryNotFound()
+
+        category_service.delete(category_code)
+        return {"message": "Account deleted successfully"}
+    except CategoryNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

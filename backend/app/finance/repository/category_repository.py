@@ -61,7 +61,12 @@ class CategoryRepo:
             category = session.query(Category).filter(
                 Category.code == category_code
             ).one()
-            for key, value in updated_category_data.dict().items():
+            model_dump = updated_category_data.model_dump()
+            model_dump.pop("created_at")
+            model_dump.pop("code")
+            model_dump.pop("user_code")
+
+            for key, value in model_dump.items():
                 setattr(category, key, value)
             session.commit()
             session.refresh(category)
