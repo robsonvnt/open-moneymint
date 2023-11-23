@@ -9,6 +9,7 @@ Base = declarative_base()
 class Account(Base, AllFeaturesMixin):
 
     def __init__(self, **kwargs):
+        kwargs.setdefault('id', None)
         super().__init__(**kwargs)
 
     __tablename__ = 'accounts'
@@ -18,3 +19,20 @@ class Account(Base, AllFeaturesMixin):
     description = Column(String)
     user_code = Column(String, index=True)
     created_at = Column(Date)
+
+
+class Category(Base, AllFeaturesMixin):
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('id', None)
+        super().__init__(**kwargs)
+
+    __tablename__ = 'category'
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, index=True)
+    name = Column(String, index=True)
+    user_code = Column(String, index=True)
+    parent_category_code = Column(String, index=True)
+    created_at = Column(Date)
+
+

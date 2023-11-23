@@ -28,7 +28,14 @@ class TransactionType(Enum):
 class CategoryModel(BaseModel):
     code: Optional[str]
     name: str
-    parent_category_code: str
+    parent_category_code: Optional[str]
+    user_code: str
+    created_at: Optional[date]
+
+    def __init__(self, **data):
+        data.setdefault('code', None)
+        data.setdefault('created_at', None)
+        super().__init__(**data)
 
 
 class TransactionModel(BaseModel):

@@ -8,11 +8,11 @@ from finance.repository.account_repository import AccountRepo
 from finance.repository.db.prepare_to_db_test import *
 
 
-def test_create_account(db_session):
+def test_create_account(memory_db_session):
     """
     Testa se a função de criação de conta está funcionando corretamente.
     """
-    account_repo = AccountRepo(db_session)
+    account_repo = AccountRepo(memory_db_session)
     new_account_data = AccountModel(
         name="Test Account",
         user_code="USER123",
@@ -25,12 +25,12 @@ def test_create_account(db_session):
     assert account_model.created_at == date.today()
 
 
-def test_find_by_code(db_session):
+def test_find_by_code(memory_db_session):
     """
     Testa se a função encontra a conta correta pelo código.
     """
-    add_accounts(db_session)
-    account_repo = AccountRepo(db_session)
+    add_accounts(memory_db_session)
+    account_repo = AccountRepo(memory_db_session)
 
     account_model = account_repo.find_by_code("USER001", "ACC123")
     assert account_model.name == "Existing Account"
@@ -40,12 +40,12 @@ def test_find_by_code(db_session):
         account_repo.find_by_code("USER001", "NONEXISTENT")
 
 
-def test_delete_account(db_session):
+def test_delete_account(memory_db_session):
     """
     Testa se a função de exclusão de conta está funcionando corretamente.
     """
-    add_accounts(db_session)
-    account_repo = AccountRepo(db_session)
+    add_accounts(memory_db_session)
+    account_repo = AccountRepo(memory_db_session)
 
     result = account_repo.delete("USER001", "ACC123")
     assert result is True
@@ -54,12 +54,12 @@ def test_delete_account(db_session):
         account_repo.delete("USER001", "NONEXISTENT")
 
 
-def test_update_account(db_session):
+def test_update_account(memory_db_session):
     """
     Testa se a função de atualização de conta está funcionando corretamente.
     """
-    add_accounts(db_session)
-    account_repo = AccountRepo(db_session)
+    add_accounts(memory_db_session)
+    account_repo = AccountRepo(memory_db_session)
     updated_account_data = AccountModel(name="Updated Account", user_code="USER789")
 
     updated_account_model = account_repo.update("USER001", "ACC123", updated_account_data)
@@ -70,14 +70,14 @@ def test_update_account(db_session):
         account_repo.update("PORT123", "NONEXISTENT", updated_account_data)
 
 
-def test_find_all_by_user_code(db_session):
+def test_find_all_by_user_code(memory_db_session):
     """
     Testa se a função find_all retorna todas as contas associadas a um user_code específico.
     """
     # Adiciona contas de teste ao banco de dados
-    add_accounts(db_session)
+    add_accounts(memory_db_session)
 
-    account_repo = AccountRepo(db_session)
+    account_repo = AccountRepo(memory_db_session)
 
     # Testa o retorno de todas as contas para um user_code específico
     user_code_test = "USER001"

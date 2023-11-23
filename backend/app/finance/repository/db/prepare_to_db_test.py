@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import Mock, patch
 import tempfile
 import os
@@ -8,8 +9,10 @@ from sqlalchemy.orm import sessionmaker
 
 from auth.user import User, get_current_user
 from finance.repository.db.db_connection import get_db_session
-from finance.repository.db.db_entities import Account, Base
+from finance.repository.db.db_entities import Account, Base, Category
 from fastapi.testclient import TestClient
+
+from investment.helpers import generate_code
 
 
 @pytest.fixture(scope="function")
@@ -18,8 +21,25 @@ def db_session():
     db_file_path = db_file.name
     db_file.close()
 
-    # engine = create_engine("sqlite:///.db_test.sqlite", connect_args={"check_same_thread": False})
     engine = create_engine(f"sqlite:///{db_file_path}", connect_args={"check_same_thread": False})
+    Base.metadata.create_all(bind=engine)
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
+        os.remove(db_file_path)
+
+
+@pytest.fixture(scope="function")
+def memory_db_session():
+    db_file = tempfile.NamedTemporaryFile(suffix='.sqlite', delete=False)
+    db_file_path = db_file.name
+    db_file.close()
+
+    engine = create_engine(f"sqlite:///:memory:", connect_args={"check_same_thread": False})
     Base.metadata.create_all(bind=engine)
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)
     db = TestingSessionLocal()
@@ -54,9 +74,67 @@ def add_accounts(session):
     accounts = [
         Account(code="ACC123", name="Existing Account", description="Description for ACC123", user_code="USER001"),
         Account(code="ACC124", name="Second Account", description="Description for ACC124", user_code="USER002"),
-        Account(code="ACC125", name="Other USER456's Account", description="Description for ACC125", user_code="USER001"),
+        Account(code="ACC125", name="Other USER456's Account", description="Description for ACC125",
+                user_code="USER001"),
         # Adicione mais contas conforme necessário
     ]
-
     session.add_all(accounts)
+    session.commit()
+
+
+def add_categories(session):
+    categories = []
+    categories.append(Category(
+        code="CAT001",
+        name="Main Category",
+        user_code="USER001",
+        parent_category_code=None,
+        created_at=date.today()
+    ))
+    # Adds child categories to category 001
+    for i in range(2, 5):
+        categories.append(
+            Category(
+                code=f"CAT00{i}",
+                name=f"Child Category {i}",
+                user_code="USER001",
+                parent_category_code="CAT001",
+                created_at=date.today()
+            )
+        )
+    # Adds 3 another USER001 categories without parent
+    for i in range(5, 8):
+        categories.append(
+            Category(
+                code=f"CAT00{i}",
+                name=f"Child Category {i}",
+                user_code="USER001",
+                parent_category_code=None,
+                created_at=date.today()
+            )
+        )
+    # Adds child categories to category 003
+    for i in range(8, 12):
+        categories.append(
+            Category(
+                code=f"CAT00{i}",
+                name=f"Child Category {i}",
+                user_code="USER001",
+                parent_category_code="CAT003",
+                created_at=date.today()
+            )
+        )
+
+        # Adds 3 another categories without parent and USER002
+        for i in range(12, 15):
+            categories.append(
+                Category(
+                    code=f"CAT00{i}",
+                    name=f"Child Category {i}",
+                    user_code="USER002",
+                    parent_category_code=None,
+                    created_at=date.today()
+                )
+            )
+    session.add_all(categories)
     session.commit()

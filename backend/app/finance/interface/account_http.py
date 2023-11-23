@@ -23,7 +23,7 @@ async def get_all_accounts(
         current_user: User = Depends(get_current_user)
 ):
     account_service = ServiceFactory.create_account_service(db_session)
-    return account_service.get_all_accounts_by_user_code(current_user.code)
+    return account_service.get_all_by_user_code(current_user.code)
 
 
 @account_router.get("/accounts/{account_code}", response_model=AccountModel)
@@ -34,7 +34,7 @@ async def get_account(
 ):
     try:
         account_service = ServiceFactory.create_account_service(db_session)
-        result = account_service.get_account_by_code(current_user.code, account_code)
+        result = account_service.get_by_code(current_user.code, account_code)
         return result
     except AccountNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -48,7 +48,7 @@ async def create_account(
 ):
     account_service = ServiceFactory.create_account_service(db_session)
     account_model = AccountModel(name=input.name, description=input.description, user_code=current_user.code)
-    return account_service.create_account(account_model)
+    return account_service.create(account_model)
 
 
 @account_router.put("/accounts/{account_code}", response_model=AccountModel)
@@ -60,7 +60,7 @@ async def update_account(
 ):
     account_service = ServiceFactory.create_account_service(db_session)
     try:
-        return account_service.update_account(current_user.code, account_code, account_input)
+        return account_service.update(current_user.code, account_code, account_input)
     except AccountNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -73,7 +73,7 @@ async def delete_account(
 ):
     try:
         account_service = ServiceFactory.create_account_service(db_session)
-        account_service.delete_account(current_user.code, account_code)
+        account_service.delete(current_user.code, account_code)
         return {"message": "Account deleted successfully"}
     except AccountNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
