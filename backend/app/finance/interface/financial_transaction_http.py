@@ -1,0 +1,62 @@
+from datetime import date
+
+from fastapi import APIRouter, Query, HTTPException, status
+from pydantic import BaseModel
+from typing import List, Optional
+from fastapi import Depends
+
+from auth.user import User, get_current_user
+from finance.domain.account_erros import AccountNotFound
+from finance.domain.models import TransactionType
+from finance.repository.db.db_connection import get_db_session
+from finance.services.factory import ServiceFactory
+
+finance_transaction_router = APIRouter()
+router = finance_transaction_router
+
+
+class TransactionInput(BaseModel):
+    account_code: str
+    description: str
+    category_code: str
+    type: TransactionType
+    date: date
+    value: float
+
+
+class TransactionResponse(BaseModel):
+    code: str
+    account_code: str
+    description: str
+    category_code: str
+    type: TransactionType
+    date: date
+    value: float
+
+
+@router.get("/transactions", response_model=List[TransactionResponse])
+async def get_all_transactions(
+        account_code: str = Query(None, description="Account Code"),
+        start_date: Optional[date] = Query(
+            None, description="Start date in YYYY-MM-DD format"
+        ),
+        end_date: Optional[date] = Query(
+            None, description="End date in YYYY-MM-DD format"
+        ),
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    try:
+        transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
+        account_serv = ServiceFactory.create_account_service(db_session)
+
+        account_serv.get_by_code(current_user.code, account_code)
+
+        transactions = transaction_serv.filter_by_account_and_date(
+            account_code,
+            start_date,
+            end_date
+        )
+        return transactions
+    except AccountNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

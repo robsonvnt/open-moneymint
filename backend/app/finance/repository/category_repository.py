@@ -61,10 +61,7 @@ class CategoryRepo:
             category = session.query(Category).filter(
                 Category.code == category_code
             ).one()
-            model_dump = updated_category_data.model_dump()
-            model_dump.pop("created_at")
-            model_dump.pop("code")
-            model_dump.pop("user_code")
+            model_dump = updated_category_data.model_dump(exclude={"created_at", "code", "user_code"})
 
             for key, value in model_dump.items():
                 setattr(category, key, value)

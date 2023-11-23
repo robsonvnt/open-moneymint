@@ -38,14 +38,20 @@ class CategoryModel(BaseModel):
         super().__init__(**data)
 
 
-class TransactionModel(BaseModel):
+class FinancialTransactionModel(BaseModel):
     code: Optional[str]
     account_code: str
-    description: float
+    description: str
     category_code: str
     type: TransactionType
     date: date
     value: float
+
+    def __init__(self, **data):
+        data.setdefault('code', None)
+        if isinstance(data.get('type'), str):
+            data['type'] = TransactionType[data['type']]
+        super().__init__(**data)
 
 
 class ConsolidatedAccountModel(BaseModel):
