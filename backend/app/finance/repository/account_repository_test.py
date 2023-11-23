@@ -32,12 +32,12 @@ def test_find_by_code(db_session):
     add_accounts(db_session)
     account_repo = AccountRepo(db_session)
 
-    account_model = account_repo.find_by_code("ACC123")
+    account_model = account_repo.find_by_code("USER001", "ACC123")
     assert account_model.name == "Existing Account"
-    assert account_model.user_code == "USER456"
+    assert account_model.user_code == "USER001"
 
     with pytest.raises(AccountNotFound):
-        account_repo.find_by_code("NONEXISTENT")
+        account_repo.find_by_code("USER001", "NONEXISTENT")
 
 
 def test_delete_account(db_session):
@@ -47,11 +47,11 @@ def test_delete_account(db_session):
     add_accounts(db_session)
     account_repo = AccountRepo(db_session)
 
-    result = account_repo.delete("USER456", "ACC123")
+    result = account_repo.delete("USER001", "ACC123")
     assert result is True
 
     with pytest.raises(AccountNotFound):
-        account_repo.delete("USER456", "NONEXISTENT")
+        account_repo.delete("USER001", "NONEXISTENT")
 
 
 def test_update_account(db_session):
@@ -62,7 +62,7 @@ def test_update_account(db_session):
     account_repo = AccountRepo(db_session)
     updated_account_data = AccountModel(name="Updated Account", user_code="USER789")
 
-    updated_account_model = account_repo.update("USER456", "ACC123", updated_account_data)
+    updated_account_model = account_repo.update("USER001", "ACC123", updated_account_data)
     assert updated_account_model.name == "Updated Account"
     assert updated_account_model.user_code == "USER789"
 
@@ -80,7 +80,7 @@ def test_find_all_by_user_code(db_session):
     account_repo = AccountRepo(db_session)
 
     # Testa o retorno de todas as contas para um user_code específico
-    user_code_test = "USER456"
+    user_code_test = "USER001"
     accounts = account_repo.find_all(user_code_test)
     assert len(accounts) == 2
     for account in accounts:

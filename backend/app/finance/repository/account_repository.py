@@ -39,11 +39,12 @@ class AccountRepo:
             else:
                 raise AccountUnexpectedError()
 
-    def find_by_code(self, account_code):
+    def find_by_code(self, user_code: str, account_code: str):
         session = self.session
         try:
             account = session.query(Account).filter(
                 Account.code == account_code,
+                Account.user_code == user_code
             ).one()
             return to_model(account)
         except NoResultFound:
@@ -95,5 +96,5 @@ class AccountRepo:
             return to_model(account)
         except NoResultFound:
             raise AccountNotFound()
-        except Exception:
+        except Exception as e:
             raise AccountUnexpectedError()

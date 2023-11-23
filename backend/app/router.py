@@ -2,6 +2,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import Response
 
+from finance.interface.account_http import account_router
 from investment.interface.portfolio_http import router as portfolio_router
 from investment.interface.investment_http import router as investment_router
 from investment.interface.consolidated_balance_http import router as consolidated_balance_router
@@ -27,9 +28,13 @@ class NormalizePathMiddleware(BaseHTTPMiddleware):
 def prepare_router(app):
     app.add_middleware(NormalizePathMiddleware)
 
+    # Investments
     app.include_router(portfolio_router, prefix="/portfolios")
     app.include_router(investment_router, prefix="/portfolios")
     app.include_router(consolidated_balance_router, prefix="/portfolios")
     app.include_router(transaction_router, prefix="/portfolios")
 
     app.include_router(user_router, prefix="")
+
+    # Finance
+    app.include_router(account_router, prefix="")

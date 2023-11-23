@@ -31,9 +31,9 @@ def test_get_account_by_code(account_service, mock_account_repo):
     mock_account_repo.find_by_code.return_value = AccountModel(name="Test Account", user_code="USER123",
                                                                created_at="2023-01-01")
 
-    result = account_service.get_account_by_code("ACC123")
+    result = account_service.get_account_by_code("USER123", "ACC123")
 
-    mock_account_repo.find_by_code.assert_called_once_with("ACC123")
+    mock_account_repo.find_by_code.assert_called_once_with("USER123", "ACC123")
     assert result.name == "Test Account"
 
 
@@ -77,4 +77,4 @@ def test_get_account_by_code_not_found(account_service, mock_account_repo):
     mock_account_repo.find_by_code.side_effect = AccountNotFound()
 
     with pytest.raises(AccountNotFound):
-        account_service.get_account_by_code("NONEXISTENT")
+        account_service.get_account_by_code("USER123", "NONEXISTENT")

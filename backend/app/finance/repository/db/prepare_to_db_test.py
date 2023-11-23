@@ -37,7 +37,7 @@ def client(db_session):
         yield db_session
 
     def override_get_current_user():
-        return User(name="test", user_name="test", code="001")
+        return User(name="test", user_name="test", code="USER001")
 
     mock_get_price = Mock()
     mock_get_price.return_value.get_price.return_value = 99.99
@@ -52,9 +52,9 @@ def client(db_session):
 
 def add_accounts(session):
     accounts = [
-        Account(code="ACC123", name="Existing Account", description="Description for ACC123", user_code="USER456"),
-        Account(code="ACC124", name="Second Account", description="Description for ACC124", user_code="USER457"),
-        Account(code="ACC125", name="Other USER456's Account", description="Description for ACC125", user_code="USER456"),
+        Account(code="ACC123", name="Existing Account", description="Description for ACC123", user_code="USER001"),
+        Account(code="ACC124", name="Second Account", description="Description for ACC124", user_code="USER002"),
+        Account(code="ACC125", name="Other USER456's Account", description="Description for ACC125", user_code="USER001"),
         # Adicione mais contas conforme necessário
     ]
 
