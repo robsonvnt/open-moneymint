@@ -7,6 +7,7 @@ from fastapi import Depends
 
 from auth.user import User, get_current_user
 from finance.domain.account_erros import AccountNotFound
+from finance.domain.financial_transaction_erros import FinancialTransactionNotFound
 from finance.domain.models import TransactionType
 from finance.repository.db.db_connection import get_db_session
 from finance.services.factory import ServiceFactory
@@ -50,6 +51,7 @@ async def get_all_transactions(
         transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
         account_serv = ServiceFactory.create_account_service(db_session)
 
+        # Validates whether transactions belongs to the logged in user
         account_serv.get_by_code(current_user.code, account_code)
 
         transactions = transaction_serv.filter_by_account_and_date(
@@ -58,5 +60,25 @@ async def get_all_transactions(
             end_date
         )
         return transactions
+    except AccountNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.get("/transactions/{transaction_code}", response_model=TransactionResponse)
+async def get_transaction(
+        transaction_code: str,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    try:
+        transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
+        account_serv = ServiceFactory.create_account_service(db_session)
+        transaction = transaction_serv.get_by_code(transaction_code)
+
+        # Validates whether transaction belongs to the logged in user
+        account_serv.get_by_code(current_user.code, transaction.account_code)
+        return transaction
+    except FinancialTransactionNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccountNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
