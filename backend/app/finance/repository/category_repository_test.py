@@ -26,6 +26,7 @@ def test_create_category(memory_db_session):
         parent_category_code=result.code
     )
     result = category_repo.create(new_category_data)
+    assert isinstance(result, CategoryModel)
     assert result.name == "Test Category"
     assert len(result.code) == 10
 
@@ -49,6 +50,7 @@ def test_find_by_code(memory_db_session):
     category_repo = CategoryRepo(memory_db_session)
     result = category_repo.find_by_code("CAT001")
 
+    assert isinstance(result, CategoryModel)
     assert result.code == "CAT001"
     assert result.name == "Main Category"
 
@@ -72,6 +74,7 @@ def test_update_category(memory_db_session):
     )
 
     result = category_repo.update("CAT001", updated_category)
+    assert isinstance(result, CategoryModel)
     assert result.name == "Updated Category"
 
 
@@ -118,31 +121,48 @@ def test_delete_category(memory_db_session):
         ).one()
 
 
-def test_find_all_categories(memory_db_session):
+def test_find_categories_by_user_and_parent_categories(memory_db_session):
     add_categories(memory_db_session)
     category_repo = CategoryRepo(memory_db_session)
 
-    results = category_repo.find_all(
+    results = category_repo.find_categories_by_user_and_parent(
         "USER001",
         "CAT001"
     )
 
     assert len(results) == 3
+    for cat in results:
+        assert isinstance(cat, CategoryModel)
     assert results[0].code == "CAT002"
     assert results[1].code == "CAT003"
     assert results[2].code == "CAT004"
 
 
-def test_find_all_categories_with_none_parent(memory_db_session):
+def test_find_categories_by_user_and_parent_with_none_parent(memory_db_session):
     add_categories(memory_db_session)
     category_repo = CategoryRepo(memory_db_session)
 
-    results = category_repo.find_all(
-        "USER001",None
+    results = category_repo.find_categories_by_user_and_parent(
+        "USER001", None
     )
 
     assert len(results) == 4
+    for cat in results:
+        assert isinstance(cat, CategoryModel)
     assert results[0].code == "CAT001"
     assert results[1].code == "CAT005"
     assert results[2].code == "CAT006"
     assert results[3].code == "CAT007"
+
+
+def test_find_categories_by_user(memory_db_session):
+    add_categories(memory_db_session)
+    category_repo = CategoryRepo(memory_db_session)
+
+    results = category_repo.find_all_by_user(
+        "USER001"
+    )
+
+    assert len(results) == 11
+    for cat in results:
+        assert isinstance(cat, CategoryModel)

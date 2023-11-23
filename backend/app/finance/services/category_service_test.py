@@ -93,17 +93,33 @@ def test_delete_category_failure(account_service, mock_category_repo):
     mock_category_repo.delete.assert_called_once_with(category_code)
 
 
-def test_find_all_categories(account_service, mock_category_repo):
+def test_find_categories_by_user_and_parent(account_service, mock_category_repo):
     user_code = "UC"
     parent_category_code = "P"
     mock_categories = [
         CategoryModel(name="N1", parent_category_code="P", user_code="UC"),
         CategoryModel(name="N2", parent_category_code="P", user_code="UC"),
     ]
-    mock_category_repo.find_all.return_value = mock_categories
+    mock_category_repo.find_categories_by_user_and_parent.return_value = mock_categories
 
-    results = account_service.find_all(user_code, parent_category_code)
+    results = account_service.find_categories_by_user_and_parent(user_code, parent_category_code)
 
-    mock_category_repo.find_all.assert_called_once_with(user_code, parent_category_code)
+    mock_category_repo.find_categories_by_user_and_parent.assert_called_once_with(user_code, parent_category_code)
+    assert len(results) == len(mock_categories)
+    assert all(isinstance(category, CategoryModel) for category in results)
+
+
+def test_find_all_by_user(account_service, mock_category_repo):
+    user_code = "UC"
+    parent_category_code = "P"
+    mock_categories = [
+        CategoryModel(name="N1", parent_category_code="P", user_code="UC"),
+        CategoryModel(name="N2", parent_category_code="P", user_code="UC"),
+    ]
+    mock_category_repo.find_all_by_user.return_value = mock_categories
+
+    results = account_service.find_all_by_user(user_code)
+
+    mock_category_repo.find_all_by_user.assert_called_once_with(user_code)
     assert len(results) == len(mock_categories)
     assert all(isinstance(category, CategoryModel) for category in results)

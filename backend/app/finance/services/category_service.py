@@ -23,5 +23,10 @@ class CategoryService:
     def delete(self, category_code: str):
         self.category_repo.delete(category_code)
 
-    def find_all(self, user_code: str, parent_category_code: str) -> List[CategoryModel]:
-        return self.category_repo.find_all(user_code, parent_category_code)
+    def find_categories_by_user_and_parent(
+            self, user_code: str, parent_category_code: str = None
+    ) -> List[CategoryModel]:
+        return self.category_repo.find_categories_by_user_and_parent(user_code, parent_category_code)
+
+    def find_all_by_user(self, user_code: str) -> List[CategoryModel]:
+        return self.category_repo.find_all_by_user(user_code)

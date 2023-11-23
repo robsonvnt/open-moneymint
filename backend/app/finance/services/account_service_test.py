@@ -42,11 +42,11 @@ def test_get_all_accounts_by_user_code(account_service, mock_account_repo):
         AccountModel(name="Account 1", user_code="USER123", created_at="2023-01-01"),
         AccountModel(name="Account 2", user_code="USER123", created_at="2023-01-02")
     ]
-    mock_account_repo.find_all.return_value = mock_accounts
+    mock_account_repo.find_categories_by_user_and_parent.return_value = mock_accounts
 
     results = account_service.get_all_by_user_code("USER123")
 
-    mock_account_repo.find_all.assert_called_once_with("USER123")
+    mock_account_repo.find_categories_by_user_and_parent.assert_called_once_with("USER123")
     assert len(results) == 2
 
 

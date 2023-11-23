@@ -8,7 +8,7 @@ from finance.domain.models import CategoryModel
 from finance.repository.db.db_connection import get_db_session
 from finance.services.factory import ServiceFactory
 
-account_router = APIRouter()
+category_router = APIRouter()
 
 
 class NewCategoryInput(BaseModel):
@@ -16,13 +16,35 @@ class NewCategoryInput(BaseModel):
     parent_category_code: Optional[str]
 
 
-@account_router.get("/categories", response_model=List[CategoryModel])
+class CategoryTree(BaseModel):
+    code: str
+    name: str
+    children: List["CategoryTree"]
+
+    @classmethod
+    def from_list(cls, categories, parent_code=None):
+        tree = []
+        for category in categories:
+            if category.parent_category_code == parent_code:
+                children = cls.from_list(
+                    categories, parent_code=category.code
+                )
+                tree.append(cls(code=category.code, name=category.name, children=children))
+        return tree
+
+
+CategoryTree.model_rebuild()
+
+
+@category_router.get("/categories", response_model=List[CategoryTree])
 async def get_all_accounts(
         db_session=Depends(get_db_session),
         current_user: User = Depends(get_current_user)
 ):
-    account_service = ServiceFactory.create_account_service(db_session)
-    return account_service.get_all_by_user_code(current_user.code)
+    category_service = ServiceFactory.create_category_service(db_session)
+    categories = category_service.find_all_by_user(current_user.code)
+    tree = CategoryTree.from_list(categories)
+    return tree
 #
 #
 # @account_router.get("/accounts/{account_code}", response_model=AccountModel)
