@@ -80,7 +80,6 @@ class CategoryRepo:
 
             session.delete(main_category)
             session.commit()
-            return True
         except NoResultFound:
             raise CategoryNotFound()
         except Exception:

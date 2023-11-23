@@ -34,5 +34,9 @@ class CategoryUnexpectedError(CategoryError):
 class CategoryOperationNotPermittedError(CategoryError):
     """Raised when an operation on a category is not permitted."""
 
+    def __init__(self, message="Operation not permitted"):
+        self.message = message
+        super().__init__(message)
+
     def __str__(self):
-        return "Operation not permitted"
+        return self.message
