@@ -127,7 +127,6 @@ def test_update_transaction(client, db_session):
 def test_update_transaction_non_existent(client, db_session):
     add_accounts(db_session)
     add_transactions(db_session)
-
     updated_transaction = {
         "account_code": "ACC123",
         "description": "Changed Values",
@@ -136,7 +135,6 @@ def test_update_transaction_non_existent(client, db_session):
         "date": "2023-05-05",
         "value": 100.0
     }
-
     response = client.put("/finances/transactions/non_existent", json=updated_transaction)
 
     assert response.status_code == 404
@@ -145,7 +143,6 @@ def test_update_transaction_non_existent(client, db_session):
 def test_update_transaction_other_user(client, db_session):
     add_accounts(db_session)
     add_transactions(db_session)
-
     updated_transaction = {
         "account_code": "ACC124",
         "description": "Changed Values",
@@ -154,7 +151,44 @@ def test_update_transaction_other_user(client, db_session):
         "date": "2023-05-05",
         "value": 100.0
     }
-
     response = client.put("/finances/transactions/TRA004", json=updated_transaction)
 
     assert response.status_code == 403
+
+    db_transaction: FinancialTransaction = db_session.query(FinancialTransaction).filter(
+        FinancialTransaction.code == "TRA001"
+    ).one()
+    assert db_transaction.description != updated_transaction["description"]
+
+    # Outro possível ataque
+    updated_transaction["account_code"] = "ACC123"
+    response = client.put("/finances/transactions/TRA004", json=updated_transaction)
+    assert response.status_code == 403
+    db_transaction: FinancialTransaction = db_session.query(FinancialTransaction).filter(
+        FinancialTransaction.code == "TRA001"
+    ).one()
+    assert db_transaction.description != updated_transaction["description"]
+
+
+def test_delete_transaction(client, db_session):
+    add_accounts(db_session)
+    add_transactions(db_session)
+    response = client.delete("/finances/transactions/TRA001")
+
+    assert response.status_code == 200
+
+
+def test_delete_transaction_other_user(client, db_session):
+    add_accounts(db_session)
+    add_transactions(db_session)
+    response = client.delete("/finances/transactions/TRA004")
+
+    assert response.status_code == 403
+
+
+def test_delete_transaction_non_existent(client, db_session):
+    add_accounts(db_session)
+    add_transactions(db_session)
+    response = client.delete("/finances/transactions/non_existent")
+
+    assert response.status_code == 404

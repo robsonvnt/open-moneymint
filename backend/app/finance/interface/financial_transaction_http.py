@@ -115,14 +115,38 @@ async def update_transaction(
 ):
     try:
         transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
+
+        # Validates whether transaction belongs to the logged in user
+        db_transaction = transaction_serv.get_by_code(transaction_code)
+        account_serv = ServiceFactory.create_account_service(db_session)
+        account_serv.get_by_code(current_user.code, db_transaction.account_code)
+
         updated_transaction = transaction_serv.update(
             transaction_code, FinancialTransactionModel(**new_transaction_data.model_dump())
         )
-        account_serv = ServiceFactory.create_account_service(db_session)
+        return updated_transaction
+    except FinancialTransactionNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except AccountNotFound as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+
+@router.delete("/transactions/{transaction_code}")
+async def update_transaction(
+        transaction_code: str,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    try:
+        transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
+        transaction = transaction_serv.get_by_code(transaction_code)
 
         # Validates whether transaction belongs to the logged in user
-        account_serv.get_by_code(current_user.code, updated_transaction.account_code)
-        return updated_transaction
+        account_serv = ServiceFactory.create_account_service(db_session)
+        account_serv.get_by_code(current_user.code, transaction.account_code)
+
+        transaction_serv.delete(transaction_code)
+        return {"message": "Transaction deleted successfully"}
     except FinancialTransactionNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccountNotFound as e:
