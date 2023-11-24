@@ -88,7 +88,7 @@ def test_create_transaction(client, db_session):
     assert json_result["category_code"] == "CAT001"
 
 
-def test_create_transaction(client, db_session):
+def test_create_transaction_other_user(client, db_session):
     add_accounts(db_session)
 
     new_transaction = {
@@ -101,5 +101,60 @@ def test_create_transaction(client, db_session):
     }
 
     response = client.post("/finances/transactions", json=new_transaction)
+
+    assert response.status_code == 403
+
+
+def test_update_transaction(client, db_session):
+    add_accounts(db_session)
+    add_transactions(db_session)
+
+    updated_transaction = {
+        "account_code": "ACC123",
+        "description": "Changed Values",
+        "category_code": "CAT001",
+        "type": TransactionType.TRANSFER.value,
+        "date": "2023-05-05",
+        "value": 100.0
+    }
+
+    response = client.put("/finances/transactions/TRA001", json=updated_transaction)
+
+    assert response.status_code == 200
+    assert response.json()["description"] == updated_transaction["description"]
+
+
+def test_update_transaction_non_existent(client, db_session):
+    add_accounts(db_session)
+    add_transactions(db_session)
+
+    updated_transaction = {
+        "account_code": "ACC123",
+        "description": "Changed Values",
+        "category_code": "CAT001",
+        "type": TransactionType.TRANSFER.value,
+        "date": "2023-05-05",
+        "value": 100.0
+    }
+
+    response = client.put("/finances/transactions/non_existent", json=updated_transaction)
+
+    assert response.status_code == 404
+
+
+def test_update_transaction_other_user(client, db_session):
+    add_accounts(db_session)
+    add_transactions(db_session)
+
+    updated_transaction = {
+        "account_code": "ACC124",
+        "description": "Changed Values",
+        "category_code": "CAT001",
+        "type": TransactionType.TRANSFER.value,
+        "date": "2023-05-05",
+        "value": 100.0
+    }
+
+    response = client.put("/finances/transactions/TRA004", json=updated_transaction)
 
     assert response.status_code == 403

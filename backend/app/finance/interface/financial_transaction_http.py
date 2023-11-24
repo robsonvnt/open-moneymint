@@ -104,3 +104,26 @@ async def create_transaction(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccountNotFound as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+
+@router.put("/transactions/{transaction_code}", response_model=TransactionResponse)
+async def update_transaction(
+        transaction_code: str,
+        new_transaction_data: TransactionInput,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    try:
+        transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
+        updated_transaction = transaction_serv.update(
+            transaction_code, FinancialTransactionModel(**new_transaction_data.model_dump())
+        )
+        account_serv = ServiceFactory.create_account_service(db_session)
+
+        # Validates whether transaction belongs to the logged in user
+        account_serv.get_by_code(current_user.code, updated_transaction.account_code)
+        return updated_transaction
+    except FinancialTransactionNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except AccountNotFound as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))

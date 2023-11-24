@@ -76,13 +76,13 @@ class FinancialTransactionRepo:
                 FinancialTransaction.code == transaction_code
             ).one()
             for key, value in updated_transaction_data.model_dump(exclude={'code', 'account_code'}).items():
-                setattr(transaction, key, value)
+                setattr(transaction, key, value if key != "type" else value.value)
             session.commit()
             session.refresh(transaction)
             return to_model(transaction)
         except NoResultFound:
             raise FinancialTransactionNotFound()
-        except Exception:
+        except Exception as e:
             raise FinancialTransactionUnexpectedError()
 
     def delete(self, transaction_code: str):
