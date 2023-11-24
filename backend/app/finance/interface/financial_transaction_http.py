@@ -1,10 +1,9 @@
-import datetime
 import calendar
-from datetime import date
+from datetime import date, datetime
 
 from fastapi import APIRouter, Query, HTTPException, status
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Annotated
 from fastapi import Depends
 
 from auth.user import User, get_current_user
@@ -13,6 +12,7 @@ from finance.domain.financial_transaction_erros import FinancialTransactionNotFo
 from finance.domain.models import TransactionType, FinancialTransactionModel
 from finance.repository.db.db_connection import get_db_session
 from finance.services.factory import ServiceFactory
+from helpers import get_last_day_of_the_month
 
 finance_transaction_router = APIRouter()
 router = finance_transaction_router
@@ -39,7 +39,7 @@ class TransactionResponse(BaseModel):
 
 @router.get("/transactions", response_model=List[TransactionResponse])
 async def get_all_transactions(
-        account_code: List[str] = Query(None, description="Account Code"),
+        account_codes: Annotated[Optional[list[str]], Query()] = None,
         month: Optional[str] = Query(
             None, description="Start date in YYYY-MM format"
         ),
@@ -57,19 +57,16 @@ async def get_all_transactions(
         account_serv = ServiceFactory.create_account_service(db_session)
 
         # Validates whether transactions belongs to the logged in user
-        account_serv.get_by_code(current_user.code, account_code)
+        for account_code in account_codes:
+            account_serv.get_by_code(current_user.code, account_code)
 
         if month:
-            month_date = datetime.strptime(month, '%Y-%m')
+            month_date = datetime.strptime(month, "%Y-%m").date()
             start_date = month_date
-            end_date = datetime.strptime(month_date, '%Y-%m')
-            today = datetime.date.today()
-            last_day_of_month = calendar.monthrange(month_date.year, month_date.month)[1]
-
-            last_day_of_month = datetime.date(today.year, today.month, last_day_of_month)
+            end_date = get_last_day_of_the_month(month_date)
 
         transactions = transaction_serv.filter_by_account_and_date(
-            account_code,
+            account_codes,
             start_date,
             end_date
         )

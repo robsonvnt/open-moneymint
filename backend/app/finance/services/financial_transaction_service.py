@@ -16,11 +16,11 @@ class FinancialTransactionService:
         return self.financial_transaction_repo.find_by_code(transaction_code)
 
     def filter_by_account_and_date(
-            self, account_code: str,
+            self, account_codes: List[str],
             date_start: date = None, date_end: date = None
     ) -> List[FinancialTransactionModel]:
         return self.financial_transaction_repo.filter_by_account_and_date(
-            account_code, date_start, date_end
+            account_codes, date_start, date_end
         )
 
     def update(

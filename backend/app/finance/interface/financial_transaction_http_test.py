@@ -17,20 +17,27 @@ def test_get_transactions_month_multi_accounts(client, db_session):
     add_accounts(db_session)
     add_transactions(db_session)
     response = client.get(
-        "/finances/transactions?account_codes=ACC123,ACC125&month=2023-05"
+        "/finances/transactions?account_codes=ACC123&account_codes=ACC125&month=2023-05"
     )
     json_result = response.json()
 
     assert response.status_code == 200
     assert len(json_result) == 3
 
+    response = client.get(
+        "/finances/transactions?account_codes=ACC123&account_codes=ACC125&month=2023-06"
+    )
+    json_result = response.json()
+
+    assert response.status_code == 200
+    assert len(json_result) == 1
 
 
 def test_get_transactions_empty_dates(client, db_session):
     add_accounts(db_session)
     add_transactions(db_session)
     response = client.get(
-        "/finances/transactions?account_code=ACC123"
+        "/finances/transactions?account_codes=ACC123"
     )
     json_result = response.json()
 
@@ -42,7 +49,7 @@ def test_get_transactions_account_other_user(client, db_session):
     add_accounts(db_session)
     add_transactions(db_session)
     response = client.get(
-        "/finances/transactions?account_code=ACC124"
+        "/finances/transactions?account_codes=ACC124"
     )
 
     assert response.status_code == 404
@@ -82,7 +89,6 @@ def test_get_transaction_other_user(client, db_session):
 
 def test_create_transaction(client, db_session):
     add_accounts(db_session)
-
     new_transaction = {
         "account_code": "ACC123",
         "description": "Description 1",

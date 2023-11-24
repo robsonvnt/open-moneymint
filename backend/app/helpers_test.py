@@ -16,14 +16,13 @@ def test_generate_code():
 
 
 def test_get_last_day_of_the_month_today():
+    fixed_date = datetime.date(2023, 2, 15)
 
-    date_mock = Mock(wraps=datetime.date)
-    date_mock.today.return_value = datetime.date(2023, 2, 15)
-
-
-    with patch('datetime.datetime.date') as date_mock:
+    with patch('datetime.date') as mock_date:
+        mock_date.today.return_value = fixed_date
         result = get_last_day_of_the_month()
-        assert date_mock.today.calle_count == 10
+
+        assert mock_date.today.call_count == 1
         assert result == datetime.date(2023, 2, 28)
 
 
@@ -31,5 +30,3 @@ def test_get_last_day_of_the_month_specifying_the_date():
     specified_date = datetime.date(2023, 1, 15)
     result = get_last_day_of_the_month(specified_date)
     assert result == datetime.date(2023, 1, 31)
-
-

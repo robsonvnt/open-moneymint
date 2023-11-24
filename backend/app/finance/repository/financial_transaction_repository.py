@@ -59,9 +59,9 @@ class FinancialTransactionRepo:
                 FinancialTransaction.account_code.in_(account_codes)
             )
             if date_start:
-                query = query.filter(FinancialTransaction.date > date_start)
+                query = query.filter(FinancialTransaction.date >= date_start)
             if date_end:
-                query = query.filter(FinancialTransaction.date < date_end)
+                query = query.filter(FinancialTransaction.date <= date_end)
 
             transactions = query.all()
             return [to_model(transaction) for transaction in transactions]
