@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from sqlalchemy.exc import NoResultFound
 from datetime import date
@@ -7,7 +7,7 @@ from finance.domain.financial_transaction_erros import FinancialTransactionUnexp
 from finance.domain.models import FinancialTransactionModel
 from finance.repository.db.db_entities import FinancialTransaction
 
-from investment.helpers import generate_code
+from helpers import generate_code
 
 
 def to_database(financial_transaction_model: FinancialTransactionModel) -> FinancialTransaction:
@@ -51,12 +51,12 @@ class FinancialTransactionRepo:
             raise FinancialTransactionUnexpectedError()
 
     def filter_by_account_and_date(
-            self, account_code: str, date_start: date = None, date_end: date = None
+            self, account_codes: List[str], date_start: date = None, date_end: date = None
     ) -> List[FinancialTransactionModel]:
         session = self.session
         try:
             query = session.query(FinancialTransaction).filter(
-                FinancialTransaction.account_code == account_code
+                FinancialTransaction.account_code.in_(account_codes)
             )
             if date_start:
                 query = query.filter(FinancialTransaction.date > date_start)

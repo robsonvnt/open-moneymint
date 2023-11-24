@@ -1,3 +1,5 @@
+import datetime
+import calendar
 from datetime import date
 
 from fastapi import APIRouter, Query, HTTPException, status
@@ -37,7 +39,10 @@ class TransactionResponse(BaseModel):
 
 @router.get("/transactions", response_model=List[TransactionResponse])
 async def get_all_transactions(
-        account_code: str = Query(None, description="Account Code"),
+        account_code: List[str] = Query(None, description="Account Code"),
+        month: Optional[str] = Query(
+            None, description="Start date in YYYY-MM format"
+        ),
         start_date: Optional[date] = Query(
             None, description="Start date in YYYY-MM-DD format"
         ),
@@ -53,6 +58,15 @@ async def get_all_transactions(
 
         # Validates whether transactions belongs to the logged in user
         account_serv.get_by_code(current_user.code, account_code)
+
+        if month:
+            month_date = datetime.strptime(month, '%Y-%m')
+            start_date = month_date
+            end_date = datetime.strptime(month_date, '%Y-%m')
+            today = datetime.date.today()
+            last_day_of_month = calendar.monthrange(month_date.year, month_date.month)[1]
+
+            last_day_of_month = datetime.date(today.year, today.month, last_day_of_month)
 
         transactions = transaction_serv.filter_by_account_and_date(
             account_code,

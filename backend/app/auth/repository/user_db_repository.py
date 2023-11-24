@@ -8,7 +8,7 @@ from sqlalchemy_mixins import AllFeaturesMixin
 
 from auth.domain.models import UserModel
 from auth.domain.user_erros import UserNotFound
-from investment.helpers import generate_code
+from helpers import generate_code
 
 Base = declarative_base()
 

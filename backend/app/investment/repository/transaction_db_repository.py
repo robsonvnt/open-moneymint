@@ -3,7 +3,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 from investment.domain.models import TransactionModel
 from investment.domain.transaction_errors import TransactionNotFound, TransactionUnexpectedError
-from investment.helpers import generate_code
+from helpers import generate_code
 from investment.repository.db.db_entities import Transaction
 from investment.repository.investment_db_repository import InvestmentRepo
 

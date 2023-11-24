@@ -7,7 +7,7 @@ from datetime import date
 from finance.domain.category_erros import CategoryUnexpectedError, CategoryNotFound
 from finance.domain.models import CategoryModel
 from finance.repository.db.db_entities import Category
-from investment.helpers import generate_code
+from helpers import generate_code
 
 
 def to_database(category_model: CategoryModel) -> Category:

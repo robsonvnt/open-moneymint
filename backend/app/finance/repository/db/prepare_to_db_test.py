@@ -13,8 +13,6 @@ from finance.repository.db.db_connection import get_db_session
 from finance.repository.db.db_entities import Account, Base, Category, FinancialTransaction
 from fastapi.testclient import TestClient
 
-from investment.helpers import generate_code
-
 
 @pytest.fixture(scope="function")
 def db_session():
@@ -90,7 +88,7 @@ def add_transactions(session):
             type=TransactionType.TRANSFER.value, date=date(2023, 5, 5), value=100.0
         ),
         FinancialTransaction(
-            code="TRA002", account_code="ACC123", description="Description 2", category_code="CAT002",
+            code="TRA002", account_code="ACC123", description="Description 2", category_code="CAT003",
             type=TransactionType.DEPOSIT.value, date=date(2023, 5, 10), value=200.0
         ),
         FinancialTransaction(
@@ -104,6 +102,10 @@ def add_transactions(session):
         FinancialTransaction(
             code="TRA005", account_code="ACC124", description="Description 5", category_code="CAT005",
             type=TransactionType.TRANSFER.value, date=date(2023, 4, 5), value=250.0
+        ),
+        FinancialTransaction(
+            code="TRA006", account_code="ACC125", description="Description 6", category_code="CAT003",
+            type=TransactionType.TRANSFER.value, date=date(2023, 5, 5), value=250.0
         )
     ]
     session.add_all(transactions)

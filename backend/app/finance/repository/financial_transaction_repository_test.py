@@ -74,7 +74,7 @@ def test_filter_by_account_and_date():
 
     mock_session.query.return_value.filter.return_value.all.return_value = return_value_filter
 
-    result = repo.filter_by_account_and_date("TR001")
+    result = repo.filter_by_account_and_date(["TR001"])
     mock_session.query.return_value.filter.return_value.all.assert_called_once()
     assert mock_session.query.call_count == 1
     assert mock_session.query.return_value.filter.call_count == 1
@@ -98,7 +98,7 @@ def test_filter_by_account_and_date_with_date():
 
     query_2.filter.return_value.all.return_value = return_value_filter
 
-    result = repo.filter_by_account_and_date("TR001", date.today(), date.today())
+    result = repo.filter_by_account_and_date(["TR001"], date.today(), date.today())
 
     assert mock_session.query.call_count == 1
     assert mock_session.query.return_value.filter.call_count == 1
@@ -113,7 +113,7 @@ def test_filter_by_account_and_date_empty_result():
 
     mock_session.query().filter().all.return_value = []
 
-    result = repo.filter_by_account_and_date("TR001")
+    result = repo.filter_by_account_and_date(["TR001"])
     mock_session.query().filter().all.assert_called_once()
     assert len(result) == 0
 

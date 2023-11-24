@@ -3,7 +3,7 @@ from sqlalchemy import text
 from investment.domain.investment_errors import InvestmentNotFound, UnexpectedError, DatabaseError, \
     ColumnDoesNotExistError, NoAssetsFound
 from investment.domain.models import InvestmentModel
-from investment.helpers import generate_code
+from helpers import generate_code
 from investment.repository.db.db_entities import Investment
 from sqlalchemy.exc import NoResultFound
 
