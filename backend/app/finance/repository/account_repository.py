@@ -47,7 +47,7 @@ class AccountRepo:
             return to_model(account)
         except NoResultFound:
             raise AccountNotFound()
-        except Exception:
+        except Exception as w:
             raise AccountUnexpectedError()
 
     def find_all(self, user_code: str):

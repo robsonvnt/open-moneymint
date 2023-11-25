@@ -21,3 +21,13 @@ export interface CategoryTreeItem {
     children: CategoryTreeItem[];
 
 }
+
+export interface AccountTransaction {
+    code: string;
+    account_code: string;
+    description: string;
+    category_code: string;
+    type: string;
+    date: string;
+    value: number;
+}

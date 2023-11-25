@@ -33,6 +33,18 @@ def test_get_transactions_month_multi_accounts(client, db_session):
     assert len(json_result) == 1
 
 
+def test_get_transactions_empty_accounts(client, db_session):
+    add_accounts(db_session)
+    add_transactions(db_session)
+    response = client.get(
+        "/finances/transactions"
+    )
+    json_result = response.json()
+
+    assert response.status_code == 200
+    assert len(json_result) == 4
+
+
 def test_get_transactions_empty_dates(client, db_session):
     add_accounts(db_session)
     add_transactions(db_session)

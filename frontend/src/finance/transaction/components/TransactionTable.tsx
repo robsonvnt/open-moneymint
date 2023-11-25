@@ -6,6 +6,10 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from "./Title";
+import {AccountTransaction, CategoryTreeItem} from "../../models";
+import {useEffect} from "react";
+import {TransactionService} from "../TransactionService";
+import {TransactionModel} from "../../../investments/transactions/models";
 
 // Generate Order Data
 function createData(
@@ -60,27 +64,38 @@ function preventDefault(event: React.MouseEvent) {
 }
 
 export default function TransactionTable() {
+      const transactionService = TransactionService;
+    const [transactions, setTransactions] = React.useState<AccountTransaction[]>([]);
+
+
+    useEffect(() => {
+        transactionService.getAll().then(categoryTree => {
+            setTransactions(categoryTree);
+        })
+    }, []);
+
+
   return (
     <React.Fragment>
       <Title>Recent Orders</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Ship To</TableCell>
-            <TableCell>Payment Method</TableCell>
-            <TableCell align="right">Sale Amount</TableCell>
+            <TableCell>Data</TableCell>
+            <TableCell>Descrição</TableCell>
+            <TableCell>Categoria</TableCell>
+            <TableCell>Conta</TableCell>
+            <TableCell align="right">Valor</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.shipTo}</TableCell>
-              <TableCell>{row.paymentMethod}</TableCell>
-              <TableCell align="right">{`$${row.amount}`}</TableCell>
+          {transactions.map((transaction) => (
+            <TableRow key={transaction.code}>
+              <TableCell>{transaction.date}</TableCell>
+              <TableCell>{transaction.description}</TableCell>
+              <TableCell>{transaction.category_code}</TableCell>
+              <TableCell>{transaction.account_code}</TableCell>
+              <TableCell align="right">{`$${transaction.value}`}</TableCell>
             </TableRow>
           ))}
         </TableBody>

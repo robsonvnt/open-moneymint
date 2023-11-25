@@ -56,6 +56,9 @@ async def get_all_transactions(
         transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
         account_serv = ServiceFactory.create_account_service(db_session)
 
+        if not account_codes:
+            account_codes = [account_code.code for account_code in account_serv.get_all_by_user_code(current_user.code)]
+
         # Validates whether transactions belongs to the logged in user
         for account_code in account_codes:
             account_serv.get_by_code(current_user.code, account_code)
@@ -72,6 +75,8 @@ async def get_all_transactions(
         )
         return transactions
     except AccountNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
