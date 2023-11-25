@@ -72,10 +72,10 @@ def test_filter_by_account_and_date():
         generate_financial_transaction(),
     ]
 
-    mock_session.query.return_value.filter.return_value.all.return_value = return_value_filter
+    mock_session.query.return_value.filter.return_value.order_by.return_value.all.return_value = return_value_filter
 
     result = repo.filter_by_account_and_date(["TR001"])
-    mock_session.query.return_value.filter.return_value.all.assert_called_once()
+    assert mock_session.query.return_value.filter.return_value.order_by.return_value.all.call_count == 1
     assert mock_session.query.call_count == 1
     assert mock_session.query.return_value.filter.call_count == 1
     assert len(result) == 2
@@ -96,7 +96,7 @@ def test_filter_by_account_and_date_with_date():
     query_1.filter.return_value = query_2
     mock_session.query.return_value.filter.return_value = query_1
 
-    query_2.filter.return_value.all.return_value = return_value_filter
+    query_2.filter.return_value.order_by.return_value.all.return_value = return_value_filter
 
     result = repo.filter_by_account_and_date(["TR001"], date.today(), date.today())
 
@@ -111,10 +111,10 @@ def test_filter_by_account_and_date_empty_result():
     mock_session = create_autospec(Session)
     repo = FinancialTransactionRepo(mock_session)
 
-    mock_session.query().filter().all.return_value = []
+    mock_session.query().filter().order_by().all.return_value = []
 
     result = repo.filter_by_account_and_date(["TR001"])
-    mock_session.query().filter().all.assert_called_once()
+    mock_session.query().filter().order_by().all.assert_called_once()
     assert len(result) == 0
 
 

@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {TreeView} from '@mui/x-tree-view/TreeView';
 import {TreeItem} from '@mui/x-tree-view/TreeItem';
-import {AccountModel, CategoryTreeItem} from "../../models";
+import {CategoryTreeItem} from "../../models";
 
 
 const CategoryTree: React.FC = () => {

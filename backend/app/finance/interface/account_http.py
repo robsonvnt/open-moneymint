@@ -58,7 +58,11 @@ async def create_account(
         current_user: User = Depends(get_current_user)
 ):
     account_service = ServiceFactory.create_account_service(db_session)
-    account_model = AccountModel(name=input.name, description=input.description, user_code=current_user.code)
+    account_model = AccountModel(
+        name=input.name,
+        description=input.description,
+        user_code=current_user.code
+    )
     return account_service.create(account_model)
 
 

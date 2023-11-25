@@ -17,6 +17,7 @@ class AccountModel(BaseModel):
         data.setdefault('code', None)
         data.setdefault('created_at', None)
         data.setdefault('description', None)
+        data.setdefault('balance', 0)
         super().__init__(**data)
 
 
