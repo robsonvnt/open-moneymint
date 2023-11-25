@@ -15,6 +15,7 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = (
         currentDate,
         setCurrentDate,
     }) => {
+
     const capitalize = (str: string) => {
         return str.charAt(0).toUpperCase() + str.slice(1);
     };

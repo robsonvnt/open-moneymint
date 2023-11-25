@@ -7,8 +7,11 @@ import {TreeView} from '@mui/x-tree-view/TreeView';
 import {TreeItem} from '@mui/x-tree-view/TreeItem';
 import {CategoryTreeItem} from "../../models";
 
+interface CategoryTreeProps {
+    selectedCategoryCode: string;
+}
 
-const CategoryTree: React.FC = () => {
+const CategoryTree: React.FC<CategoryTreeProps> = ({selectedCategoryCode}) => {
     const categoryService = CategoryService;
     const [categoryTree, setCategoryTree] = React.useState<CategoryTreeItem[]>([]);
 

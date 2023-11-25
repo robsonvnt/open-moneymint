@@ -11,6 +11,9 @@ import {useEffect, useState} from "react";
 import {TransactionService} from "../TransactionService";
 import MonthNavigator from "./MonthNavigator";
 import {currencyFormatter, formatDateStr} from "../../../helpers/BRFormatHelper";
+import TransactionView from "./TransactionView";
+import {AccountService} from "../../account/AccountService";
+import {CategoryService} from "../../category/CategoryService";
 
 // Generate Order Data
 function createData(
@@ -31,18 +34,49 @@ function preventDefault(event: React.MouseEvent) {
     event.preventDefault();
 }
 
-export default function TransactionTable() {
+interface TransactionTableProps {
+    checkedAccounts: Map<string, boolean>;
+}
+
+const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts}) => {
+
     const transactionService = TransactionService;
     const [transactions, setTransactions] = React.useState<AccountTransaction[]>([]);
+    const [accountsMap, setAccountsMap] = React.useState<Map<string, string>>(new Map());
+    const [categoriesMap, setCategoriesMap] = React.useState<Map<string, string>>(new Map());
 
 
     useEffect(() => {
         loadTransactions();
+
+        // Carrega todas as Contas
+        AccountService.getAllAccounts().then(
+            accounts => {
+                const newAccountsMap = new Map(accountsMap.entries());
+                accounts.map(account => newAccountsMap.set(account.code, account.name))
+                setAccountsMap(newAccountsMap)
+            })
+
+        // Carrega todas as Categorias
+        CategoryService.getAllCategoriesList().then(
+            categories => {
+                const newCategoriesMap = new Map();
+                categories.map(category => {
+                    newCategoriesMap.set(category.code, category.name)
+                })
+                setCategoriesMap(newCategoriesMap)
+
+            })
     }, []);
+
+    useEffect(() => {
+        loadTransactions();
+    }, [checkedAccounts]);
 
     // Transactions
     const loadTransactions = () => {
-        transactionService.getAll(currentDate).then(transactions => {
+        const account_codes = Array.from(checkedAccounts.keys()).filter(key => checkedAccounts.get(key) === true);
+        transactionService.getAll(currentDate, account_codes).then(transactions => {
             setTransactions(transactions);
         })
     };
@@ -57,7 +91,7 @@ export default function TransactionTable() {
 
     return (
         <React.Fragment>
-            <Title>Recent Orders</Title>
+            <Title>Jaque</Title>
             <MonthNavigator
                 currentDate={currentDate}
                 setCurrentDate={setCurrentDate}
@@ -79,8 +113,8 @@ export default function TransactionTable() {
                                 {formatDateStr(transaction.date)}
                             </TableCell>
                             <TableCell>{transaction.description}</TableCell>
-                            <TableCell>{transaction.category_code}</TableCell>
-                            <TableCell>{transaction.account_code}</TableCell>
+                            <TableCell>{categoriesMap.get(transaction.category_code)}</TableCell>
+                            <TableCell>{accountsMap.get(transaction.account_code)}</TableCell>
                             <TableCell
                                 align="right"
                                 style={{
@@ -101,3 +135,5 @@ export default function TransactionTable() {
         </React.Fragment>
     );
 }
+
+export default TransactionTable;

@@ -17,4 +17,14 @@ export const CategoryService = {
         }
     },
 
+    async getAllCategoriesList(): Promise<CategoryTreeItem[]> {
+        let url_call = `${baseUrl}/list`;
+        try {
+            const response: AxiosResponse<CategoryTreeItem[]> = await axios.get(url_call);
+            return response.data;
+        } catch (error) {
+            throw new Error(`Erro ao obter Categories: ${error}`);
+        }
+    },
+
 };

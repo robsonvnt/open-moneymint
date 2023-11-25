@@ -6,7 +6,12 @@ import {Copyright} from "@mui/icons-material";
 import TransactionTable from "./TransactionTable";
 
 
-const TransactionView: React.FC = () => {
+interface TransactionViewProps {
+    checkedAccounts: Map<string, boolean>;
+}
+
+
+const TransactionView: React.FC<TransactionViewProps> = ({checkedAccounts}) => {
 
     useEffect(() => {
 
@@ -58,7 +63,9 @@ const TransactionView: React.FC = () => {
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <TransactionTable/>
+                  <TransactionTable
+                    checkedAccounts={checkedAccounts}
+                  />
                 </Paper>
               </Grid>
             </Grid>

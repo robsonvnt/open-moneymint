@@ -14,12 +14,22 @@ const FinanceHome: React.FC = () => {
 
     }, []);
 
+    // SideBar State
+    const [accountChecked, setAccountChecked] = React.useState<Map<string, boolean>>(new Map());
+    const [selectedCategoryCode, setSelectedCategoryCode] = React.useState<string>("");
+
 
     return (
         <Box sx={{display: 'flex'}}>
             <MoneyMineAppBar/>
-            <SideBar/>
-            <TransactionView/>
+            <SideBar
+                checkedAccounts={accountChecked}
+                setCheckedAccounts={setAccountChecked}
+                selectedCategoryCode={selectedCategoryCode}
+            />
+            <TransactionView
+                checkedAccounts={accountChecked}
+            />
         </Box>
 
     );

@@ -63,7 +63,7 @@ class FinancialTransactionRepo:
             if date_end:
                 query = query.filter(FinancialTransaction.date <= date_end)
 
-            query = query.order_by(FinancialTransaction.date)
+            query = query.order_by(FinancialTransaction.id, FinancialTransaction.date)
             transactions = query.all()
             return [to_model(transaction) for transaction in transactions]
         except Exception as e:

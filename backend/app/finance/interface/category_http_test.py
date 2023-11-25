@@ -15,6 +15,17 @@ def test_get_categories(client, db_session):
     assert len(json_result[0]["children"][1]["children"]) == 4
 
 
+def test_get_categories_list(client, db_session):
+    add_categories(db_session)
+    response = client.get("/finances/categories/list")
+    json_result = response.json()
+
+    assert response.status_code == 200
+    assert len(json_result) == 11
+    for item in json_result:
+        assert len(item["children"]) == 0
+
+
 def test_get_categories_by_code(client, db_session):
     add_categories(db_session)
     response = client.get("/finances/categories/CAT001")

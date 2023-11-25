@@ -31,6 +31,10 @@ class CategoryTree(BaseModel):
     name: str
     children: List["CategoryTree"]
 
+    def __init__(self, **data):
+        data.setdefault('children', [])
+        super().__init__(**data)
+
     @classmethod
     def from_list(cls, categories, parent_code=None):
         tree = []
@@ -55,6 +59,17 @@ async def get_all_categories(
     categories = category_service.find_all_by_user(current_user.code)
     tree = CategoryTree.from_list(categories)
     return tree
+
+
+@category_router.get("/categories/list", response_model=List[CategoryTree])
+async def get_all_categories_list(
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    category_service = ServiceFactory.create_category_service(db_session)
+    categories = [CategoryTree(code=cat.code, name=cat.name) for cat in
+                  category_service.find_all_by_user(current_user.code)]
+    return categories
 
 
 @category_router.get("/categories/{category_code}", response_model=CategoryResponse)
