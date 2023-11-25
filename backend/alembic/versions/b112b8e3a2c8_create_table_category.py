@@ -1,8 +1,8 @@
-"""Create Table Account
+"""Create Table Category
 
-Revision ID: f0d0bbf5748c
-Revises: d0dbb9e15630
-Create Date: 2023-11-24 20:51:56.656163
+Revision ID: b112b8e3a2c8
+Revises: f0d0bbf5748c
+Create Date: 2023-11-24 22:45:50.551088
 
 """
 from typing import Sequence, Union
@@ -10,28 +10,29 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+
 # revision identifiers, used by Alembic.
-revision: str = 'f0d0bbf5748c'
-down_revision: Union[str, None] = 'd0dbb9e15630'
+revision: str = 'b112b8e3a2c8'
+down_revision: Union[str, None] = 'f0d0bbf5748c'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade():
     op.create_table(
-        'accounts',
+        'categories',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('code', sa.String(length=10), nullable=False, unique=True),
         sa.Column('name', sa.String(length=200), nullable=False),
-        sa.Column('description', sa.String(length=300), nullable=True),
         sa.Column('user_code', sa.String(length=10), nullable=False),
-        sa.Column('balance', sa.Float(), nullable=False, default=0.0),
+        sa.Column('parent_category_code', sa.String(length=10), nullable=True),
         sa.Column('created_at', sa.Date(), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_accounts_code'), 'accounts', ['code'], unique=True)
-    op.create_index(op.f('ix_accounts_user_code'), 'accounts', ['user_code'])
+    op.create_index(op.f('ix_categories_code'), 'categories', ['code'], unique=True)
+    op.create_index(op.f('ix_categories_user_code'), 'categories', ['user_code'])
+    op.create_index(op.f('ix_categories_parent_category_code'), 'categories', ['parent_category_code'])
 
 
 def downgrade():
-    op.drop_table('accounts')
+    op.drop_table('categories')
