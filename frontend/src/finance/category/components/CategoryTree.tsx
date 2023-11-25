@@ -30,7 +30,13 @@ const CategoryTree: React.FC = () => {
 
     return (
         <>
-            <center><h4>Categorias</h4></center>
+            <center>
+                <h4
+                style={{marginBottom: 8}}
+                >
+                    Categorias
+                </h4>
+            </center>
             <TreeView
                 aria-label="file system navigator"
                 defaultCollapseIcon={<ExpandMoreIcon/>}

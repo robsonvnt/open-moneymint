@@ -34,9 +34,8 @@ const SideBar: React.FC = () => {
             <Box sx={{overflow: 'auto'}}>
                 <AccountList />
                 <Divider />
-                <List>
-                    <CategoryTree/>
-                </List>
+                <CategoryTree/>
+
             </Box>
         </Drawer>
     );

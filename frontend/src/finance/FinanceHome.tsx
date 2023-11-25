@@ -5,6 +5,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import {Typography} from "@mui/material";
 import MoneyMineAppBar from "../app/MoneyMineAppBar";
+import TransactionView from "./transaction/components/TransactionView";
 
 
 const FinanceHome: React.FC = () => {
@@ -18,7 +19,9 @@ const FinanceHome: React.FC = () => {
         <Box sx={{display: 'flex'}}>
             <MoneyMineAppBar/>
             <SideBar/>
+            <TransactionView/>
         </Box>
+
     );
 }
 
