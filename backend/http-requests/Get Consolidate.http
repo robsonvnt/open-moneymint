@@ -1,3 +1,3 @@
-GET https://my-investments.home.robsonvnt.me/api/portfolios/heueWALW3h/investments/
+GET http://127.0.0.1:9000/finances/accounts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJyb2Jzb252bnQiLCJleHAiOjE3MDA1MTAyMDh9.vzgV8LXnmFrMd1ODFzbAkBVd3AllJYq8c5j_YH0Hh74
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJyb2Jzb252bnQiLCJleHAiOjE3MDA5NTYxNzh9.aR4qiCarNHGZ8dghm15zek7o5PfA8Jt3dRisNjWGHiY

@@ -66,7 +66,6 @@ async def signin(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Incorrect username or password")
     except Exception as e:
-        a = 0
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="Failed to retrieve user.")
 

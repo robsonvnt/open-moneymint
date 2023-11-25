@@ -28,7 +28,7 @@ class NormalizePathMiddleware(BaseHTTPMiddleware):
 
 
 def prepare_router(app):
-    app.add_middleware(NormalizePathMiddleware)
+    # app.add_middleware(NormalizePathMiddleware)
 
     # Investments
     app.include_router(portfolio_router, prefix="/portfolios")
@@ -39,7 +39,7 @@ def prepare_router(app):
     app.include_router(user_router, prefix="")
 
     # Finance
-    app.include_router(account_router, prefix="")
+    app.include_router(account_router, prefix="/finances")
     app.include_router(category_router, prefix="/finances")
     app.include_router(finance_transaction_router, prefix="/finances")
 

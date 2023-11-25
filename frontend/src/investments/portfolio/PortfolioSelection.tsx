@@ -8,6 +8,7 @@ import PortfolioList from './components/PortifolioList';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { Portfolio } from './models';
 import PortfolioService from './PortfolioService';
+import MoneyMineAppBar from "../../app/MoneyMineAppBar";
 
 
 
@@ -20,7 +21,7 @@ const PortfolioSelection: React.FC = () => {
 
   const selectPortfolio = (portfolio: Portfolio) => {
     // Navegue para a nova rota com o 'code' do portfólio quando um portfólio for selecionado
-    navigate(`/portfolio/${portfolio.code}`);
+    navigate(`/investments/portfolio/${portfolio.code}`);
   };
 
   const toggleDialog = () => {
@@ -73,6 +74,7 @@ const PortfolioSelection: React.FC = () => {
 
   return (
     <>
+      <MoneyMineAppBar/>
       <Container>
         <FormDialogPortfolio
           openDialog={dialogOpen}

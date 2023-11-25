@@ -10,6 +10,7 @@ class AccountModel(BaseModel):
     name: str
     description: Optional[str]
     user_code: str
+    balance: float
     created_at: Optional[date]
 
     def __init__(self, **data):

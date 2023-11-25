@@ -20,6 +20,7 @@ class Account(Base, AllFeaturesMixin):
     name = Column(String, index=True)
     description = Column(String)
     user_code = Column(String, index=True)
+    balance = Column(Float)
     created_at = Column(Date)
 
 

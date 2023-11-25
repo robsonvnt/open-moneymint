@@ -9,7 +9,7 @@ export interface NewTransaction {
 
 
 export interface TransactionModel {
-  code: string,
+  code: string;
   investment_code: string;
   type: string;
   date: string;

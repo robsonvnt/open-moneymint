@@ -13,6 +13,7 @@ import AssetAccumulationChart from './components/charts/AssetAccumulationChart';
 import InvestmentDiversificationChart from './components/charts/InvestmentDiversificationChart';
 import FormDialogPortfolio from './components/DialogForm';
 import InvestmentCard from './components/InvestmentCard';
+import MoneyMineAppBar from "../../app/MoneyMineAppBar";
 
 
 interface InvestmentsListParams {
@@ -155,7 +156,8 @@ const InvestmentsList: React.FC = () => {
 
     return (
         <>
-            <Container >
+            <MoneyMineAppBar/>
+            <Container>
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',

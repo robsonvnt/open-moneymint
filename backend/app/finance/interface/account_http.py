@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import HTTPException, status, APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
@@ -17,7 +19,16 @@ class NewAccountInput(BaseModel):
     description: Optional[str]
 
 
-@account_router.get("/accounts", response_model=List[AccountModel])
+class AccountResponse(BaseModel):
+    code: Optional[str]
+    name: str
+    description: Optional[str]
+    user_code: str
+    balance: float
+    created_at: Optional[date]
+
+
+@account_router.get("/accounts", response_model=List[AccountResponse])
 async def get_all_accounts(
         db_session=Depends(get_db_session),
         current_user: User = Depends(get_current_user)

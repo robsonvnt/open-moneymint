@@ -57,7 +57,7 @@ class AccountRepo:
                 Account.user_code == user_code
             ).all()
             return [to_model(account) for account in accounts]
-        except Exception:
+        except Exception as e:
             raise AccountUnexpectedError()
 
     def delete(self, user_code: str, account_code: str):
