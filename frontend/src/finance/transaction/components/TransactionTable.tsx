@@ -52,8 +52,7 @@ export default function TransactionTable() {
 
     useEffect(() => {
         loadTransactions();
-    }, [currentDate]); // O useEffect será re-executado quando 'currentDate' mudar
-
+    }, [currentDate]);
 
 
     return (
