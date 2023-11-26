@@ -8,6 +8,7 @@ from fastapi import Depends
 
 from auth.user import User, get_current_user
 from finance.domain.account_erros import AccountNotFound
+from finance.domain.category_erros import CategoryNotFound
 from finance.domain.financial_transaction_erros import FinancialTransactionNotFound
 from finance.domain.models import TransactionType, FinancialTransactionModel
 from finance.repository.db.db_connection import get_db_session
@@ -40,6 +41,7 @@ class TransactionResponse(BaseModel):
 @router.get("/transactions", response_model=List[TransactionResponse])
 async def get_all_transactions(
         account_codes: Annotated[Optional[list[str]], Query()] = None,
+        category_codes: Annotated[Optional[list[str]], Query()] = None,
         month: Optional[str] = Query(
             None, description="Start date in YYYY-MM format"
         ),
@@ -55,13 +57,23 @@ async def get_all_transactions(
     try:
         transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
         account_serv = ServiceFactory.create_account_service(db_session)
+        category_service = ServiceFactory.create_category_service(db_session)
 
         if not account_codes:
             account_codes = [account_code.code for account_code in account_serv.get_all_by_user_code(current_user.code)]
 
-        # Validates whether transactions belongs to the logged in user
+        # TODO Move to Service
+        # Validates whether accounts belongs to the logged in user
         for account_code in account_codes:
             account_serv.get_by_code(current_user.code, account_code)
+
+        # TODO Move to Service
+        # Validates whether categories belongs to the logged in user
+        if category_codes:
+            for category_code in category_codes:
+                category = category_service.get_by_code(category_code)
+                if category.user_code != current_user.code:
+                    raise CategoryNotFound()
 
         if month:
             month_date = datetime.strptime(month, "%Y-%m").date()
@@ -70,11 +82,14 @@ async def get_all_transactions(
 
         transactions = transaction_serv.filter_by_account_and_date(
             account_codes,
+            category_codes,
             start_date,
             end_date
         )
         return transactions
     except AccountNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except CategoryNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

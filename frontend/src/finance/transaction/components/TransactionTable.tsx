@@ -36,9 +36,10 @@ function preventDefault(event: React.MouseEvent) {
 
 interface TransactionTableProps {
     checkedAccounts: Map<string, boolean>;
+    selectedCategoryCode: string;
 }
 
-const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts}) => {
+const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, selectedCategoryCode}) => {
 
     const transactionService = TransactionService;
     const [transactions, setTransactions] = React.useState<AccountTransaction[]>([]);
@@ -71,12 +72,17 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts}) =>
 
     useEffect(() => {
         loadTransactions();
-    }, [checkedAccounts]);
+    }, [checkedAccounts, selectedCategoryCode]);
 
     // Transactions
     const loadTransactions = () => {
         const account_codes = Array.from(checkedAccounts.keys()).filter(key => checkedAccounts.get(key) === true);
-        transactionService.getAll(currentDate, account_codes).then(transactions => {
+        let categoryList = []
+        if (selectedCategoryCode != "")
+            categoryList.push(selectedCategoryCode)
+        transactionService.getAll(
+            currentDate, account_codes, categoryList
+        ).then(transactions => {
             setTransactions(transactions);
         })
     };
@@ -91,7 +97,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts}) =>
 
     return (
         <React.Fragment>
-            <Title>Jaque</Title>
+            <Title>Movimentações</Title>
             <MonthNavigator
                 currentDate={currentDate}
                 setCurrentDate={setCurrentDate}
