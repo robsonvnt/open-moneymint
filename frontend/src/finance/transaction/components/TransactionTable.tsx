@@ -11,7 +11,6 @@ import {useEffect, useState} from "react";
 import {TransactionService} from "../TransactionService";
 import MonthNavigator from "./MonthNavigator";
 import {currencyFormatter, formatDateStr} from "../../../helpers/BRFormatHelper";
-import TransactionView from "./TransactionView";
 import {AccountService} from "../../account/AccountService";
 import {CategoryService} from "../../category/CategoryService";
 import {Checkbox} from "@mui/material";
