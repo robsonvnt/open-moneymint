@@ -45,8 +45,6 @@ export const TransactionService = {
   async create(portfolioCode: string, investmentCode: string, transaction: NewTransaction): Promise<TransactionModel | ErrorResponse> {
     try {
       let url = `/api/portfolios/${portfolioCode}/investments/${investmentCode}/transactions`
-      console.log(url);
-      console.log(transaction);
       const response = await axios.post<TransactionModel>(url, transaction);
       return response.data;
     } catch (error: any) {

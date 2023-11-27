@@ -1,9 +1,10 @@
-import React, {useEffect} from 'react';
-import {Box, Container, Grid} from "@mui/material";
+import React, {useEffect, useState} from 'react';
+import {Alert, Box, Container, Grid, Snackbar} from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
 import {Copyright} from "@mui/icons-material";
 import TransactionTable from "./TransactionTable";
+import Title from "./Title";
 
 
 interface TransactionViewProps {
@@ -22,7 +23,6 @@ const TransactionView: React.FC<TransactionViewProps> =
 
         }, []);
 
-
         return (
             <Box
                 component="main"
@@ -39,33 +39,12 @@ const TransactionView: React.FC<TransactionViewProps> =
                 <Toolbar/>
                 <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
                     <Grid container spacing={3}>
-                        {/* Chart */}
-                        <Grid item xs={12} md={8} lg={9}>
-                            <Paper
-                                sx={{
-                                    p: 2,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    height: 240,
-                                }}
-                            >
-                                <h1>Teste</h1>
+
+                        <Grid item xs={12}>
+                            <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
+                                <Title>Filtros</Title>
                             </Paper>
                         </Grid>
-                        {/* Recent Deposits */}
-                        <Grid item xs={12} md={4} lg={3}>
-                            <Paper
-                                sx={{
-                                    p: 2,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    height: 240,
-                                }}
-                            >
-                                <h1></h1>
-                            </Paper>
-                        </Grid>
-                        {/* Recent Orders */}
                         <Grid item xs={12}>
                             <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
                                 <TransactionTable

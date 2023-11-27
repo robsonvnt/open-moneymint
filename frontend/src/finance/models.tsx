@@ -31,3 +31,28 @@ export interface AccountTransaction {
     date: string;
     value: number;
 }
+
+export interface NewAccountTransaction {
+    account_code?: string;
+    description?: string;
+    category_code?: string;
+    type?: string;
+    date?: string;
+    value?: number;
+}
+
+export enum AccountTransactionType {
+    TRANSFER = "TRANSFER",
+    WITHDRAWAL = "WITHDRAWAL",
+    DEPOSIT = "DEPOSIT"
+}
+
+const transactionTypeLabels: { [key: string]: string } = {
+    [AccountTransactionType.TRANSFER]: "Transferência",
+    [AccountTransactionType.WITHDRAWAL]: "Saque",
+    [AccountTransactionType.DEPOSIT]: "Depósito"
+};
+
+export const getTransactionTypeLabel = (type: string): string => {
+    return transactionTypeLabels[type] || "Tipo Desconhecido";
+};

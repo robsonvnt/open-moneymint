@@ -6,14 +6,18 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from "./Title";
-import {AccountTransaction} from "../../models";
+import {AccountTransaction, NewAccountTransaction} from "../../models";
 import {useEffect, useState} from "react";
 import {TransactionService} from "../TransactionService";
 import MonthNavigator from "./MonthNavigator";
 import {currencyFormatter, formatDateStr} from "../../../helpers/BRFormatHelper";
 import {AccountService} from "../../account/AccountService";
 import {CategoryService} from "../../category/CategoryService";
-import {Checkbox} from "@mui/material";
+import {Alert, Checkbox, Snackbar} from "@mui/material";
+import AccountTransactionDialogForm from "./AccountTransactionDialogForm";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import Fab from "@mui/material/Fab";
 
 // Generate Order Data
 function createData(
@@ -39,10 +43,12 @@ interface TransactionTableProps {
     selectedCategoryCode: string;
 }
 
-const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, selectedCategoryCode}) => {
+const TransactionTable: React.FC<TransactionTableProps> = ({
+                                                               checkedAccounts,
+                                                               selectedCategoryCode
+                                                           }) => {
 
     const transactionService = TransactionService;
-    const [transactions, setTransactions] = React.useState<AccountTransaction[]>([]);
     const [accountsMap, setAccountsMap] = React.useState<Map<string, string>>(new Map());
     const [categoriesMap, setCategoriesMap] = React.useState<Map<string, string>>(new Map());
 
@@ -64,8 +70,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
                 categories.map(category => {
                     newCategoriesMap.set(category.code, category.name)
                 })
-                setCategoriesMap(newCategoriesMap)
-
             })
     }, []);
 
@@ -82,8 +86,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
         transactionService.getAll(
             currentDate, account_codes, categoryList
         ).then(transactions => {
-            setTransactions(transactions);
-
             const newTransactionTotalsByDate = new Map<string, number>();
             let grouped = groupTransactionsByDate(transactions)
             grouped.forEach((transactions, date) => {
@@ -104,7 +106,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
 
 
     // Seleção de itens na tabela
-    const [selectedTransactions, setSelectedTransactions] = React.useState<Set<string>>(new Set());
+
     const [transactionTotalsByDate, setTransactionTotalsByDate] = React.useState<Map<string, number>>(new Map<string, number>());
     const [groupedTransaction, setGroupedTransaction] = React.useState<Map<string, AccountTransaction[]>>(new Map<string, AccountTransaction[]>());
 
@@ -132,6 +134,58 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
             grouped.set(date, group);
         });
         return grouped;
+    };
+
+
+    // Transactions
+    const [selectedTransactions, setSelectedTransactions] = React.useState<Set<string>>(new Set());
+    const [notificationOpen, setNotificationOpen] = React.useState(false);
+    const [statusTransactionAction, setStatusTransactionAction] = useState<"success" | "error">("success");
+    const [reloadTransactions, setReloadTransactions] = useState(false);
+
+    const addTransaction = () => {
+        setDialogOpen(true)
+        setReloadTransactions(true)
+    };
+
+    const removeTransaction = () => {
+        selectedTransactions.forEach((item) => {
+            selectedTransactions.forEach((transaction_code) => {
+                transactionService.delete(transaction_code).then(() => {
+                    setStatusTransactionAction("success")
+                    setNotificationOpen(true);
+                    loadTransactions();
+                }).catch(() => {
+                    setStatusTransactionAction("error")
+                    setNotificationOpen(true);
+                })
+
+            })
+        })
+        setSelectedTransactions(new Set());
+    };
+
+    const handleNotificationClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+        setNotificationOpen(false);
+    };
+
+    // Transaction dialog form
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
+
+    const handleSaveTransaction = (newTransaction: NewAccountTransaction) => {
+        transactionService.create(newTransaction).then((transaction) => {
+            setNotificationOpen(true);
+            setStatusTransactionAction("success")
+            loadTransactions();
+
+        }).catch(() => {
+            setNotificationOpen(true);
+            setStatusTransactionAction("error")
+        })
     };
 
 
@@ -166,7 +220,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
                         return (
                             <React.Fragment key={date}>
                                 {transactions.map(transaction => (
-                                    <TableRow key={transaction.code} style={selectedTransactions.has(transaction.code) ? selectedRowStyle : undefined}>
+                                    <TableRow key={transaction.code}
+                                              style={selectedTransactions.has(transaction.code) ? selectedRowStyle : undefined}>
                                         <TableCell padding="checkbox">
                                             <Checkbox
                                                 checked={selectedTransactions.has(transaction.code)}
@@ -221,6 +276,33 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
             <Link color="primary" href="#" onClick={preventDefault} sx={{mt: 3}}>
                 See more orders
             </Link>
+
+            <AccountTransactionDialogForm
+                open={dialogOpen}
+                onClose={handleDialogClose}
+                onSave={handleSaveTransaction}
+            />
+
+
+            <Snackbar open={notificationOpen} autoHideDuration={6000} onClose={handleNotificationClose}>
+                <Alert onClose={handleNotificationClose} severity="success" sx={{width: '100%'}}>
+                    Transação criada com sucesso!
+                </Alert>
+            </Snackbar>
+
+            <Fab
+                color="primary"
+                aria-label={selectedTransactions.size > 0 ? "remove" : "add"}
+                style={{
+                    margin: '20px 0',
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px'
+                }}
+                onClick={selectedTransactions.size > 0 ? removeTransaction : addTransaction}
+            >
+                {selectedTransactions.size > 0 ? <DeleteIcon/> : <AddIcon/>}
+            </Fab>
         </React.Fragment>
     )
         ;

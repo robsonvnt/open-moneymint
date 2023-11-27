@@ -32,12 +32,8 @@ const SignupForm: React.FC = () => {
         password: password
       }
       if (validate()) {
-        console.log("Validou!");
         const response = await axios.post<AccessTokenResponse>('/api/users/signup', signupInput);
-        console.log(response);
         navigate(`/login`);
-      }else{
-        console.log("Erro teste!");
       }
 
     } catch (error) {

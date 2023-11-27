@@ -56,7 +56,6 @@ SQLAlchemy==2.0.23
 sqlalchemy-mixins==2.0.5
 SQLAlchemy-Utils==0.41.1
 sqlparse==0.4.4
-starlette==0.32.0.post1
 Tempita==0.5.2
 tomlkit==0.12.3
 typing_extensions==4.8.0
