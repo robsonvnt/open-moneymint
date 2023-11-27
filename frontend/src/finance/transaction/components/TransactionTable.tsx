@@ -14,6 +14,7 @@ import {currencyFormatter, formatDateStr} from "../../../helpers/BRFormatHelper"
 import TransactionView from "./TransactionView";
 import {AccountService} from "../../account/AccountService";
 import {CategoryService} from "../../category/CategoryService";
+import {Checkbox} from "@mui/material";
 
 // Generate Order Data
 function createData(
@@ -45,7 +46,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
     const [transactions, setTransactions] = React.useState<AccountTransaction[]>([]);
     const [accountsMap, setAccountsMap] = React.useState<Map<string, string>>(new Map());
     const [categoriesMap, setCategoriesMap] = React.useState<Map<string, string>>(new Map());
-
 
     useEffect(() => {
         loadTransactions();
@@ -84,6 +84,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
             currentDate, account_codes, categoryList
         ).then(transactions => {
             setTransactions(transactions);
+
+            const newTransactionTotalsByDate = new Map<string, number>();
+            let grouped = groupTransactionsByDate(transactions)
+            grouped.forEach((transactions, date) => {
+                const total = transactions.reduce((sum, transaction) => sum + transaction.value, 0);
+                newTransactionTotalsByDate.set(date, total);
+            });
+            setTransactionTotalsByDate(newTransactionTotalsByDate);
+            setGroupedTransaction(grouped)
         })
     };
 
@@ -93,6 +102,38 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
     useEffect(() => {
         loadTransactions();
     }, [currentDate]);
+
+
+    // Seleção de itens na tabela
+    const [selectedTransactions, setSelectedTransactions] = React.useState<Set<string>>(new Set());
+    const [transactionTotalsByDate, setTransactionTotalsByDate] = React.useState<Map<string, number>>(new Map<string, number>());
+    const [groupedTransaction, setGroupedTransaction] = React.useState<Map<string, AccountTransaction[]>>(new Map<string, AccountTransaction[]>());
+
+
+    const handleSelectTransaction = (code: string) => {
+        const newSelected = new Set(selectedTransactions);
+        if (newSelected.has(code)) {
+            newSelected.delete(code);
+        } else {
+            newSelected.add(code);
+        }
+        setSelectedTransactions(newSelected);
+    };
+
+    const selectedRowStyle = {
+        backgroundColor: "#f6f6f6" // escolha a cor que preferir
+    };
+
+    const groupTransactionsByDate = (transactions: AccountTransaction[]): Map<string, AccountTransaction[]> => {
+        const grouped = new Map<string, AccountTransaction[]>();
+        transactions.forEach(transaction => {
+            const date = formatDateStr(transaction.date);
+            const group = grouped.get(date) || [];
+            group.push(transaction);
+            grouped.set(date, group);
+        });
+        return grouped;
+    };
 
 
     return (
@@ -105,6 +146,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
             <Table size="small">
                 <TableHead>
                     <TableRow>
+                        <TableCell>Selecionar</TableCell>
                         <TableCell>Data</TableCell>
                         <TableCell>Descrição</TableCell>
                         <TableCell>Categoria</TableCell>
@@ -113,33 +155,75 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {transactions.map((transaction) => (
-                        <TableRow key={transaction.code}>
-                            <TableCell>
-                                {formatDateStr(transaction.date)}
-                            </TableCell>
-                            <TableCell>{transaction.description}</TableCell>
-                            <TableCell>{categoriesMap.get(transaction.category_code)}</TableCell>
-                            <TableCell>{accountsMap.get(transaction.account_code)}</TableCell>
-                            <TableCell
-                                align="right"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    color: transaction.value < 0 ? red_color : green_color
-                                }}
-                            >
-                                {`${currencyFormatter.format(transaction.value)}`}
-                            </TableCell>
-                        </TableRow>
-                    ))}
+
+                    {Array.from(groupedTransaction.keys()).map(date => {
+                        const transactions = groupedTransaction.get(date);
+                        if (!transactions) return null;
+
+                        let saldo = 0.0;
+                        if (transactionTotalsByDate.get(date))
+                            saldo = transactionTotalsByDate.get(date) as number
+
+                        return (
+                            <React.Fragment key={date}>
+                                {transactions.map(transaction => (
+                                    <TableRow key={transaction.code} style={selectedTransactions.has(transaction.code) ? selectedRowStyle : undefined}>
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                checked={selectedTransactions.has(transaction.code)}
+                                                onChange={() => handleSelectTransaction(transaction.code)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatDateStr(transaction.date)}
+                                        </TableCell>
+                                        <TableCell>{transaction.description}</TableCell>
+                                        <TableCell>{categoriesMap.get(transaction.category_code)}</TableCell>
+                                        <TableCell>{accountsMap.get(transaction.account_code)}</TableCell>
+                                        <TableCell
+                                            align="right"
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                color: transaction.value < 0 ? red_color : green_color
+                                            }}
+                                        >
+                                            {`${currencyFormatter.format(transaction.value)}`}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                <TableRow
+                                    style={{backgroundColor: '#eaeaea'}}
+                                >
+                                    <TableCell colSpan={5} align="right"></TableCell>
+                                    <TableCell align="right"
+                                               style={{
+                                                   color: saldo < 0 ? red_color : green_color,
+                                               }}
+                                    >
+                                        <b style={{marginRight: 10, color: '#444'}}>Saldo do dia: </b> {currencyFormatter.format(saldo)}
+                                    </TableCell>
+                                </TableRow>
+
+                                <TableRow
+                                    style={{backgroundColor: '#fff', height: 30}}
+                                >
+                                    <TableCell colSpan={6} align="right"></TableCell>
+                                </TableRow>
+
+                            </React.Fragment>
+                        )
+                    })}
+
+
                 </TableBody>
             </Table>
             <Link color="primary" href="#" onClick={preventDefault} sx={{mt: 3}}>
                 See more orders
             </Link>
         </React.Fragment>
-    );
+    )
+        ;
 }
 
 export default TransactionTable;
