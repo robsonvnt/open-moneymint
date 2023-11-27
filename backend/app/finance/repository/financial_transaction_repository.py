@@ -53,7 +53,7 @@ class FinancialTransactionRepo:
     def filter_by_account_and_date(
             self,
             account_codes: List[str],
-            category_codes: List[str],
+            category_codes: List[str] = None,
             date_start: date = None,
             date_end: date = None
     ) -> List[FinancialTransactionModel]:
@@ -62,7 +62,7 @@ class FinancialTransactionRepo:
             query = session.query(FinancialTransaction).filter(
                 FinancialTransaction.account_code.in_(account_codes)
             )
-            if category_codes and len(category_codes) > 0:
+            if category_codes:
                 query = query.filter(FinancialTransaction.category_code.in_(category_codes))
             if date_start:
                 query = query.filter(FinancialTransaction.date >= date_start)
