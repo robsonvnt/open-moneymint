@@ -192,7 +192,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
                                     </TableRow>
                                 ))}
                                 <TableRow
-                                    style={{backgroundColor: '#eaeaea'}}
+                                    style={{backgroundColor: '#d7d5d5'}}
                                 >
                                     <TableCell colSpan={5} align="right"></TableCell>
                                     <TableCell align="right"
@@ -200,7 +200,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({checkedAccounts, sel
                                                    color: saldo < 0 ? red_color : green_color,
                                                }}
                                     >
-                                        <b style={{marginRight: 10, color: '#444'}}>Saldo do dia: </b> {currencyFormatter.format(saldo)}
+                                        <b style={{marginRight: 10, color: '#444'}}>Saldo do dia: </b>
+                                        <b>{currencyFormatter.format(saldo)}</b>
                                     </TableCell>
                                 </TableRow>
 
