@@ -73,10 +73,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             })
     }, []);
 
-    useEffect(() => {
-        loadTransactions();
-    }, [checkedAccounts, selectedCategoryCode]);
-
     // Transactions
     const loadTransactions = () => {
         const account_codes = Array.from(checkedAccounts.keys()).filter(key => checkedAccounts.get(key) === true);
@@ -99,11 +95,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
     // Month Navigator
     const [currentDate, setCurrentDate] = useState(new Date());
-
-    useEffect(() => {
-        loadTransactions();
-    }, [currentDate]);
-
 
     // Seleção de itens na tabela
 
@@ -154,7 +145,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                 transactionService.delete(transaction_code).then(() => {
                     setStatusTransactionAction("success")
                     setNotificationOpen(true);
-                    loadTransactions();
                 }).catch(() => {
                     setStatusTransactionAction("error")
                     setNotificationOpen(true);
@@ -163,6 +153,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             })
         })
         setSelectedTransactions(new Set());
+        loadTransactions();
     };
 
     const handleNotificationClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -181,7 +172,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             setNotificationOpen(true);
             setStatusTransactionAction("success")
             loadTransactions();
-
         }).catch(() => {
             setNotificationOpen(true);
             setStatusTransactionAction("error")
