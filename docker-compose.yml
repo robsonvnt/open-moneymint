@@ -47,9 +47,6 @@ services:
     image: nginx:alpine
     ports:
       - "8000:80"
-    depends_on:
-      - fastapi
-      - react_app
     volumes:
       - "./dev-env/nginx-dev.conf:/etc/nginx/nginx.conf"
     restart: unless-stopped

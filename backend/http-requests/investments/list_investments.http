@@ -1,5 +1,6 @@
 ### Lista todos os investimentos
-GET http://localhost:8000/portfolios/b185557eda/investments/ HTTP/1.1
+GET http://my-investments.home.robsonvnt.me/api/portfolios/a196b8782e/investments HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJyb2Jzb252bnQiLCJleHAiOjE3MDEyNzI3Nzl9.cqBP_QLsetLXDUQbEKdYPfAqvwxnjRQAZ8q6Pq6VjXA
 
 
 #PETR4 34.88
@@ -7,4 +8,3 @@ GET http://localhost:8000/portfolios/b185557eda/investments/ HTTP/1.1
 #Antigo: 34,92
 
 
-sCVwkHdnTRBWoUyrzohNQm

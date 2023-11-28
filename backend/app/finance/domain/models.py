@@ -37,6 +37,9 @@ class CategoryModel(BaseModel):
     def __init__(self, **data):
         data.setdefault('code', None)
         data.setdefault('created_at', None)
+        if data["parent_category_code"] == "":
+            data["parent_category_code"] = None
+        data.setdefault('parent_category_code', None)
         super().__init__(**data)
 
 

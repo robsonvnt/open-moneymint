@@ -18,6 +18,10 @@ class CategoryInput(BaseModel):
     name: str
     parent_category_code: Optional[str]
 
+    def __init__(self, **data):
+        data.setdefault('parent_category_code', None)
+        super().__init__(**data)
+
 
 class CategoryResponse(BaseModel):
     code: str

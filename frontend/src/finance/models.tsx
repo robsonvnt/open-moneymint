@@ -7,6 +7,14 @@ export interface AccountModel {
     created_at: string;
 }
 
+export interface NewAccountModel {
+    name: string;
+    description: string;
+    balance: number;
+}
+
+
+
 export interface CategoryModel {
     code: string;
     name: string;

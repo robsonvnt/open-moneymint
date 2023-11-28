@@ -2,5 +2,7 @@
 #GET http://localhost:8000/portfolios/6a267bfca6/investments/454c021046 HTTP/1.1
 
 
-GET http://localhost:8000/portfolios/6a267bfca6/investments-diversification HTTP/1.1
+GET http://localhost:8000/portfolios/f6noXlFZwW/investments-diversification HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJyb2Jzb252bnQiLCJleHAiOjE3MDEyNzM1Mjh9.m4ffv8FYn_hJJA7qFxllDgBpGWRJaXD9VLg8v3dHHSI
 
+	/api/portfolios/f6noXlFZwW/investments/

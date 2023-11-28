@@ -7,6 +7,10 @@ import {Checkbox, Divider} from "@mui/material";
 import {AccountModel} from "../../models";
 import {AccountService} from "../AccountService";
 import {currencyFormatter} from "../../../helpers/BRFormatHelper";
+import IconButton from '@mui/material/IconButton';
+import AddIcon from '@mui/icons-material/Add';
+import AccountDialogForm, {NewAccountModel} from "./AccountDialogForm"; // Substitua por seu ícone preferido
+
 
 interface AccountListProps {
     checked: Map<string, boolean>;
@@ -32,27 +36,71 @@ const AccountList: React.FC<AccountListProps> =
             setChecked(newCheckedMap);
         };
 
+        const updateList = (accounts: AccountModel[]) => {
+            let tmpTotalBalance = 0
+            accounts.map(account => {
+                checked.set(account.code, true)
+                tmpTotalBalance += account.balance
+            });
+            setTotalBalance(tmpTotalBalance)
+            setAccountList(accounts);
+        }
+
         useEffect(() => {
-            accountService.getAllAccounts()
-                .then(accounts => {
-                    let tmpTotalBalance = 0
-                    accounts.map(account => {
-                        checked.set(account.code, true)
-                        tmpTotalBalance += account.balance
+            if (accountList.length == 0) {
+                accountService.getAllAccounts()
+                    .then(accounts => {
+                        updateList(accounts);
                     });
-                    setTotalBalance(tmpTotalBalance)
-                    setAccountList(accounts);
-                });
+            }
         }, []);
+
+        // New or Edit Account
+        const [openForm, setOpenForm] = useState<boolean>(false);
+        const [onCloseForm, setOnCloseForm] = useState<boolean>(false);
+        const [onSaveAccount, setOnSaveAccount] = useState<boolean>(false);
+
+        const handleIconClick = () => {
+            setOpenForm(true);
+        };
+
+        const handleDialogClose = () => {
+            setOpenForm(false);
+        };
+
+        const handleOnSave = (account: NewAccountModel) => {
+            AccountService.create(account).then((createdAccount) => {
+                let newAccountList: AccountModel[] = []
+                accountList.map((acc) => newAccountList.push(acc))
+                newAccountList.push(createdAccount);
+                updateList(newAccountList);
+            })
+        };
 
 
         return (
             <>
-                <center>
-                    <h4 style={{margin: 15, marginBottom: 2}}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    margin: 0,
+                    marginTop: 5
+                }}>
+                    <div style={{width: 48}}> {/* Ajuste a largura para corresponder à do IconButton */}
+                    </div>
+                    <h4 style={{
+                        margin: 0,
+                        flexGrow: 1,
+                        textAlign: 'center'
+                    }}>
                         Contas
                     </h4>
-                </center>
+                    <IconButton onClick={handleIconClick}>
+                        <AddIcon/> {/* Substitua por seu ícone preferido */}
+                    </IconButton>
+                </div>
+
                 <List dense
                       sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}
                       style={{paddingTop: 2, paddingBottom: 20}}
@@ -106,6 +154,12 @@ const AccountList: React.FC<AccountListProps> =
                         </ListItemButton>
                     </ListItem>
                 </List>
+
+                <AccountDialogForm
+                    open={openForm}
+                    onClose={handleDialogClose}
+                    onSave={handleOnSave}
+                />
             </>
         );
     }

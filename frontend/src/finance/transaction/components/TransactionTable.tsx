@@ -18,6 +18,8 @@ import AccountTransactionDialogForm from "./AccountTransactionDialogForm";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Fab from "@mui/material/Fab";
+import ActionButton from "../../components/ActionButton";
+import AccountDialogForm from "../../account/components/AccountDialogForm";
 
 // Generate Order Data
 function createData(
@@ -193,7 +195,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         loadTransactionsWithDate(dt);
     }
 
-
     return (
         <React.Fragment>
             <Title>Movimentações</Title>
@@ -295,6 +296,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                 </Alert>
             </Snackbar>
 
+
+
             <Fab
                 color="primary"
                 aria-label={selectedTransactions.size > 0 ? "remove" : "add"}
@@ -308,6 +311,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             >
                 {selectedTransactions.size > 0 ? <DeleteIcon/> : <AddIcon/>}
             </Fab>
+
         </React.Fragment>
     )
         ;
