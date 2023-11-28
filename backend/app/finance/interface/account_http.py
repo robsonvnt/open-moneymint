@@ -17,6 +17,12 @@ account_router = APIRouter()
 class NewAccountInput(BaseModel):
     name: str
     description: Optional[str]
+    balance: float
+
+    def __init__(self, **data):
+        data.setdefault('description', None)
+        data.setdefault('balance', 0)
+        super().__init__(**data)
 
 
 class AccountResponse(BaseModel):
@@ -59,9 +65,8 @@ async def create_account(
 ):
     account_service = ServiceFactory.create_account_service(db_session)
     account_model = AccountModel(
-        name=input.name,
-        description=input.description,
-        user_code=current_user.code
+        user_code=current_user.code,
+        **input.model_dump()
     )
     return account_service.create(account_model)
 

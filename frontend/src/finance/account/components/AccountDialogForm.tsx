@@ -13,7 +13,7 @@ import {AccountTransactionType} from "../../models";
 
 export interface NewAccountModel {
     name: string;
-    description: string;
+    description?: string;
     balance: number;
 }
 
@@ -33,20 +33,29 @@ const AccountDialogForm: React.FC<AccountDialogFormProps> = ({open, onClose, onS
     const [newAccount, setNewAccount] = useState<NewAccountModel>({name: '', description: '', balance: 0});
     const [errors, setErrors] = useState<FormErrors>({});
 
+    const clearForm = () => {
+        setNewAccount({name: "", balance: 0});
+        setErrors({});
+    }
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewAccount({...newAccount, [e.target.name]: e.target.value});
+        let value: any = e.target.value;
+        if (e.target.name === "balance"){
+            value = parseFloat(value);
+        }
+        setNewAccount({...newAccount, [e.target.name]: value});
     };
 
     const handleClose = () => {
         onClose();
-        setNewAccount({name: "", description: "", balance: 0});
-        setErrors({});
+        clearForm()
     };
 
     const handleSave = () => {
         if (validate()) {
             onSave(newAccount);
             onClose();
+            clearForm()
         }
     };
 
