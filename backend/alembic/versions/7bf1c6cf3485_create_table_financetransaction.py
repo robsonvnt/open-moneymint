@@ -25,7 +25,7 @@ def upgrade():
         sa.Column('code', sa.String(length=10), nullable=False, unique=True),
         sa.Column('account_code', sa.String(length=10), nullable=False),
         sa.Column('description', sa.String(length=300), nullable=False),
-        sa.Column('category_code', sa.String(length=10), nullable=False),
+        sa.Column('category_code', sa.String(length=10), nullable=True),
         sa.Column('type', sa.String(length=100), nullable=True),
         sa.Column('date', sa.Date(), nullable=False),
         sa.Column('value', sa.Float(), nullable=False),

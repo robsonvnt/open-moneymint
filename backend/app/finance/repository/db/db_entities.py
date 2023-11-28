@@ -51,7 +51,7 @@ class FinancialTransaction(Base, AllFeaturesMixin):
     code = Column(String, index=True, unique=True)
     account_code = Column(String, index=True)
     description = Column(String)
-    category_code = Column(String, index=True)
+    category_code = Column(String, index=True, nullable=True)
     type = Column(String)
     date = Column(Date)
     value = Column(Float)

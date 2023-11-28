@@ -7,7 +7,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 interface MonthNavigatorProps {
     currentDate: Date;
-    setCurrentDate: React.Dispatch<React.SetStateAction<Date>>;
+    setCurrentDate: (date: Date) => void;
 }
 
 const MonthNavigator: React.FC<MonthNavigatorProps> = (

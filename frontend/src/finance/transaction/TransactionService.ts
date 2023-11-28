@@ -25,13 +25,9 @@ export const TransactionService = {
     },
 
     async create(transaction: NewAccountTransaction): Promise<AccountTransaction> {
-        try {
-            let url_call = `${baseUrl}`;
-            const response: AxiosResponse<AccountTransaction> = await axios.post(url_call, transaction);
-            return response.data;
-        } catch (error) {
-            throw new Error(`Erro ao criar o transaction: ${error}`);
-        }
+        let url_call = `${baseUrl}`;
+        const response: AxiosResponse<AccountTransaction> = await axios.post(url_call, transaction);
+        return response.data;
     },
 
     async delete(code: string): Promise<void> {

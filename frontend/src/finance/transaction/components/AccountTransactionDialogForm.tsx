@@ -80,7 +80,16 @@ const AccountTransactionDialogForm: React.FC<AccountTransactionDialogFormProps> 
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTransaction({...transaction, [event.target.name]: event.target.value});
+
+        let transactionType = event.target.name === "type" ? event.target.value : transaction.type;
+        let transactionValue = event.target.name === "value" ? parseFloat(event.target.value) : transaction.value ? transaction.value : 0.0;
+        if (transactionType === AccountTransactionType.DEPOSIT) {
+            transactionValue = Math.abs(transactionValue);
+        } else if (transactionType === AccountTransactionType.TRANSFER || transactionType === AccountTransactionType.WITHDRAWAL) {
+            transactionValue = Math.abs(transactionValue) * -1;
+        }
+        setTransaction({...transaction, [event.target.name]: event.target.value, "value": transactionValue});
+
     };
 
     const handleSave = () => {
@@ -110,24 +119,31 @@ const AccountTransactionDialogForm: React.FC<AccountTransactionDialogFormProps> 
     const validate = (): boolean => {
         let tempErrors: FormErrors = {};
         tempErrors.account_code = transaction.account_code ? "" : "Campo é obrigatório";
-        tempErrors.description = transaction.description ? "" : "Campo é obrigatório";
-        tempErrors.category_code = transaction.category_code ? "" : "Campo é obrigatório";
         tempErrors.type = transaction.type ? "" : "Campo é obrigatório";
+        tempErrors.description = transaction.description ? "" : "Campo é obrigatório";
         tempErrors.date = transaction.date ? "" : "Campo é obrigatório";
         if (transaction.value)
-            tempErrors.value = transaction.value > 0 ? "" : "Campo é obrigatório";
+            tempErrors.value = transaction.value > 0 ? "" : "Valor deve ser maior que zero.";
         else
             tempErrors.value = "Campo é obrigatório"
 
+        if (transaction.type === AccountTransactionType.TRANSFER || transaction.type === AccountTransactionType.WITHDRAWAL) {
+            if (transaction.value) {
+                tempErrors.value = transaction.value < 0 ? "" : "O valor deve ser negativo";
+            } else {
+                tempErrors.value = "Campo é obrigatório";
+            }
+        } else {
+            tempErrors.value = transaction.value ? "" : "Campo é obrigatório";
+        }
 
         setErrors(tempErrors);
         return Object.keys(tempErrors).every(key => tempErrors[key as keyof FormErrors] === "");
     }
 
-
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>Adicionar Nova Transação - {transaction.date}</DialogTitle>
+            <DialogTitle>Adicionar Nova Transação</DialogTitle>
             <DialogContent>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} sm={6}>
@@ -136,6 +152,7 @@ const AccountTransactionDialogForm: React.FC<AccountTransactionDialogFormProps> 
                             margin="dense"
                             name="account_code"
                             label="Conta"
+                            required
                             value={transaction.account_code}
                             error={Boolean(errors.account_code)}
                             helperText={errors.account_code || ""}
@@ -161,12 +178,34 @@ const AccountTransactionDialogForm: React.FC<AccountTransactionDialogFormProps> 
                             name="description"
                             label="Descrição"
                             type="text"
+                            required
                             fullWidth
                             value={transaction.description}
                             error={Boolean(errors.description)}
                             helperText={errors.description || ""}
                             onChange={handleChange}
                         />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            select
+                            margin="dense"
+                            name="type"
+                            label="Tipo"
+                            required
+                            value={transaction.type}
+                            error={Boolean(errors.type)}
+                            helperText={errors.type || ""}
+                            onChange={handleChange}
+                            fullWidth
+                        >
+                            {transactionOptions.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+
+                        </TextField>
                     </Grid>
                     <Grid item xs={12} sm={6}>
 
@@ -193,26 +232,6 @@ const AccountTransactionDialogForm: React.FC<AccountTransactionDialogFormProps> 
 
                         </TextField>
 
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            select
-                            margin="dense"
-                            name="type"
-                            label="Tipo"
-                            value={transaction.type}
-                            error={Boolean(errors.type)}
-                            helperText={errors.type || ""}
-                            onChange={handleChange}
-                            fullWidth
-                        >
-                            {transactionOptions.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-
-                        </TextField>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField

@@ -74,13 +74,18 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     }, []);
 
     // Transactions
+
     const loadTransactions = () => {
+        loadTransactionsWithDate(currentDate);
+    };
+
+    const loadTransactionsWithDate = (date: Date) => {
         const account_codes = Array.from(checkedAccounts.keys()).filter(key => checkedAccounts.get(key) === true);
         let categoryList = []
         if (selectedCategoryCode != "")
             categoryList.push(selectedCategoryCode)
         transactionService.getAll(
-            currentDate, account_codes, categoryList
+            date, account_codes, categoryList
         ).then(transactions => {
             const newTransactionTotalsByDate = new Map<string, number>();
             let grouped = groupTransactionsByDate(transactions)
@@ -131,6 +136,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     // Transactions
     const [selectedTransactions, setSelectedTransactions] = React.useState<Set<string>>(new Set());
     const [notificationOpen, setNotificationOpen] = React.useState(false);
+    const [notificationMessage, setNotificationMessage] = useState<string>("");
     const [statusTransactionAction, setStatusTransactionAction] = useState<"success" | "error">("success");
     const [reloadTransactions, setReloadTransactions] = useState(false);
 
@@ -144,9 +150,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             selectedTransactions.forEach((transaction_code) => {
                 transactionService.delete(transaction_code).then(() => {
                     setStatusTransactionAction("success")
+                    setNotificationMessage("Transação removida com sucesso!")
                     setNotificationOpen(true);
                 }).catch(() => {
                     setStatusTransactionAction("error")
+                    setNotificationMessage("Erro ao remover a Transação!")
                     setNotificationOpen(true);
                 })
 
@@ -169,14 +177,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
     const handleSaveTransaction = (newTransaction: NewAccountTransaction) => {
         transactionService.create(newTransaction).then((transaction) => {
-            setNotificationOpen(true);
             setStatusTransactionAction("success")
+            setNotificationMessage("Transação criada com sucesso!")
+            setNotificationOpen(true);
             loadTransactions();
         }).catch(() => {
-            setNotificationOpen(true);
+            setNotificationMessage("Erro ao criar a Transação!")
             setStatusTransactionAction("error")
+            setNotificationOpen(true);
         })
     };
+
+    const changeCurrentDate = (dt: Date) => {
+        setCurrentDate(dt);
+        loadTransactionsWithDate(dt);
+    }
 
 
     return (
@@ -184,7 +199,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             <Title>Movimentações</Title>
             <MonthNavigator
                 currentDate={currentDate}
-                setCurrentDate={setCurrentDate}
+                setCurrentDate={changeCurrentDate}
             />
             <Table size="small">
                 <TableHead>
@@ -274,9 +289,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             />
 
 
-            <Snackbar open={notificationOpen} autoHideDuration={6000} onClose={handleNotificationClose}>
-                <Alert onClose={handleNotificationClose} severity="success" sx={{width: '100%'}}>
-                    Transação criada com sucesso!
+            <Snackbar open={notificationOpen} autoHideDuration={5000} onClose={handleNotificationClose}>
+                <Alert onClose={handleNotificationClose} severity={statusTransactionAction} sx={{width: '100%'}}>
+                    {notificationMessage}
                 </Alert>
             </Snackbar>
 

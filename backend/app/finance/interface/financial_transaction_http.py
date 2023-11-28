@@ -22,17 +22,21 @@ router = finance_transaction_router
 class TransactionInput(BaseModel):
     account_code: str
     description: str
-    category_code: str
+    category_code: Optional[str]
     type: TransactionType
     date: date
     value: float
+
+    def __init__(self, **data):
+        data.setdefault('category_code', None)
+        super().__init__(**data)
 
 
 class TransactionResponse(BaseModel):
     code: str
     account_code: str
     description: str
-    category_code: str
+    category_code: Optional[str]
     type: TransactionType
     date: date
     value: float

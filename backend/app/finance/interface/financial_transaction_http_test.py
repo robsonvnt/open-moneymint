@@ -142,6 +142,21 @@ def test_create_transaction(client, db_session):
     assert json_result["category_code"] == "CAT001"
 
 
+def test_create_transaction_null_category(client, db_session):
+    add_accounts(db_session)
+    new_transaction = {
+        "account_code": "ACC123",
+        "description": "Description 1",
+        "type": TransactionType.TRANSFER.value,
+        "date": "2023-05-05",
+        "value": 100.0
+    }
+
+    # Create without category_code
+    response = client.post("/finances/transactions", json=new_transaction)
+    assert response.status_code == 200
+
+
 def test_create_transaction_other_user(client, db_session):
     add_accounts(db_session)
 

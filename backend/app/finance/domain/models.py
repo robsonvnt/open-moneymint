@@ -44,7 +44,7 @@ class FinancialTransactionModel(BaseModel):
     code: Optional[str]
     account_code: str
     description: str
-    category_code: str
+    category_code: Optional[str]
     type: TransactionType
     date: date
     value: float
