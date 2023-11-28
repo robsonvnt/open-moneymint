@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import SideBar from "./components/SideBar";
 import Box from '@mui/material/Box';
 import MoneyMineAppBar from "../app/MoneyMineAppBar";
-import TransactionView from "./transaction/components/TransactionView";
+import TransactionView from "./transaction/TransactionView";
 
 
 const FinanceHome: React.FC = () => {
@@ -22,6 +22,7 @@ const FinanceHome: React.FC = () => {
             <SideBar
                 checkedAccounts={accountChecked}
                 setCheckedAccounts={setAccountChecked}
+                selectedCategoryCode={selectedCategoryCode}
                 setSelectedCategoryCode={setSelectedCategoryCode}
             />
             <TransactionView

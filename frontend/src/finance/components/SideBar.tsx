@@ -9,6 +9,7 @@ import CategoryTree from "../category/components/CategoryTree";
 interface SideBarProps {
     checkedAccounts: Map<string, boolean>;
     setCheckedAccounts: React.Dispatch<React.SetStateAction<Map<string, boolean>>>;
+    selectedCategoryCode: string;
     setSelectedCategoryCode: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -16,7 +17,8 @@ const SideBar: React.FC<SideBarProps> =
     ({
          checkedAccounts,
          setCheckedAccounts,
-        setSelectedCategoryCode
+         selectedCategoryCode,
+         setSelectedCategoryCode
      }) => {
 
         useEffect(() => {
@@ -41,6 +43,7 @@ const SideBar: React.FC<SideBarProps> =
                     />
                     <Divider/>
                     <CategoryTree
+                        selectedCategoryCode={selectedCategoryCode}
                         setSelectedCategoryCode={setSelectedCategoryCode}
                     />
 

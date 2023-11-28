@@ -5,17 +5,20 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {TreeView} from '@mui/x-tree-view/TreeView';
 import {TreeItem} from '@mui/x-tree-view/TreeItem';
-import {CategoryTreeItem} from "../../models";
+import {CategoryInput, CategoryTreeItem} from "../../models";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-import CategoryDialogForm, {NewCategoryModel} from "./CategoryDialogForm";
+import EditIcon from "@mui/icons-material/Edit";
+import CategoryDialogForm from "./CategoryDialogForm";
 
 interface CategoryTreeProps {
+    selectedCategoryCode: string;
     setSelectedCategoryCode: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const CategoryTree: React.FC<CategoryTreeProps> =
     ({
+         selectedCategoryCode,
          setSelectedCategoryCode
      }) => {
         const categoryService = CategoryService;
@@ -30,26 +33,62 @@ const CategoryTree: React.FC<CategoryTreeProps> =
 
         useEffect(() => {
             loadCategories();
-        }, []);
+            setActionButton(selectedCategoryCode === "" ? "create" : "edit")
+        }, [selectedCategoryCode]);
 
+        const [actionButton, setActionButton] = React.useState<"edit" | "create">("create");
+
+        const handlerSetSelectedCategoryCode = (category_code: string) => {
+            setSelectedCategoryCode(category_code)
+            setActionButton("edit")
+        }
 
         // Form
         const [openCategoryForm, setOpenCategoryForm] = useState<boolean>(false);
         const [onCloseAccount, setOnCloseAccount] = useState<boolean>(false);
         const [onSaveAccount, setOnSaveAccount] = useState<boolean>(false);
+        const [currentCategory, setCurrentCategory] = useState<CategoryInput>({name: '', parent_category_code: ''});
 
 
-        const handleIconClick = () => {
+        const handleClickAdd = () => {
+            setCurrentCategory({name: '', parent_category_code: ''})
             setOpenCategoryForm(true);
         };
 
-        const onCloseCategoryForm = () => {
-            setOpenCategoryForm(false);
+        const handleClickEdit = () => {
+            categoryService.get(selectedCategoryCode).then((cat) => {
+                let cmi: CategoryInput = {
+                    name: cat.name,
+                    parent_category_code: cat.parent_category_code
+                }
+                setCurrentCategory(cmi);
+                setOpenCategoryForm(true);
+            });
         };
-        const onSaveCategoryForm = (newCategory: NewCategoryModel) => {
-            categoryService.create(newCategory).then((cateory) => {
-                loadCategories()
+
+        const handleOnDelete = () => {
+            categoryService.delete(selectedCategoryCode).then(() => {
+                loadCategories();
+                setSelectedCategoryCode("");
             })
+        };
+
+        const handleSaveForm = (newCategory: CategoryInput) => {
+            if (selectedCategoryCode === "") {
+                categoryService.create(newCategory).then((cateory) => {
+                    loadCategories()
+                    setSelectedCategoryCode(cateory.code);
+                })
+            } else {
+                categoryService.update(selectedCategoryCode, newCategory).then((cateory) => {
+                    loadCategories()
+                })
+            }
+        };
+
+        const onCloseForm = () => {
+            setCurrentCategory({name: '', parent_category_code: ''})
+            setOpenCategoryForm(false);
         };
 
         // Tree
@@ -60,7 +99,7 @@ const CategoryTree: React.FC<CategoryTreeProps> =
                     key={category.code}
                     nodeId={category.code}
                     label={category.name}
-                    onClick={() => setSelectedCategoryCode(category.code)}
+                    onClick={() => handlerSetSelectedCategoryCode(category.code)}
                 >
                     {category.children && renderNode(category.children)}
                 </TreeItem>
@@ -85,8 +124,8 @@ const CategoryTree: React.FC<CategoryTreeProps> =
                     }}>
                         Categorias
                     </h4>
-                    <IconButton onClick={handleIconClick}>
-                        <AddIcon/> {/* Substitua por seu ícone preferido */}
+                    <IconButton onClick={actionButton === "edit" ? handleClickEdit : handleClickAdd}>
+                        {actionButton === "edit" ? <EditIcon/> : <AddIcon/>}
                     </IconButton>
                 </div>
 
@@ -94,6 +133,7 @@ const CategoryTree: React.FC<CategoryTreeProps> =
                     aria-label="file system navigator"
                     defaultCollapseIcon={<ExpandMoreIcon/>}
                     defaultExpandIcon={<ChevronRightIcon/>}
+                    selected={selectedCategoryCode}
                 >
                     <TreeItem
                         key="-"
@@ -107,8 +147,12 @@ const CategoryTree: React.FC<CategoryTreeProps> =
                 </TreeView>
                 <CategoryDialogForm
                     open={openCategoryForm}
-                    onClose={onCloseCategoryForm}
-                    onSave={onSaveCategoryForm}
+                    onClose={onCloseForm}
+                    onSave={handleSaveForm}
+                    onDelete={handleOnDelete}
+                    currentCategory={currentCategory}
+                    setCurrentCategory={setCurrentCategory}
+                    selectedCategoryCode={selectedCategoryCode}
                 />
             </>
         );

@@ -15,7 +15,8 @@ class ServiceFactory:
     @staticmethod
     def create_category_service(session=None) -> CategoryService:
         category_repo = CategoryRepo(session)
-        return CategoryService(category_repo)
+        financial_transaction_repo = FinancialTransactionRepo(session)
+        return CategoryService(category_repo, financial_transaction_repo)
 
     @staticmethod
     def create_financial_transaction_service(session=None) -> FinancialTransactionService:

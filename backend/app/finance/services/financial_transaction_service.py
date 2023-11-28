@@ -22,7 +22,7 @@ class FinancialTransactionService:
             date_start: date = None,
             date_end: date = None
     ) -> List[FinancialTransactionModel]:
-        return self.financial_transaction_repo.filter_by_account_and_date(
+        return self.financial_transaction_repo.filter(
             account_codes, category_codes, date_start, date_end
         )
 

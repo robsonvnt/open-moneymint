@@ -3,8 +3,8 @@ import {Alert, Box, Container, Grid, Snackbar} from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
 import {Copyright} from "@mui/icons-material";
-import TransactionTable from "./TransactionTable";
-import Title from "./Title";
+import TransactionTable from "./components/TransactionTable";
+import Title from "./components/Title";
 
 
 interface TransactionViewProps {

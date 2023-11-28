@@ -63,7 +63,7 @@ def test_find_by_code_not_found():
         repo.find_by_code("TRANS123")
 
 
-def test_filter_by_account_and_date():
+def test_filter():
     mock_session = create_autospec(Session)
     repo = FinancialTransactionRepo(mock_session)
 
@@ -74,14 +74,14 @@ def test_filter_by_account_and_date():
 
     mock_session.query.return_value.filter.return_value.order_by.return_value.all.return_value = return_value_filter
 
-    result = repo.filter_by_account_and_date(["TR001"])
+    result = repo.filter(["TR001"])
     assert mock_session.query.return_value.filter.return_value.order_by.return_value.all.call_count == 1
     assert mock_session.query.call_count == 1
     assert mock_session.query.return_value.filter.call_count == 1
     assert len(result) == 2
 
 
-def test_filter_by_account_and_date_with_date():
+def test_filter_with_date():
     mock_session = create_autospec(Session)
     repo = FinancialTransactionRepo(mock_session)
 
@@ -98,7 +98,7 @@ def test_filter_by_account_and_date_with_date():
 
     query_2.filter.return_value.order_by.return_value.all.return_value = return_value_filter
 
-    result = repo.filter_by_account_and_date(["TR001"], None, date.today(), date.today())
+    result = repo.filter(["TR001"], None, date.today(), date.today())
 
     assert mock_session.query.call_count == 1
     assert mock_session.query.return_value.filter.call_count == 1
@@ -107,13 +107,13 @@ def test_filter_by_account_and_date_with_date():
     assert len(result) == 2
 
 
-def test_filter_by_account_and_date_empty_result():
+def test_filter_empty_result():
     mock_session = create_autospec(Session)
     repo = FinancialTransactionRepo(mock_session)
 
     mock_session.query().filter().order_by().all.return_value = []
 
-    result = repo.filter_by_account_and_date(["TR001"])
+    result = repo.filter(["TR001"])
     mock_session.query().filter().order_by().all.assert_called_once()
     assert len(result) == 0
 

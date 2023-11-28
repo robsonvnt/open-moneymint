@@ -9,11 +9,6 @@ Base = declarative_base()
 
 # Modelo de Investment
 class Account(Base, AllFeaturesMixin):
-
-    def __init__(self, **kwargs):
-        kwargs.setdefault('id', None)
-        super().__init__(**kwargs)
-
     __tablename__ = 'finances_accounts'
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, index=True, unique=True)
@@ -23,13 +18,12 @@ class Account(Base, AllFeaturesMixin):
     balance = Column(Float, default=0)
     created_at = Column(Date)
 
-
-class Category(Base, AllFeaturesMixin):
-
     def __init__(self, **kwargs):
         kwargs.setdefault('id', None)
         super().__init__(**kwargs)
 
+
+class Category(Base, AllFeaturesMixin):
     __tablename__ = 'finances_categories'
     id = Column(Integer, primary_key=True, index=True, unique=True)
     code = Column(String, index=True, unique=True)
@@ -38,14 +32,12 @@ class Category(Base, AllFeaturesMixin):
     parent_category_code = Column(String, index=True)
     created_at = Column(Date)
 
-
-class FinancialTransaction(Base, AllFeaturesMixin):
     def __init__(self, **kwargs):
         kwargs.setdefault('id', None)
-        if isinstance(kwargs.get('type'), TransactionType):
-            kwargs['type'] = kwargs['type'].value
         super().__init__(**kwargs)
 
+
+class FinancialTransaction(Base, AllFeaturesMixin):
     __tablename__ = 'finances_transactions'
     id = Column(Integer, primary_key=True, index=True, unique=True)
     code = Column(String, index=True, unique=True)
@@ -55,3 +47,9 @@ class FinancialTransaction(Base, AllFeaturesMixin):
     type = Column(String)
     date = Column(Date)
     value = Column(Float)
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('id', None)
+        if isinstance(kwargs.get('type'), TransactionType):
+            kwargs['type'] = kwargs['type'].value
+        super().__init__(**kwargs)

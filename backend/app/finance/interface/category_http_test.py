@@ -125,6 +125,12 @@ def test_update_category_bad_request(client, db_session):
 
 def test_delete_category(client, db_session):
     add_categories(db_session)
+    add_transactions(db_session)
+    # Garantir que FinancialTransaction com CAT001 existe
+    transaction_old = db_session.query(FinancialTransaction).filter(
+        FinancialTransaction.code == "TRA001"
+    ).one()
+    assert transaction_old.category_code == "CAT001"
 
     response = client.delete("/finances/categories/CAT001")
 
@@ -134,6 +140,11 @@ def test_delete_category(client, db_session):
         ).one()
 
     assert response.status_code == 200
+    transaction = db_session.query(FinancialTransaction).filter(
+        FinancialTransaction.code == "TRA001"
+    ).one()
+
+    assert transaction.category_code is None
 
 
 def test_delete_non_existent_category(client, db_session):

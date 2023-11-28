@@ -14,6 +14,10 @@ export interface NewAccountModel {
 }
 
 
+export interface CategoryInput {
+    name: string;
+    parent_category_code?: string;
+}
 
 export interface CategoryModel {
     code: string;

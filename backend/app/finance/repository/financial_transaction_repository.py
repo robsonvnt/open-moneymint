@@ -50,7 +50,7 @@ class FinancialTransactionRepo:
         except Exception as e:
             raise FinancialTransactionUnexpectedError()
 
-    def filter_by_account_and_date(
+    def filter(
             self,
             account_codes: List[str],
             category_codes: List[str] = None,
@@ -59,9 +59,13 @@ class FinancialTransactionRepo:
     ) -> List[FinancialTransactionModel]:
         session = self.session
         try:
-            query = session.query(FinancialTransaction).filter(
-                FinancialTransaction.account_code.in_(account_codes)
-            )
+            query = session.query(FinancialTransaction)
+            if account_codes:
+                query = query.filter(
+                    FinancialTransaction.account_code.in_(account_codes)
+                )
+            if category_codes:
+                query = query.filter(FinancialTransaction.category_code.in_(category_codes))
             if category_codes:
                 query = query.filter(FinancialTransaction.category_code.in_(category_codes))
             if date_start:

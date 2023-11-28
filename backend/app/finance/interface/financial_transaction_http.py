@@ -73,11 +73,16 @@ async def get_all_transactions(
 
         # TODO Move to Service
         # Validates whether categories belongs to the logged in user
+        category_codes_filter = []
         if category_codes:
             for category_code in category_codes:
                 category = category_service.get_by_code(category_code)
                 if category.user_code != current_user.code:
                     raise CategoryNotFound()
+                else:
+                    children = category_service.list_all_children(category.code, category.user_code)
+                    category_codes_filter.append(category.code)
+                    category_codes_filter.extend([cat.code for cat in children])
 
         if month:
             month_date = datetime.strptime(month, "%Y-%m").date()
@@ -86,7 +91,7 @@ async def get_all_transactions(
 
         transactions = transaction_serv.filter_by_account_and_date(
             account_codes,
-            category_codes,
+            category_codes_filter,
             start_date,
             end_date
         )
