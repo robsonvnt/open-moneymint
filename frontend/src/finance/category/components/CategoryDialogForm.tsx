@@ -63,7 +63,7 @@ const CategoryDialogForm: React.FC<AccountDialogFormProps> =
                     let newCategoryList = prepareCategoryList("", categoryList);
                     setCategoryList(newCategoryList);
                 });
-        }, []);
+        }, [open]);
 
         const clearForm = () => {
             setCurrentCategory({name: ""});
