@@ -17,7 +17,7 @@ const LoginForm: React.FC = () => {
   useEffect(() => {
     let token = localStorage.getItem('accessToken');
     if (token) {
-      navigate(`/`);
+      navigate(`/finances`);
     }
   }, []);
 
@@ -29,13 +29,13 @@ const LoginForm: React.FC = () => {
         user_name: userName,
         password: password
       }
-      const response = await axios.post<AccessTokenResponse>('/api/users/signin', loginInput);
+      const response = await axios.post<AccessTokenResponse>('/api/users/signin', loginInput)
       localStorage.setItem('accessToken', response.data.access_token);
 
       setTimeout(() => {
         if (localStorage.getItem('accessToken')) {
           setLoading(false);
-          navigate(`/`);
+          navigate(`/finances`);
         }
       }, 1500);
 

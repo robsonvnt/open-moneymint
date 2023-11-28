@@ -29,6 +29,11 @@ const Router: React.FC = () => {
                         <FinanceHome/>
                     </PrivateRoute>
                 }/>
+                <Route path="/" element={
+                    <PrivateRoute>
+                        <FinanceHome/>
+                    </PrivateRoute>
+                }/>
             </Routes>
         </BrowserRouter>
     );
