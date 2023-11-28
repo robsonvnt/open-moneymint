@@ -14,7 +14,7 @@ class Account(Base, AllFeaturesMixin):
         kwargs.setdefault('id', None)
         super().__init__(**kwargs)
 
-    __tablename__ = 'accounts'
+    __tablename__ = 'finances_accounts'
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, index=True, unique=True)
     name = Column(String, index=True)
@@ -30,7 +30,7 @@ class Category(Base, AllFeaturesMixin):
         kwargs.setdefault('id', None)
         super().__init__(**kwargs)
 
-    __tablename__ = 'categories'
+    __tablename__ = 'finances_categories'
     id = Column(Integer, primary_key=True, index=True, unique=True)
     code = Column(String, index=True, unique=True)
     name = Column(String, index=True)

@@ -23,7 +23,7 @@ class Investment(Base, AllFeaturesMixin):
 
 
 class ConsolidatedPortfolio(Base, AllFeaturesMixin):
-    __tablename__ = 'consolidated_balance_portfolios'
+    __tablename__ = 'investments_consolidated_balance_portfolios'
     id = Column(Integer, primary_key=True)
     portfolio_code = Column(String)
     date = Column(Date)
@@ -32,7 +32,7 @@ class ConsolidatedPortfolio(Base, AllFeaturesMixin):
 
 
 class Portfolio(Base, AllFeaturesMixin):
-    __tablename__ = 'portfolios'
+    __tablename__ = 'investments_portfolios'
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     code = Column(String, unique=True, index=True)
     name = Column(String, index=True)
@@ -41,7 +41,7 @@ class Portfolio(Base, AllFeaturesMixin):
 
 
 class Transaction(Base, AllFeaturesMixin):
-    __tablename__ = 'transactions'
+    __tablename__ = 'investments_transactions'
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     code = Column(String(10), index=True)
     investment_code = Column(String(10), index=True)

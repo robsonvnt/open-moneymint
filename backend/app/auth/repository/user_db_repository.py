@@ -17,7 +17,7 @@ class User(Base, AllFeaturesMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    __tablename__ = 'users'
+    __tablename__ = 'auth_users'
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, index=True, unique=True)
     name = Column(String)
