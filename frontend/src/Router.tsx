@@ -6,6 +6,7 @@ import PortfolioSelection from './investments/portfolio/PortfolioSelection';
 import InvestmentsList from './investments/investments/InvestmentsList';
 import SignupForm from './auth/SignupForm';
 import FinanceHome from "./finance/FinanceHome";
+import Home from "./home/Home";
 
 const Router: React.FC = () => {
     return (
@@ -31,7 +32,7 @@ const Router: React.FC = () => {
                 }/>
                 <Route path="/" element={
                     <PrivateRoute>
-                        <FinanceHome/>
+                        <Home/>
                     </PrivateRoute>
                 }/>
             </Routes>

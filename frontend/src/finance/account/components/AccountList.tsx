@@ -137,14 +137,14 @@ const AccountList: React.FC<AccountListProps> =
                             </ListItem>
                         );
                     })}
-                    <Divider light/>
-                    <ListItem disablePadding>
-                        <ListItemButton>
+                    {/*<Divider light/>*/}
+                    <ListItem disablePadding style={{backgroundColor: "#f0f0f0"}}>
+                        <ListItemButton >
                             <ListItemText primary="Total"/>
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                color: totalBalance < 0 ? '#db0000' : 'inherit' // Altera a cor para vermelho se o saldo for negativo
+                                color: totalBalance < 0 ? '#db0000' : 'inherit',
                             }}>
                                 <ListItemText
                                     primary={`${currencyFormatter.format(totalBalance)}`}

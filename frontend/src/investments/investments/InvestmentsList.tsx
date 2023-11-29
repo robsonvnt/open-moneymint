@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Card, CardActionArea, Grid, Container} from '@mui/material';
-import { Investment, createEmptynvestment } from './models';
+import React, {useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
+import {Card, CardActionArea, Grid, Container} from '@mui/material';
+import {Investment, createEmptynvestment} from './models';
 import InvestmentsService from './InvestmentsService';
-import { Portfolio, PortfolioConsolidationModel } from '../portfolio/models';
+import {Portfolio, PortfolioConsolidationModel} from '../portfolio/models';
 import PortfolioService from '../portfolio/PortfolioService';
-import { clearFloatFormatter } from '../../helpers/BRFormatHelper';
+import {clearFloatFormatter} from '../../helpers/BRFormatHelper';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import EarningsCard from './components/charts/EarningsCard';
@@ -33,7 +33,7 @@ const InvestmentsList: React.FC = () => {
 
     const portfolioService = PortfolioService;
 
-    const { code } = useParams<InvestmentsListParams>();
+    const {code} = useParams<InvestmentsListParams>();
 
     const investmentsService = InvestmentsService;
 
@@ -41,6 +41,13 @@ const InvestmentsList: React.FC = () => {
     const [activeTab, setActiveTab] = useState<number>(0);
     const [selectedInvestment, setSelectedInvestment] = useState<Investment>(createEmptynvestment());
     const [reloadChart, setReloadChart] = useState(false);
+
+
+    // Barra lateral
+    const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
 
 
     const handleFormSubmit = (e: React.FormEvent) => {
@@ -52,23 +59,22 @@ const InvestmentsList: React.FC = () => {
                         loadInvestments();
                         setDialogOpen(false);
                     }).catch(() => {
-                        setError("Erro ao alterar um investimento.");
-                    })
+                    setError("Erro ao alterar um investimento.");
+                })
             } else {
                 investmentsService.createInvestment(code, selectedInvestment)
                     .finally(() => {
                         loadInvestments();
                         setDialogOpen(false);
                     }).catch(() => {
-                        setError("Erro ao criar um investimento.");
-                    })
+                    setError("Erro ao criar um investimento.");
+                })
             }
 
         } else {
             setError("Nenhum portifólio selecionado.");
         }
     };
-
 
 
     const createInvestment = () => {
@@ -88,8 +94,8 @@ const InvestmentsList: React.FC = () => {
                     loadInvestments();
                     setDialogOpen(false);
                 }).catch(() => {
-                    setError("Erro ao deletar um investimento.");
-                })
+                setError("Erro ao deletar um investimento.");
+            })
         }
     }
 
@@ -156,7 +162,9 @@ const InvestmentsList: React.FC = () => {
 
     return (
         <>
-            <MoneyMineAppBar/>
+            <MoneyMineAppBar
+                handleDrawerToggle={handleDrawerToggle}
+            />
             <Container>
                 <div style={{
                     display: 'flex',
@@ -164,16 +172,16 @@ const InvestmentsList: React.FC = () => {
                     alignItems: 'center',
                     marginBottom: 5
                 }}>
-                    <h2 style={{ color: '#444444' }}>Detalhes do Portfólio: <b>{consolidatedPortfolio.name}</b></h2>
+                    <h2 style={{color: '#444444'}}>Detalhes do Portfólio: <b>{consolidatedPortfolio.name}</b></h2>
                 </div>
 
                 <Grid container
-                    spacing={2}
-                    direction="row"
-                    alignItems="stretch"
+                      spacing={2}
+                      direction="row"
+                      alignItems="stretch"
                 >
                     <Grid item xs={12} sm={6} md={4} lg={4}
-                        style={{ display: 'flex' }}>
+                          style={{display: 'flex'}}>
                         <EarningsCard
                             amount={clearFloatFormatter.format(consolidatedPortfolio.amount_invested)}
                             label='Quantia Investida'
@@ -181,7 +189,7 @@ const InvestmentsList: React.FC = () => {
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={4} lg={4}
-                        style={{ display: 'flex' }}>
+                          style={{display: 'flex'}}>
                         <EarningsCard
                             amount={clearFloatFormatter.format(consolidatedPortfolio.current_balance)}
                             label='Saldo Atual'
@@ -189,7 +197,7 @@ const InvestmentsList: React.FC = () => {
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={4} lg={4}
-                        style={{ display: 'flex' }}>
+                          style={{display: 'flex'}}>
                         <EarningsCard
                             amount={clearFloatFormatter.format(net_yield)}
                             label='Rendimento'
@@ -201,20 +209,20 @@ const InvestmentsList: React.FC = () => {
                 </Grid>
 
                 <Grid container
-                    spacing={2}
-                    direction="row"
-                    alignItems="stretch"
-                    marginTop={5}
+                      spacing={2}
+                      direction="row"
+                      alignItems="stretch"
+                      marginTop={5}
                 >
                     <Grid item xs={12} sm={6} md={8} lg={8}
-                        style={{ display: 'flex' }}>
+                          style={{display: 'flex'}}>
                         <AssetAccumulationChart
                             portfolio_code={code ? code : ''}
                         />
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={4} lg={4}
-                        style={{ display: 'flex' }}>
+                          style={{display: 'flex'}}>
                         <InvestmentDiversificationChart
                             portfolio_code={code ? code : ''}
                             reloadChart={reloadChart}
@@ -228,12 +236,12 @@ const InvestmentsList: React.FC = () => {
                 </div>
 
                 <Grid container
-                    spacing={2}
-                    direction="row"
-                    alignItems="stretch">
+                      spacing={2}
+                      direction="row"
+                      alignItems="stretch">
                     {investments.map((investment, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={index} style={{ display: 'flex' }}>
-                            <Card sx={{ flex: 1 }}>
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={index} style={{display: 'flex'}}>
+                            <Card sx={{flex: 1}}>
                                 <CardActionArea>
                                     <InvestmentCard
                                         investment={investment}
@@ -255,7 +263,7 @@ const InvestmentsList: React.FC = () => {
                 setInvestment={setSelectedInvestment}
                 handleFormSubmit={handleFormSubmit}
                 deleteInvestment={deleteInvestment}
-                activeTab ={activeTab}
+                activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 reloadInvestments={loadInvestments}
             />
@@ -264,9 +272,14 @@ const InvestmentsList: React.FC = () => {
                 color="primary"
                 aria-label="add"
                 onClick={() => createInvestment()}
-                style={{ margin: '20px 0', position: 'fixed', bottom: '20px', right: '20px' }}  // Posiciona o botão no canto inferior direito
+                style={{
+                    margin: '20px 0',
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px'
+                }}  // Posiciona o botão no canto inferior direito
             >
-                <AddIcon />
+                <AddIcon/>
             </Fab>
 
         </>
