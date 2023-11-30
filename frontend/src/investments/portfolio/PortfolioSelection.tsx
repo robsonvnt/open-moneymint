@@ -89,9 +89,13 @@ const PortfolioSelection: React.FC = () => {
                     sendPortfolio={adicionarOuAtualizarPortfolio}
                     portfolio={selectedPortfolio}
                 />
-                <h2>Portifolios</h2>
+                <h2
+                style={{
+                    marginTop: 80
+                }}
+                >Portifolios</h2>
                 <PortfolioList
-                    dados={portfolios}
+                    portfolios={portfolios}
                     aoSelecionar={portfolioEdit}
                     deletePortifolio={deletePortifolio}
                     selectPortfolio={selectPortfolio}
