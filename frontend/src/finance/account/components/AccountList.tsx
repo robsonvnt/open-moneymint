@@ -59,8 +59,11 @@ const AccountList: React.FC<AccountListProps> =
         const [openForm, setOpenForm] = useState<boolean>(false);
         const [onCloseForm, setOnCloseForm] = useState<boolean>(false);
         const [onSaveAccount, setOnSaveAccount] = useState<boolean>(false);
+        const [currentAccount, setCurrentAccount] = useState<NewAccountModel>({name: '', description: '', balance: 0});
+
 
         const handleIconClick = () => {
+            setCurrentAccount({name: '', description: '', balance: 0})
             setOpenForm(true);
         };
 
@@ -156,6 +159,8 @@ const AccountList: React.FC<AccountListProps> =
                 </List>
 
                 <AccountDialogForm
+                    currentAccount={currentAccount}
+                    setCurrentAccount={setCurrentAccount}
                     open={openForm}
                     onClose={handleDialogClose}
                     onSave={handleOnSave}
