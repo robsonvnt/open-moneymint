@@ -1,10 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {Alert, Box, Container, Grid, Snackbar} from "@mui/material";
-import Toolbar from "@mui/material/Toolbar";
+import React, {useEffect} from 'react';
+import {Box, Container, Grid} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {Copyright} from "@mui/icons-material";
 import TransactionTable from "./components/TransactionTable";
-import Title from "./components/Title";
 
 
 interface TransactionViewProps {

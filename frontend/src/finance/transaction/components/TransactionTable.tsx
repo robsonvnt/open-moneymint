@@ -6,18 +6,26 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from "./Title";
-import {AccountTransaction, NewAccountTransaction} from "../../models";
+import {AccountTransaction, InputAccountTransaction} from "../../models";
 import {useEffect, useState} from "react";
 import {TransactionService} from "../TransactionService";
 import MonthNavigator from "./MonthNavigator";
 import {currencyFormatter, formatDateStr} from "../../../helpers/BRFormatHelper";
 import {AccountService} from "../../account/AccountService";
 import {CategoryService} from "../../category/CategoryService";
-import {Alert, Checkbox, Snackbar} from "@mui/material";
+import {Alert, Checkbox, DialogContentText, IconButton, Snackbar} from "@mui/material";
 import AccountTransactionDialogForm from "./AccountTransactionDialogForm";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Fab from "@mui/material/Fab";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
 
 // Generate Order Data
 function createData(
@@ -140,28 +148,11 @@ const TransactionTable: React.FC<TransactionTableProps> =
         const [notificationOpen, setNotificationOpen] = React.useState(false);
         const [notificationMessage, setNotificationMessage] = useState<string>("");
         const [statusTransactionAction, setStatusTransactionAction] = useState<"success" | "error">("success");
-        const [reloadTransactions, setReloadTransactions] = useState(false);
 
-        const addTransaction = () => {
-            setDialogOpen(true)
-            setReloadTransactions(true)
-        };
-
-        const removeTransaction = () => {
-            selectedTransactions.forEach((item) => {
-                selectedTransactions.forEach((transaction_code) => {
-                    transactionService.delete(transaction_code).then(() => {
-                        setStatusTransactionAction("success")
-                        setNotificationMessage("Transação removida com sucesso!")
-                        setNotificationOpen(true);
-                    }).catch(() => {
-                        setStatusTransactionAction("error")
-                        setNotificationMessage("Erro ao remover a Transação!")
-                        setNotificationOpen(true);
-                    })
-
-                })
-            })
+        const removeTransaction = async () => {
+            for (const transaction_code of Array.from(selectedTransactions)) {
+                await deleteTransaction(transaction_code);
+            }
             setSelectedTransactions(new Set());
             loadTransactions();
         };
@@ -177,23 +168,103 @@ const TransactionTable: React.FC<TransactionTableProps> =
             setDialogOpen(false);
         };
 
-        const handleSaveTransaction = (newTransaction: NewAccountTransaction) => {
-            transactionService.create(newTransaction).then((transaction) => {
-                setStatusTransactionAction("success")
-                setNotificationMessage("Transação criada com sucesso!")
-                setNotificationOpen(true);
-                loadTransactions();
-            }).catch(() => {
-                setNotificationMessage("Erro ao criar a Transação!")
-                setStatusTransactionAction("error")
-                setNotificationOpen(true);
-            })
+        const handleSaveTransaction = (transaction: InputAccountTransaction) => {
+            if (transaction.code) {
+                updateTransaction(transaction)
+            } else {
+                createTransaction(transaction)
+            }
+            loadTransactions()
         };
 
         const changeCurrentDate = (dt: Date) => {
             setCurrentDate(dt);
             loadTransactionsWithDate(dt);
         }
+
+        const handleEditTransaction = (code: string) => {
+            handleCloseMenuTraActions();
+            transactionService.get(code).then((loadedTransaction) => {
+                setCurrentTransaction(loadedTransaction)
+                setDialogOpen(true)
+            })
+        }
+        const handleAddTransaction = () => {
+            setCurrentTransaction({})
+            setDialogOpen(true)
+        };
+
+        // CRUD Transaction
+        const [currentTransaction, setCurrentTransaction] = useState<InputAccountTransaction>({});
+        const [currentTransactionCode, setCurrentTransactionCode] = useState<string>("");
+        const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+
+        const handleClickTransactionItemMenu = (transactionCode: string) => (event: React.MouseEvent<HTMLElement>) => {
+            setAnchorEl(event.currentTarget);
+            setCurrentTransactionCode(transactionCode);
+        };
+
+        const handleCloseMenuTraActions = () => {
+            setAnchorEl(null);
+        };
+
+        const updateTransaction = (transaction: InputAccountTransaction) => {
+            transactionService.update(transaction).then(() => {
+                setNotificationMessage("Transação alterada com sucesso!")
+                setStatusTransactionAction("success")
+                setNotificationOpen(true);
+            }).catch(() => {
+                setNotificationMessage("Erro ao salvar a Transação!")
+                setStatusTransactionAction("error")
+                setNotificationOpen(true);
+            })
+        }
+
+        const createTransaction = (transaction: InputAccountTransaction) => {
+            transactionService.create(transaction).then(() => {
+                setNotificationMessage("Transação criada com sucesso!")
+                setStatusTransactionAction("success")
+                setNotificationOpen(true);
+            }).catch(() => {
+                setNotificationMessage("Erro ao salvar a Transação!")
+                setStatusTransactionAction("error")
+                setNotificationOpen(true);
+            })
+        }
+
+        const deleteTransaction = async (code: string) => {
+            try {
+                await transactionService.delete(code);
+                setStatusTransactionAction("success");
+                setNotificationMessage("Transação excluída com sucesso!");
+            } catch (error) {
+                setStatusTransactionAction("error");
+                setNotificationMessage("Falha ao tentar excluir a transação!");
+            } finally {
+                setNotificationOpen(true);
+            }
+        }
+
+        // Confirmação
+        const [confirmOpen, setConfirmOpen] = useState(false);
+        const [transactionCodeToDelete, setTransactionCodeToDelete] = useState("");
+
+        const handleDelete = (code: string) => {
+            transactionService.get(code).then((tran) => {
+                setCurrentTransaction(tran)
+                setConfirmOpen(true)
+                handleCloseMenuTraActions();
+            })
+
+        };
+
+        const handleConfirmDelete = () => {
+            deleteTransaction(transactionCodeToDelete).then(r => loadTransactions());
+            setConfirmOpen(false);
+            setTransactionCodeToDelete("")
+        };
+
 
         return (
             <React.Fragment>
@@ -226,8 +297,9 @@ const TransactionTable: React.FC<TransactionTableProps> =
                             return (
                                 <React.Fragment key={date}>
                                     {transactions.map(transaction => (
-                                        <TableRow key={transaction.code}
-                                                  style={selectedTransactions.has(transaction.code) ? selectedRowStyle : undefined}>
+                                        <TableRow key={`row-${transaction.code}`}
+                                                  style={selectedTransactions.has(transaction.code) ? selectedRowStyle : undefined}
+                                        >
                                             <TableCell padding="checkbox">
                                                 <Checkbox
                                                     checked={selectedTransactions.has(transaction.code)}
@@ -249,6 +321,13 @@ const TransactionTable: React.FC<TransactionTableProps> =
                                                 }}
                                             >
                                                 {`${currencyFormatter.format(transaction.value)}`}
+
+                                                <IconButton
+                                                    key={transaction.code}
+                                                    onClick={handleClickTransactionItemMenu(transaction.code)}
+                                                >
+                                                    <MoreVertIcon/>
+                                                </IconButton>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -279,11 +358,23 @@ const TransactionTable: React.FC<TransactionTableProps> =
 
                     </TableBody>
                 </Table>
-                <Link color="primary" href="#" onClick={preventDefault} sx={{mt: 3}}>
-                    See more orders
-                </Link>
+
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleCloseMenuTraActions}
+                >
+                    <MenuItem
+                        onClick={() => handleEditTransaction(currentTransactionCode)}
+                    >Editar</MenuItem>
+                    <MenuItem
+                        onClick={() => handleDelete(currentTransactionCode)}
+                    >Excluir</MenuItem>
+                </Menu>
 
                 <AccountTransactionDialogForm
+                    transaction={currentTransaction}
+                    setTransaction={setCurrentTransaction}
                     open={dialogOpen}
                     onClose={handleDialogClose}
                     onSave={handleSaveTransaction}
@@ -306,10 +397,34 @@ const TransactionTable: React.FC<TransactionTableProps> =
                         bottom: '20px',
                         right: '20px'
                     }}
-                    onClick={selectedTransactions.size > 0 ? removeTransaction : addTransaction}
+                    onClick={selectedTransactions.size > 0 ? removeTransaction : handleAddTransaction}
                 >
                     {selectedTransactions.size > 0 ? <DeleteIcon/> : <AddIcon/>}
                 </Fab>
+
+                <Dialog
+                    open={confirmOpen}
+                    onClose={() => setConfirmOpen(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                        {"Confirmar exclusão"}
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Tem certeza de que deseja excluir?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setConfirmOpen(false)} color="primary">
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+                            Confirmar
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
             </React.Fragment>
         )

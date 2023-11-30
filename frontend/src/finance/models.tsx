@@ -44,7 +44,8 @@ export interface AccountTransaction {
     value: number;
 }
 
-export interface NewAccountTransaction {
+export interface InputAccountTransaction {
+    code?: string;
     account_code?: string;
     description?: string;
     category_code?: string;
