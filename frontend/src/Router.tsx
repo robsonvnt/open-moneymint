@@ -6,6 +6,7 @@ import PortfolioSelection from './investments/portfolio/PortfolioSelection';
 import InvestmentsList from './investments/investments/InvestmentsList';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import SignupForm from './auth/SignupForm';
+import FinanceHome from "./finance/FinanceHome";
 
 const Router: React.FC = () => {
     return (
@@ -40,6 +41,11 @@ const Router: React.FC = () => {
                 <Route path="/portfolio/:code" element={
                     <PrivateRoute>
                         <InvestmentsList />
+                    </PrivateRoute>
+                } />
+                <Route path="/finance" element={
+                    <PrivateRoute>
+                        <FinanceHome />
                     </PrivateRoute>
                 } />
             </Routes>
