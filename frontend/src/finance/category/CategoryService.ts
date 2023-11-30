@@ -1,6 +1,6 @@
 import {AccountModel, CategoryModel, CategoryInput, CategoryTreeItem} from "../models";
 import axios, {AxiosResponse} from "axios";
-import {NewAccountModel} from "../account/components/AccountDialogForm";
+import {InputAccountModel} from "../account/components/AccountDialogForm";
 
 
 const baseUrl = '/api/finances/categories'; // ou a URL base do seu backend

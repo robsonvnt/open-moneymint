@@ -9,7 +9,7 @@ import {AccountService} from "../AccountService";
 import {currencyFormatter} from "../../../helpers/BRFormatHelper";
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
-import AccountDialogForm, {NewAccountModel} from "./AccountDialogForm"; // Substitua por seu ícone preferido
+import AccountDialogForm, {InputAccountModel} from "./AccountDialogForm"; // Substitua por seu ícone preferido
 
 
 interface AccountListProps {
@@ -59,7 +59,11 @@ const AccountList: React.FC<AccountListProps> =
         const [openForm, setOpenForm] = useState<boolean>(false);
         const [onCloseForm, setOnCloseForm] = useState<boolean>(false);
         const [onSaveAccount, setOnSaveAccount] = useState<boolean>(false);
-        const [currentAccount, setCurrentAccount] = useState<NewAccountModel>({name: '', description: '', balance: 0});
+        const [currentAccount, setCurrentAccount] = useState<InputAccountModel>({
+            name: '',
+            description: '',
+            balance: 0
+        });
 
 
         const handleIconClick = () => {
@@ -67,17 +71,51 @@ const AccountList: React.FC<AccountListProps> =
             setOpenForm(true);
         };
 
+        const handleItemListDoubleClick = (code: string) => {
+            accountService.get(code).then((account) => {
+                setCurrentAccount(account)
+                setOpenForm(true);
+            })
+        };
+
         const handleDialogClose = () => {
             setOpenForm(false);
         };
 
-        const handleOnSave = (account: NewAccountModel) => {
-            AccountService.create(account).then((createdAccount) => {
-                let newAccountList: AccountModel[] = []
-                accountList.map((acc) => newAccountList.push(acc))
-                newAccountList.push(createdAccount);
-                updateList(newAccountList);
-            })
+        const handleOnDelete = (account: InputAccountModel) => {
+            if (account.code) {
+                accountService.delete(account.code)
+                setOpenForm(false);
+                setCurrentAccount({name: '', description: '', balance: 0})
+                accountService.getAllAccounts()
+                    .then(accounts => {
+                        updateList(accounts);
+                    });
+            }
+        }
+
+        const handleOnSave = (account: InputAccountModel) => {
+            if (account.code) {
+                AccountService.update(account).then((updatedAccount) => {
+                    let newAccountList: AccountModel[] = []
+                    accountList.map((acc): void => {
+                        if (acc.code === updatedAccount.code) {
+                            newAccountList.push(updatedAccount)
+                        } else {
+                            newAccountList.push(acc)
+                        }
+                    })
+
+                    updateList(newAccountList);
+                })
+            } else {
+                AccountService.create(account).then((createdAccount) => {
+                    let newAccountList: AccountModel[] = []
+                    accountList.map((acc) => newAccountList.push(acc))
+                    newAccountList.push(createdAccount);
+                    updateList(newAccountList);
+                })
+            }
         };
 
 
@@ -126,7 +164,7 @@ const AccountList: React.FC<AccountListProps> =
                                 }
                                 disablePadding
                             >
-                                <ListItemButton>
+                                <ListItemButton onDoubleClick={() => handleItemListDoubleClick(account.code)}>
                                     <ListItemText id={labelId} primary={`${account.name}`}/>
                                     <div style={{
                                         display: 'flex',
@@ -142,7 +180,7 @@ const AccountList: React.FC<AccountListProps> =
                     })}
                     {/*<Divider light/>*/}
                     <ListItem disablePadding style={{backgroundColor: "#f0f0f0"}}>
-                        <ListItemButton >
+                        <ListItemButton>
                             <ListItemText primary="Total"/>
                             <div style={{
                                 display: 'flex',
@@ -164,6 +202,7 @@ const AccountList: React.FC<AccountListProps> =
                     open={openForm}
                     onClose={handleDialogClose}
                     onSave={handleOnSave}
+                    onDelete={handleOnDelete}
                 />
             </>
         );

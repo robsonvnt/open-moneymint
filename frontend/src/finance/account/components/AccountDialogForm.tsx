@@ -11,7 +11,8 @@ import {
 } from '@mui/material';
 import {AccountTransactionType, CategoryInput} from "../../models";
 
-export interface NewAccountModel {
+export interface InputAccountModel {
+    code?: string;
     name: string;
     description?: string;
     balance: number;
@@ -24,11 +25,12 @@ interface FormErrors {
 }
 
 interface AccountDialogFormProps {
-    currentAccount: NewAccountModel;
-    setCurrentAccount: React.Dispatch<React.SetStateAction<NewAccountModel>>;
+    currentAccount: InputAccountModel;
+    setCurrentAccount: React.Dispatch<React.SetStateAction<InputAccountModel>>;
     open: boolean;
     onClose: () => void;
-    onSave: (account: NewAccountModel) => void;
+    onSave: (account: InputAccountModel) => void;
+    onDelete: (account: InputAccountModel) => void;
 }
 
 const AccountDialogForm: React.FC<AccountDialogFormProps> =
@@ -37,7 +39,8 @@ const AccountDialogForm: React.FC<AccountDialogFormProps> =
          setCurrentAccount,
          open,
          onClose,
-         onSave
+         onSave,
+        onDelete
      }) => {
         const [errors, setErrors] = useState<FormErrors>({});
 
@@ -53,6 +56,12 @@ const AccountDialogForm: React.FC<AccountDialogFormProps> =
             }
             setCurrentAccount({...currentAccount, [e.target.name]: value});
         };
+
+        const handleDelete = () => {
+            onDelete(currentAccount);
+            onClose();
+            clearForm()
+        }
 
         const handleClose = () => {
             onClose();
@@ -127,6 +136,16 @@ const AccountDialogForm: React.FC<AccountDialogFormProps> =
 
                 </DialogContent>
                 <DialogActions>
+
+                    {currentAccount.code && (
+                        <Button
+                            onClick={handleDelete}
+                            style={{color: 'red', marginLeft: 20}}
+                        >
+                            Excluir
+                        </Button>
+                    )}
+
                     <Button onClick={handleClose}>Cancelar</Button>
                     <Button onClick={handleSave}>Salvar</Button>
                 </DialogActions>
