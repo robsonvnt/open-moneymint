@@ -27,14 +27,7 @@ const SideBar: React.FC<SideBarProps> =
 
 
         return (
-            <Drawer
-                variant="permanent"
-                sx={{
-                    width: 240,
-                    flexShrink: 0,
-                    [`& .MuiDrawer-paper`]: {width: 240, boxSizing: 'border-box'},
-                }}
-            >
+            < >
                 <Toolbar/>
                 <Box sx={{overflow: 'auto'}}>
                     <AccountList
@@ -48,7 +41,7 @@ const SideBar: React.FC<SideBarProps> =
                     />
 
                 </Box>
-            </Drawer>
+            </>
         );
     }
 

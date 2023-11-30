@@ -18,8 +18,6 @@ import AccountTransactionDialogForm from "./AccountTransactionDialogForm";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Fab from "@mui/material/Fab";
-import ActionButton from "../../components/ActionButton";
-import AccountDialogForm from "../../account/components/AccountDialogForm";
 
 // Generate Order Data
 function createData(
@@ -122,7 +120,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
         };
 
         const selectedRowStyle = {
-            backgroundColor: "#f6f6f6" // escolha a cor que preferir
+            backgroundColor: "#f5f8ff" // escolha a cor que preferir
         };
 
         const groupTransactionsByDate = (transactions: AccountTransaction[]): Map<string, AccountTransaction[]> => {
@@ -255,7 +253,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
                                         </TableRow>
                                     ))}
                                     <TableRow
-                                        style={{backgroundColor: '#d7d5d5'}}
+                                        style={{backgroundColor: '#f0f0f0'}}
                                     >
                                         <TableCell colSpan={5} align="right"></TableCell>
                                         <TableCell align="right"

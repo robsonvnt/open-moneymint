@@ -36,15 +36,10 @@ const TransactionView: React.FC<TransactionViewProps> =
                     overflow: 'auto',
                 }}
             >
-                <Toolbar/>
+
                 <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
                     <Grid container spacing={3}>
 
-                        <Grid item xs={12}>
-                            <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
-                                <Title>Filtros</Title>
-                            </Paper>
-                        </Grid>
                         <Grid item xs={12}>
                             <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
                                 <TransactionTable
