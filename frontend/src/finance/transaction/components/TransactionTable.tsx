@@ -260,9 +260,11 @@ const TransactionTable: React.FC<TransactionTableProps> =
         };
 
         const handleConfirmDelete = () => {
-            deleteTransaction(transactionCodeToDelete).then(r => loadTransactions());
-            setConfirmOpen(false);
-            setTransactionCodeToDelete("")
+            if (currentTransaction.code) {
+                deleteTransaction(currentTransaction.code).then(r => loadTransactions());
+                setConfirmOpen(false);
+                setTransactionCodeToDelete("")
+            }
         };
 
 
@@ -282,6 +284,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
                             <TableCell>Categoria</TableCell>
                             <TableCell>Conta</TableCell>
                             <TableCell align="right">Valor</TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -315,13 +318,16 @@ const TransactionTable: React.FC<TransactionTableProps> =
                                             <TableCell
                                                 align="right"
                                                 style={{
-                                                    display: 'flex',
                                                     alignItems: 'center',
                                                     color: transaction.value < 0 ? red_color : green_color
                                                 }}
                                             >
                                                 {`${currencyFormatter.format(transaction.value)}`}
-
+                                            </TableCell>
+                                            <TableCell
+                                                align="right"
+                                                style={{width: '24px'}}
+                                            >
                                                 <IconButton
                                                     key={transaction.code}
                                                     onClick={handleClickTransactionItemMenu(transaction.code)}
@@ -335,7 +341,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
                                         style={{backgroundColor: '#f0f0f0'}}
                                     >
                                         <TableCell colSpan={5} align="right"></TableCell>
-                                        <TableCell align="right"
+                                        <TableCell colSpan={2} align="right"
                                                    style={{
                                                        color: saldo < 0 ? red_color : green_color,
                                                    }}
@@ -343,12 +349,13 @@ const TransactionTable: React.FC<TransactionTableProps> =
                                             <b style={{marginRight: 10, color: '#444'}}>Saldo do dia: </b>
                                             <b>{currencyFormatter.format(saldo)}</b>
                                         </TableCell>
+
                                     </TableRow>
 
                                     <TableRow
                                         style={{backgroundColor: '#fff', height: 30}}
                                     >
-                                        <TableCell colSpan={6} align="right"></TableCell>
+                                        <TableCell colSpan={7} align="right"></TableCell>
                                     </TableRow>
 
                                 </React.Fragment>
