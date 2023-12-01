@@ -148,7 +148,7 @@ const AccountTransactionDialogForm: React.FC<AccountTransactionDialogFormProps> 
 
         return (
             <Dialog open={open} onClose={onClose}>
-                <DialogTitle>Adicionar Nova Transação</DialogTitle>
+                <DialogTitle>Adicionar Nova Transação - {transaction.account_code}</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2} alignItems="center">
                         <Grid item xs={12} sm={6}>
@@ -161,11 +161,12 @@ const AccountTransactionDialogForm: React.FC<AccountTransactionDialogFormProps> 
                                 value={transaction.account_code}
                                 error={Boolean(errors.account_code)}
                                 helperText={errors.account_code || ""}
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     setTransaction({
                                         ...transaction,
                                         account_code: e.target.value,
-                                    })}
+                                    })
+                                }}
                                 fullWidth
                             >
                                 {accountList.map((option) => (

@@ -24,7 +24,6 @@ const FinanceHome: React.FC = () => {
 
     const runRefreshAccounts = () => {
         setRefreshAccounts(true);
-        console.log("setRefreshAccounts(true);")
     }
 
     // Barra lateral

@@ -85,7 +85,7 @@ class FinancialTransactionRepo:
             transaction = session.query(FinancialTransaction).filter(
                 FinancialTransaction.code == transaction_code
             ).one()
-            for key, value in updated_transaction_data.model_dump(exclude={'code', 'account_code'}).items():
+            for key, value in updated_transaction_data.model_dump(exclude={'code'}).items():
                 setattr(transaction, key, value if key != "type" else value.value)
             session.commit()
             session.refresh(transaction)
