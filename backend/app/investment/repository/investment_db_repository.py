@@ -1,11 +1,11 @@
 from sqlalchemy import text
+from sqlalchemy.exc import NoResultFound
 
+from helpers import generate_code
 from investment.domain.investment_errors import InvestmentNotFound, UnexpectedError, DatabaseError, \
     ColumnDoesNotExistError, NoAssetsFound
 from investment.domain.models import InvestmentModel
-from helpers import generate_code
 from investment.repository.db.db_entities import Investment
-from sqlalchemy.exc import NoResultFound
 
 
 def to_database(investment_model: InvestmentModel) -> Investment:

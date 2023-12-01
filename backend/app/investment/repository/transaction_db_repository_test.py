@@ -7,8 +7,8 @@ from sqlalchemy.orm import sessionmaker
 from investment.domain.models import TransactionModel, TransactionType
 from investment.domain.transaction_errors import TransactionNotFound
 from investment.repository.db.db_entities import Base, Transaction
-from investment.repository.transaction_db_repository import TransactionRepo
 from investment.repository.prepareto_db_test import add_portfolio, add_investments
+from investment.repository.transaction_db_repository import TransactionRepo
 
 
 # Configuração do banco de dados de teste

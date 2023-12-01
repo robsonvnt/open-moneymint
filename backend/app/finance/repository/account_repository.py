@@ -1,7 +1,7 @@
 from datetime import date
 
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy import func
+from sqlalchemy.exc import NoResultFound
 
 from finance.domain.account_erros import AccountNotFound, AccountUnexpectedError
 from finance.domain.models import AccountModel

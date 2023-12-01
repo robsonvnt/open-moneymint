@@ -1,9 +1,9 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 
+from helpers import generate_code
 from investment.domain.models import PortfolioModel
 from investment.domain.portfolio_erros import PortfolioNotFound, PortfolioUnexpectedError
-from helpers import generate_code
 from investment.repository.db.db_entities import Portfolio
 
 

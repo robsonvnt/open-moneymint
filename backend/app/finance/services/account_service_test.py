@@ -1,10 +1,11 @@
-import pytest
 from unittest.mock import create_autospec
 
+import pytest
+
 from finance.domain.account_erros import AccountNotFound
+from finance.domain.models import AccountModel
 from finance.repository.account_repository import AccountRepo
 from finance.services.account_service import AccountService
-from finance.domain.models import AccountModel
 
 
 @pytest.fixture

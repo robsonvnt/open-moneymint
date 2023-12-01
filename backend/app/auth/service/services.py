@@ -1,12 +1,13 @@
 from datetime import timedelta, datetime
 from typing import Optional
+
+import bcrypt
 import jwt
 
-from auth.domain.auth_erros import ExpiredToken, InvalidToken, SecretKeyNotSet
+from auth.domain.auth_erros import ExpiredToken, InvalidToken
 from auth.domain.models import UserModel
 from auth.domain.user_erros import UserNotFound
 from auth.repository.user_db_repository import UserRepository
-import bcrypt
 
 
 class PasswordService:

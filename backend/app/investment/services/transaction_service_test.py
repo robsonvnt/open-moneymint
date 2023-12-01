@@ -9,10 +9,10 @@ from investment.domain.models import InvestmentModel, AssetType, TransactionMode
 from investment.repository.db.db_entities import Base, Investment
 from investment.repository.investment_db_repository import InvestmentRepo
 from investment.repository.portfolio_db_repository import PortfolioRepo
+from investment.repository.prepareto_db_test import add_portfolio, add_investments
 from investment.repository.transaction_db_repository import TransactionRepo
 from investment.services.investment_service import InvestmentService
 from investment.services.transaction_service import TransactionService
-from investment.repository.prepareto_db_test import add_portfolio, add_investments
 
 
 @pytest.fixture(scope="function")

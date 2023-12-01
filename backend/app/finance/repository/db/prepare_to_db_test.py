@@ -1,9 +1,10 @@
+import os
+import tempfile
 from datetime import date
 from unittest.mock import Mock, patch
-import tempfile
-import os
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -11,7 +12,6 @@ from auth.user import User, get_current_user
 from finance.domain.models import TransactionType
 from finance.repository.db.db_connection import get_db_session
 from finance.repository.db.db_entities import Account, Base, Category, FinancialTransaction
-from fastapi.testclient import TestClient
 
 
 @pytest.fixture(scope="function")

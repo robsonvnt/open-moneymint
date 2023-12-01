@@ -1,8 +1,7 @@
+from datetime import date
 from typing import List
 
 from sqlalchemy.exc import NoResultFound
-
-from datetime import date
 
 from finance.domain.category_erros import CategoryUnexpectedError, CategoryNotFound
 from finance.domain.models import CategoryModel

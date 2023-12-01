@@ -1,9 +1,9 @@
 from datetime import date
+from typing import List
 
+from fastapi import Depends
 from fastapi import HTTPException, status, APIRouter
 from pydantic import BaseModel
-from typing import List
-from fastapi import Depends
 
 from auth.user import get_current_user, User
 from investment.domain.investment_errors import InvestmentNotFound

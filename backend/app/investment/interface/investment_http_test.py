@@ -1,5 +1,6 @@
-from investment.repository.prepareto_db_test import *
 from sqlalchemy.orm.exc import NoResultFound
+
+from investment.repository.prepareto_db_test import *
 
 
 def test_get_all_investment(client, db_session):

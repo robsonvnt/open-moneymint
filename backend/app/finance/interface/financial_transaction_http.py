@@ -1,10 +1,9 @@
-import calendar
 from datetime import date, datetime
+from typing import List, Optional, Annotated
 
 from fastapi import APIRouter, Query, HTTPException, status
-from pydantic import BaseModel
-from typing import List, Optional, Annotated
 from fastapi import Depends
+from pydantic import BaseModel
 
 from auth.user import User, get_current_user
 from finance.domain.account_erros import AccountNotFound

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, Date, Integer, String, Text
+from sqlalchemy import Column, Float, Date, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_mixins import AllFeaturesMixin
 

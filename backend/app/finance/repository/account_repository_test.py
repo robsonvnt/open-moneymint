@@ -1,7 +1,3 @@
-from datetime import date
-
-import pytest
-
 from finance.domain.account_erros import AccountNotFound
 from finance.domain.models import AccountModel
 from finance.repository.account_repository import AccountRepo

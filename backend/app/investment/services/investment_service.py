@@ -1,9 +1,9 @@
 from datetime import date
-from typing import List
 from decimal import Decimal
+from typing import List
 
 from constants import SUCCESS_RESULT
-from investment.domain.investment_errors import OperationNotPermittedError, UnexpectedError, InvestmentError
+from investment.domain.investment_errors import OperationNotPermittedError, UnexpectedError
 from investment.domain.models import InvestmentModel, PortfolioOverviewModel, TransactionModel, TransactionType, \
     AssetType
 from investment.domain.transaction_errors import TransactionInvalidType, TransactionOperationNotPermitted

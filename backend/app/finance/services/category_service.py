@@ -1,6 +1,6 @@
 from typing import List
 
-from finance.domain.category_erros import CategoryNotFound, CategoryUnexpectedError, CategoryOperationNotPermittedError
+from finance.domain.category_erros import CategoryOperationNotPermittedError
 from finance.domain.models import CategoryModel
 from finance.repository.category_repository import CategoryRepo
 from finance.repository.financial_transaction_repository import FinancialTransactionRepo

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, status, Query, HTTPException, Depends
-from typing import Optional
 from datetime import date
+from typing import Optional
+
+from fastapi import APIRouter, status, Query, HTTPException, Depends
 
 from auth.user import User, get_current_user
-from investment.domain.models import ConsolidatedPortfolioModel
 from investment.repository.db.db_connection import get_db_session
 from investment.services.consolidated_service import ConsolidatedPortfolioService
 from investment.services.service_factory import ServiceFactory

@@ -1,9 +1,8 @@
 from datetime import date
+from typing import List
 
 from finance.domain.models import FinancialTransactionModel
 from finance.repository.financial_transaction_repository import FinancialTransactionRepo
-from typing import List
-
 from finance.services.account_service import AccountService
 
 
@@ -34,8 +33,11 @@ class FinancialTransactionService:
     def update(
             self, user_code: str, transaction_code: str, updated_transaction: FinancialTransactionModel
     ) -> FinancialTransactionModel:
+        db_transaction_account_code = self.get_by_code(transaction_code).account_code
         tran_result = self.financial_transaction_repo.update(transaction_code, updated_transaction)
         self.account_service.refresh_balance(user_code, tran_result.account_code)
+        if db_transaction_account_code != updated_transaction.account_code:
+            self.account_service.refresh_balance(user_code, db_transaction_account_code)
         return tran_result
 
     def delete(self, user_code: str, transaction_code: str):

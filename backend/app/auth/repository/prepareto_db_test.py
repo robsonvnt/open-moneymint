@@ -1,12 +1,11 @@
-from unittest.mock import Mock
-import tempfile
 import os
+import tempfile
+from unittest.mock import Mock
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from fastapi.testclient import TestClient
 
 from auth.repository.db_connection import get_db_session
 from auth.repository.user_db_repository import Base

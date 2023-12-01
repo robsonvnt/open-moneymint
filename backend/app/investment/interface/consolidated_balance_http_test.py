@@ -1,5 +1,6 @@
-from investment.repository.prepareto_db_test import *
 from fastapi import APIRouter
+
+from investment.repository.prepareto_db_test import *
 
 router = APIRouter()
 
