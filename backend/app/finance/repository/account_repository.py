@@ -1,10 +1,11 @@
 from datetime import date
 
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy import func
 
 from finance.domain.account_erros import AccountNotFound, AccountUnexpectedError
 from finance.domain.models import AccountModel
-from finance.repository.db.db_entities import Account
+from finance.repository.db.db_entities import Account, FinancialTransaction
 from helpers import generate_code
 
 
@@ -96,3 +97,11 @@ class AccountRepo:
             raise AccountNotFound()
         except Exception as e:
             raise AccountUnexpectedError()
+
+    def calculate_balance(self, account_code):
+        session = self.session
+        query = session.query(
+            func.sum(FinancialTransaction.value).label('total_value')
+        ).filter(FinancialTransaction.account_code == account_code)
+        result = query.one()
+        return result.total_value

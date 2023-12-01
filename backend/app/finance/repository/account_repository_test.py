@@ -89,3 +89,14 @@ def test_find_all_by_user_code(memory_db_session):
     # Testa o retorno de contas para um user_code que não existe
     accounts = account_repo.find_all("NONEXISTENT_USER")
     assert len(accounts) == 0
+
+
+def test_calculate_balance(memory_db_session):
+    add_accounts(memory_db_session)
+    add_transactions(memory_db_session)
+    account_repo = AccountRepo(memory_db_session)
+
+    result = account_repo.calculate_balance("ACC123")
+
+     # Saldo deve ser 0
+    assert result == 0

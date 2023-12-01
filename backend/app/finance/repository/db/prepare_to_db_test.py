@@ -93,7 +93,7 @@ def add_transactions(session):
         ),
         FinancialTransaction(
             code="TRA003", account_code="ACC123", description="Description 3", category_code="CAT003",
-            type=TransactionType.TRANSFER.value, date=date(2023, 6, 5), value=300.0
+            type=TransactionType.TRANSFER.value, date=date(2023, 6, 5), value=-300.0
         ),
         FinancialTransaction(
             code="TRA004", account_code="ACC124", description="Description 4", category_code="CAT004",
