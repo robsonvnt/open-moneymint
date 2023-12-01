@@ -133,6 +133,7 @@ async def create_transaction(
     try:
         transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
         new_transaction = transaction_serv.create(
+            current_user.code,
             FinancialTransactionModel(**new_transaction_data.model_dump())
         )
         account_serv = ServiceFactory.create_account_service(db_session)
@@ -162,6 +163,7 @@ async def update_transaction(
         account_serv.get_by_code(current_user.code, db_transaction.account_code)
 
         updated_transaction = transaction_serv.update(
+            current_user.code,
             transaction_code, FinancialTransactionModel(**new_transaction_data.model_dump())
         )
         return updated_transaction
@@ -185,7 +187,7 @@ async def update_transaction(
         account_serv = ServiceFactory.create_account_service(db_session)
         account_serv.get_by_code(current_user.code, transaction.account_code)
 
-        transaction_serv.delete(transaction_code)
+        transaction_serv.delete(current_user.code, transaction_code)
         return {"message": "Transaction deleted successfully"}
     except FinancialTransactionNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

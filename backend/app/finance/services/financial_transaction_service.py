@@ -4,13 +4,18 @@ from finance.domain.models import FinancialTransactionModel
 from finance.repository.financial_transaction_repository import FinancialTransactionRepo
 from typing import List
 
+from finance.services.account_service import AccountService
+
 
 class FinancialTransactionService:
-    def __init__(self, financial_transaction_repo: FinancialTransactionRepo):
+    def __init__(self, financial_transaction_repo: FinancialTransactionRepo, account_service: AccountService):
         self.financial_transaction_repo = financial_transaction_repo
+        self.account_service = account_service
 
-    def create(self, new_transaction: FinancialTransactionModel) -> FinancialTransactionModel:
-        return self.financial_transaction_repo.create(new_transaction)
+    def create(self, user_code: str, new_transaction: FinancialTransactionModel) -> FinancialTransactionModel:
+        created_transaction = self.financial_transaction_repo.create(new_transaction)
+        self.account_service.refresh_balance(user_code, created_transaction.account_code)
+        return created_transaction
 
     def get_by_code(self, transaction_code: str) -> FinancialTransactionModel:
         return self.financial_transaction_repo.find_by_code(transaction_code)
@@ -27,9 +32,13 @@ class FinancialTransactionService:
         )
 
     def update(
-            self, transaction_code: str, updated_transaction: FinancialTransactionModel
+            self, user_code: str, transaction_code: str, updated_transaction: FinancialTransactionModel
     ) -> FinancialTransactionModel:
-        return self.financial_transaction_repo.update(transaction_code, updated_transaction)
+        tran_result = self.financial_transaction_repo.update(transaction_code, updated_transaction)
+        self.account_service.refresh_balance(user_code, tran_result.account_code)
+        return tran_result
 
-    def delete(self, transaction_code: str):
+    def delete(self, user_code: str, transaction_code: str):
+        account_code = self.get_by_code(transaction_code).account_code
         self.financial_transaction_repo.delete(transaction_code)
+        self.account_service.refresh_balance(user_code, account_code)

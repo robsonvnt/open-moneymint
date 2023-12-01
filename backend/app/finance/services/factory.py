@@ -20,5 +20,7 @@ class ServiceFactory:
 
     @staticmethod
     def create_financial_transaction_service(session=None) -> FinancialTransactionService:
+        account_repo = AccountRepo(session)
+        account_service = AccountService(account_repo)
         financial_transaction_repo = FinancialTransactionRepo(session)
-        return FinancialTransactionService(financial_transaction_repo)
+        return FinancialTransactionService(financial_transaction_repo, account_service)
