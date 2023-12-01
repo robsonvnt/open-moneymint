@@ -20,7 +20,12 @@ const FinanceHome: React.FC = () => {
     const [selectedCategoryCode, setSelectedCategoryCode] = React.useState<string>("");
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [refreshAccounts, setRefreshAccounts] = React.useState<boolean>(false);
 
+    const runRefreshAccounts = () => {
+        setRefreshAccounts(true);
+        console.log("setRefreshAccounts(true);")
+    }
 
     // Barra lateral
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -78,6 +83,8 @@ const FinanceHome: React.FC = () => {
                     <AccountList
                         checked={checkedAccounts}
                         setChecked={setCheckedAccounts}
+                        refresh={refreshAccounts}
+                        setRefresh={setRefreshAccounts}
                     />
                     <Divider/>
                     <CategoryTree
@@ -99,6 +106,7 @@ const FinanceHome: React.FC = () => {
                 <TransactionView
                     checkedAccounts={checkedAccounts}
                     selectedCategoryCode={selectedCategoryCode}
+                    reloadAccounts={runRefreshAccounts}
                 />
 
             </Box>

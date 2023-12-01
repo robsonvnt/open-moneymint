@@ -30,10 +30,10 @@ const SideBar: React.FC<SideBarProps> =
             < >
                 <Toolbar/>
                 <Box sx={{overflow: 'auto'}}>
-                    <AccountList
-                        checked={checkedAccounts}
-                        setChecked={setCheckedAccounts}
-                    />
+                    {/*<AccountList*/}
+                    {/*    checked={checkedAccounts}*/}
+                    {/*    setChecked={setCheckedAccounts}*/}
+                    {/*/>*/}
                     <Divider/>
                     <CategoryTree
                         selectedCategoryCode={selectedCategoryCode}

@@ -8,13 +8,15 @@ import TransactionTable from "./components/TransactionTable";
 interface TransactionViewProps {
     checkedAccounts: Map<string, boolean>;
     selectedCategoryCode: string;
+    reloadAccounts: () => void;
 }
 
 
 const TransactionView: React.FC<TransactionViewProps> =
     ({
          checkedAccounts,
-         selectedCategoryCode
+         selectedCategoryCode,
+         reloadAccounts
      }) => {
 
         useEffect(() => {
@@ -43,6 +45,7 @@ const TransactionView: React.FC<TransactionViewProps> =
                                 <TransactionTable
                                     checkedAccounts={checkedAccounts}
                                     selectedCategoryCode={selectedCategoryCode}
+                                    reloadAccounts={reloadAccounts}
                                 />
                             </Paper>
                         </Grid>

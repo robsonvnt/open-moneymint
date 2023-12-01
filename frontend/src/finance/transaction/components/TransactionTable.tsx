@@ -49,12 +49,14 @@ function preventDefault(event: React.MouseEvent) {
 interface TransactionTableProps {
     checkedAccounts: Map<string, boolean>;
     selectedCategoryCode: string;
+    reloadAccounts: () => void;
 }
 
 const TransactionTable: React.FC<TransactionTableProps> =
     ({
          checkedAccounts,
-         selectedCategoryCode
+         selectedCategoryCode,
+         reloadAccounts
      }) => {
 
         const transactionService = TransactionService;
@@ -174,7 +176,8 @@ const TransactionTable: React.FC<TransactionTableProps> =
             } else {
                 createTransaction(transaction)
             }
-            loadTransactions()
+            setTimeout(loadTransactions, 200);
+            reloadAccounts()
         };
 
         const changeCurrentDate = (dt: Date) => {
@@ -244,6 +247,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
             } finally {
                 setNotificationOpen(true);
             }
+            reloadAccounts();
         }
 
         // Confirmação

@@ -15,13 +15,17 @@ import AccountDialogForm, {InputAccountModel} from "./AccountDialogForm"; // Sub
 interface AccountListProps {
     checked: Map<string, boolean>;
     setChecked: React.Dispatch<React.SetStateAction<Map<string, boolean>>>;
+    refresh: boolean,
+    setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
 const AccountList: React.FC<AccountListProps> =
     ({
          checked,
-         setChecked
+         setChecked,
+         refresh,
+         setRefresh
      }) => {
 
         const [accountList, setAccountList] = React.useState<AccountModel[]>([]);
@@ -54,6 +58,17 @@ const AccountList: React.FC<AccountListProps> =
                     });
             }
         }, []);
+
+        useEffect(() => {
+            if (refresh) {
+                accountService.getAllAccounts()
+                    .then(accounts => {
+                        updateList(accounts);
+                        setRefresh(false);
+                    });
+            }
+        }, [refresh]);
+
 
         // New or Edit Account
         const [openForm, setOpenForm] = useState<boolean>(false);
