@@ -34,11 +34,11 @@ class AccountConsolidationRepo:
     def find_by_account_month(self, account_code: str, month: date):
         session = self.session
         try:
-            consolidations = session.query(AccountConsolidation).filter(
+            consolidation = session.query(AccountConsolidation).filter(
                 AccountConsolidation.account_code == account_code,
                 AccountConsolidation.month == date(month.year, month.month, 1)
             ).one()
-            return to_model(consolidations)
+            return to_model(consolidation)
         except NoResultFound:
             raise AccountConsolidationNotFound()
 
