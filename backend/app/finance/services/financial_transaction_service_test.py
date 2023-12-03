@@ -3,13 +3,10 @@ from unittest.mock import create_autospec, Mock
 
 import pytest
 
-from finance.domain.category_erros import CategoryNotFound, CategoryOperationNotPermittedError
-from finance.domain.models import CategoryModel, FinancialTransactionModel, TransactionType
-from finance.repository.category_repository import CategoryRepo
+from finance.domain.models import FinancialTransactionModel, TransactionType
 from finance.repository.financial_transaction_repository import FinancialTransactionRepo
 from finance.services.account_consolidation_service import AccountConsolidationService
 from finance.services.account_service import AccountService
-from finance.services.category_service import CategoryService
 from finance.services.financial_transaction_service import FinancialTransactionService
 
 
@@ -78,7 +75,6 @@ def test_delete_transaction_success(transaction_service,
                                     mock_financial_transaction_repo,
                                     mock_account_service,
                                     mock_consolidation_service):
-    transaction_model = generate_financial_transaction_model()
     transaction_service.get_by_code = Mock(return_value=generate_financial_transaction_model())
     mock_financial_transaction_repo.find_by_code = Mock(return_value=generate_financial_transaction_model())
 

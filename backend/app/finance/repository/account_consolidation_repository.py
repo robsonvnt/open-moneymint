@@ -1,13 +1,10 @@
 from datetime import date
 
-from sqlalchemy import func
 from sqlalchemy.exc import NoResultFound
 
-from finance.domain.account_erros import AccountConsolidationNotFound, AccountUnexpectedConsolidationError, \
-    AccountConsolidationAlreadyExists
+from finance.domain.account_erros import AccountConsolidationNotFound, AccountConsolidationAlreadyExists
 from finance.domain.models import AccountConsolidationModel
 from finance.repository.db.db_entities import AccountConsolidation
-from helpers import generate_code
 
 
 def to_database(consolidation_model: AccountConsolidationModel) -> AccountConsolidation:

@@ -1,11 +1,10 @@
 from sqlalchemy.exc import NoResultFound
 
 from finance.domain.account_erros import AccountConsolidationAlreadyExists, AccountConsolidationNotFound
-from finance.repository.db.prepare_to_db_test import *
-
 from finance.domain.models import AccountConsolidationModel
 from finance.repository.account_consolidation_repository import AccountConsolidationRepo
 from finance.repository.db.db_entities import AccountConsolidation
+from finance.repository.db.prepare_to_db_test import *
 
 
 def test_create_consolidation(memory_db_session):

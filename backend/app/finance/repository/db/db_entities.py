@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Float, Date, Integer, String, UniqueConstraint, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
 from sqlalchemy_mixins import AllFeaturesMixin
 
 from finance.domain.models import TransactionType
