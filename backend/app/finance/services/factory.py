@@ -30,3 +30,9 @@ class ServiceFactory:
         consolidation_service = AccountConsolidationService(cons_repo, transaction_repo)
 
         return FinancialTransactionService(transaction_repo, account_service, consolidation_service)
+
+    @staticmethod
+    def create_account_consolidations_service(session=None) -> AccountConsolidationService:
+        transaction_repo = FinancialTransactionRepo(session)
+        cons_repo = AccountConsolidationRepo(session)
+        return AccountConsolidationService(cons_repo, transaction_repo)

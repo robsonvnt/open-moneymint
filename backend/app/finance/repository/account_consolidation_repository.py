@@ -5,6 +5,7 @@ from sqlalchemy.exc import NoResultFound
 from finance.domain.account_erros import AccountConsolidationNotFound, AccountConsolidationAlreadyExists
 from finance.domain.models import AccountConsolidationModel
 from finance.repository.db.db_entities import AccountConsolidation
+from helpers import get_last_day_of_the_month
 
 
 def to_database(consolidation_model: AccountConsolidationModel) -> AccountConsolidation:
@@ -41,11 +42,16 @@ class AccountConsolidationRepo:
         except NoResultFound:
             raise AccountConsolidationNotFound()
 
-    def find_all_by_account(self, account_code: str):
+    def find_all_by_account(self, account_code: str, start_month: date = None, end_month: date = None):
         session = self.session
-        accounts = session.query(AccountConsolidation).filter(
+        query = session.query(AccountConsolidation).filter(
             AccountConsolidation.account_code == account_code
-        ).all()
+        )
+        if start_month:
+            query = query.filter(AccountConsolidation.month >= date(start_month.year, start_month.month, 1))
+        if end_month:
+            query = query.filter(AccountConsolidation.month <= get_last_day_of_the_month(end_month))
+        accounts = query.all()
         return [to_model(account) for account in accounts]
 
     def update(

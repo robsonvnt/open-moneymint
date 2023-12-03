@@ -3,6 +3,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from auth.interface.user_http import router as user_router
+from finance.interface.account_consolidation_http import account_consolidation_router
 from finance.interface.account_http import account_router
 from finance.interface.category_http import category_router
 from finance.interface.financial_transaction_http import finance_transaction_router
@@ -42,4 +43,6 @@ def prepare_router(app):
     app.include_router(account_router, prefix="/finances")
     app.include_router(category_router, prefix="/finances")
     app.include_router(finance_transaction_router, prefix="/finances")
+    app.include_router(account_consolidation_router, prefix="/finances")
+
 

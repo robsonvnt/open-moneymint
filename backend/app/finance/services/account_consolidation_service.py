@@ -22,8 +22,10 @@ class AccountConsolidationService:
     def find_by_account_month(self, account_code: str, month: date):
         return self.account_consolidation_repo.find_by_account_month(account_code, month)
 
-    def find_all_by_account(self, account_code: str):
-        return self.account_consolidation_repo.find_all_by_account(account_code)
+    def find_all_by_account(
+            self, account_code: str, start_month: date = None, end_month: date = None
+    ):
+        return self.account_consolidation_repo.find_all_by_account(account_code, start_month, end_month)
 
     def refresh_month_balance(
             self,
