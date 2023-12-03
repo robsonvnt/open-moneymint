@@ -2,7 +2,7 @@ from unittest.mock import create_autospec
 
 import pytest
 
-from finance.domain.account_erros import AccountNotFound
+from finance.domain.account_erros import AccountConsolidationNotFound
 from finance.domain.models import AccountModel
 from finance.repository.account_repository import AccountRepo
 from finance.services.account_service import AccountService
@@ -75,7 +75,7 @@ def test_delete_account(account_service, mock_account_repo):
 
 
 def test_get_account_by_code_not_found(account_service, mock_account_repo):
-    mock_account_repo.find_by_code.side_effect = AccountNotFound()
+    mock_account_repo.find_by_code.side_effect = AccountConsolidationNotFound()
 
-    with pytest.raises(AccountNotFound):
+    with pytest.raises(AccountConsolidationNotFound):
         account_service.get_by_code("USER123", "NONEXISTENT")

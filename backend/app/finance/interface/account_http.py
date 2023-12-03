@@ -6,7 +6,7 @@ from fastapi import HTTPException, status, APIRouter
 from pydantic import BaseModel
 
 from auth.user import User, get_current_user
-from finance.domain.account_erros import AccountNotFound
+from finance.domain.account_erros import AccountConsolidationNotFound
 from finance.domain.models import AccountModel
 from finance.repository.db.db_connection import get_db_session
 from finance.services.factory import ServiceFactory
@@ -53,7 +53,7 @@ async def get_account(
         account_service = ServiceFactory.create_account_service(db_session)
         result = account_service.get_by_code(current_user.code, account_code)
         return result
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
@@ -81,7 +81,7 @@ async def update_account(
     account_service = ServiceFactory.create_account_service(db_session)
     try:
         return account_service.update(current_user.code, account_code, account_input)
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
@@ -95,7 +95,7 @@ async def delete_account(
         account_service = ServiceFactory.create_account_service(db_session)
         account_service.delete(current_user.code, account_code)
         return {"message": "Account deleted successfully"}
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

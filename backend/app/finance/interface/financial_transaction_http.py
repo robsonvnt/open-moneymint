@@ -6,7 +6,7 @@ from fastapi import Depends
 from pydantic import BaseModel
 
 from auth.user import User, get_current_user
-from finance.domain.account_erros import AccountNotFound
+from finance.domain.account_erros import AccountConsolidationNotFound
 from finance.domain.category_erros import CategoryNotFound
 from finance.domain.financial_transaction_erros import FinancialTransactionNotFound
 from finance.domain.models import TransactionType, FinancialTransactionModel
@@ -95,7 +95,7 @@ async def get_all_transactions(
             end_date
         )
         return transactions
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except CategoryNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -119,7 +119,7 @@ async def get_transaction(
         return transaction
     except FinancialTransactionNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
@@ -142,7 +142,7 @@ async def create_transaction(
         return new_transaction
     except FinancialTransactionNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
@@ -168,7 +168,7 @@ async def update_transaction(
         return updated_transaction
     except FinancialTransactionNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
@@ -190,5 +190,5 @@ async def update_transaction(
         return {"message": "Transaction deleted successfully"}
     except FinancialTransactionNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except AccountNotFound as e:
+    except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))

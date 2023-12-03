@@ -59,7 +59,7 @@ class FinancialTransactionModel(BaseModel):
         super().__init__(**data)
 
 
-class ConsolidatedAccountModel(BaseModel):
+class AccountConsolidationModel(BaseModel):
     account_code: Optional[str]
-    date: date
+    month: date
     balance: float
