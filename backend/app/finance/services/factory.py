@@ -27,7 +27,9 @@ class ServiceFactory:
         transaction_repo = FinancialTransactionRepo(session)
 
         cons_repo = AccountConsolidationRepo(session)
-        consolidation_service = AccountConsolidationService(cons_repo, transaction_repo)
+        consolidation_service = AccountConsolidationService(
+            cons_repo, transaction_repo, account_repo, None
+        )
 
         return FinancialTransactionService(transaction_repo, account_service, consolidation_service)
 

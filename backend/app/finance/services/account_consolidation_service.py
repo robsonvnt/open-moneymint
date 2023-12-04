@@ -83,8 +83,10 @@ class AccountConsolidationService:
         result = defaultdict(float)
         for t in transactions:
             if t.type != TransactionType.DEPOSIT:
-                v= result[self.get_root_category(t.category_code).name]
-                result[self.get_root_category(t.category_code).name] += t.value
+                if t.category_code:
+                    result[self.get_root_category(t.category_code).name] += t.value
+                else:
+                    result["Não categorizado"] += t.value
 
         return [{"category": key, "value": value} for key, value in result.items()]
 

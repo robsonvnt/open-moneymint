@@ -1,10 +1,11 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Container, Grid, Typography} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {Copyright} from "@mui/icons-material";
 import TransactionTable from "./components/TransactionTable";
 import Title from "./components/Title";
 import FinancialSummaryPaper from "./components/FinancialSummaryPaper";
+import TransactionsCategoriesChart from "./components/charts/TransactionsCategoriesChart";
 
 
 interface TransactionViewProps {
@@ -24,10 +25,14 @@ const TransactionView: React.FC<TransactionViewProps> =
         const [lastMonthBalance, setLastMonthBalance] = React.useState(0);
         const [totalIncome, setTotalIncome] = React.useState(0);
         const [totalExpenses, setTotalExpenses] = React.useState(0);
+        const [updatedGlobalInformation, setUpdatedGlobalInformation] = React.useState(0);
+
+        // Month Navigator
+        const [currentDate, setCurrentDate] = useState(new Date());
 
         useEffect(() => {
-
-        }, []);
+            console.log(`Mudou reloadAccounts: ${Array.from(checkedAccounts.keys())}`)
+        }, [reloadAccounts, checkedAccounts]);
 
         return (
             <Box
@@ -46,16 +51,39 @@ const TransactionView: React.FC<TransactionViewProps> =
                 <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
                     <Grid container spacing={3}>
 
-                        <Grid key="total-movements" item xs={12} md={6} lg={6}>
-                            <FinancialSummaryPaper
-                                previousBalance={lastMonthBalance}
-                                totalIncome={totalIncome}
-                                totalExpenses={totalExpenses}
-                            />
+                        <Grid key="total-movements" item xs={12} md={5} lg={5}>
+                            <Paper
+                                sx={{
+                                    p: 2,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}
+                                style={{height: 200}}
+                            >
+                                <Title>Valores totais</Title>
+
+                                <FinancialSummaryPaper
+                                    previousBalance={lastMonthBalance}
+                                    totalIncome={totalIncome}
+                                    totalExpenses={totalExpenses}
+                                />
+                            </Paper>
                         </Grid>
                         {/* Recent Deposits */}
-                        <Grid item xs={12} md={6} lg={6}>
-
+                        <Grid item xs={12} md={7} lg={7}>
+                            <Paper
+                                sx={{
+                                    p: 2,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}
+                                style={{height: 200}}
+                            >
+                                <Title>% de gastos por categoria</Title>
+                                <TransactionsCategoriesChart
+                                    accountCodesMap={checkedAccounts} date={currentDate}
+                                />
+                            </Paper>
                         </Grid>
 
                         <Grid item xs={12}>
@@ -68,6 +96,8 @@ const TransactionView: React.FC<TransactionViewProps> =
                                     setLastMonthBalance={setLastMonthBalance}
                                     setTotalIncome={setTotalIncome}
                                     setTotalExpenses={setTotalExpenses}
+                                    currentDate={currentDate}
+                                    setCurrentDate={setCurrentDate}
                                 />
                             </Paper>
                         </Grid>

@@ -39,6 +39,8 @@ interface TransactionTableProps {
     setLastMonthBalance: React.Dispatch<React.SetStateAction<number>>;
     setTotalIncome: React.Dispatch<React.SetStateAction<number>>;
     setTotalExpenses: React.Dispatch<React.SetStateAction<number>>;
+    currentDate: Date;
+    setCurrentDate: React.Dispatch<React.SetStateAction<Date>>;
 }
 
 const TransactionTable: React.FC<TransactionTableProps> =
@@ -49,7 +51,9 @@ const TransactionTable: React.FC<TransactionTableProps> =
          lastMonthBalance,
          setLastMonthBalance,
          setTotalIncome,
-         setTotalExpenses
+         setTotalExpenses,
+         currentDate,
+         setCurrentDate
      }) => {
 
         const transactionService = TransactionService;
@@ -122,7 +126,6 @@ const TransactionTable: React.FC<TransactionTableProps> =
                         const dailyTotal = transactions.reduce((sum, transaction) => sum + transaction.value, 0);
 
                         transactions.map(transaction => {
-                            console.log(transaction.value)
                             if (transaction.value > 0)
                                 totalIncome += transaction.value
                             else
@@ -141,9 +144,6 @@ const TransactionTable: React.FC<TransactionTableProps> =
 
             })
         };
-
-        // Month Navigator
-        const [currentDate, setCurrentDate] = useState(new Date());
 
         // Seleção de itens na tabela
 

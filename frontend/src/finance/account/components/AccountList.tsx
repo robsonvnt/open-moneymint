@@ -52,8 +52,11 @@ const AccountList: React.FC<AccountListProps> =
 
         useEffect(() => {
             if (accountList.length == 0) {
-                accountService.getAllAccounts()
+                AccountService.getAllAccounts()
                     .then(accounts => {
+                        const newCheckedMap = new Map<string, boolean>();
+                        accounts.map(acc => newCheckedMap.set(acc.code, true))
+                        setChecked(newCheckedMap);
                         updateList(accounts);
                     });
             }

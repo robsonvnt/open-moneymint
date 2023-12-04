@@ -136,11 +136,15 @@ def test_get_sum_consolidations_grouped_by_category(client, db_session):
             type=TransactionType.DEPOSIT.value, date=date(2023, 8, 5), value=30
         ),
         FinancialTransaction(
-            code="T9", account_code="A2", description="", category_code="C211",
+            code="T9", account_code="A2", description="", category_code=None,
+            type=TransactionType.WITHDRAWAL.value, date=date(2023, 8, 5), value=-30
+        ),
+        FinancialTransaction(
+            code="T10", account_code="A2", description="", category_code="C211",
             type=TransactionType.TRANSFER.value, date=date(2023, 9, 5), value=-30
         ),
         FinancialTransaction(
-            code="T10", account_code="A3", description="", category_code="C3",
+            code="T11", account_code="A3", description="", category_code="C3",
             type=TransactionType.TRANSFER.value, date=date(2023, 8, 5), value=-1000
         )
     ]
@@ -153,8 +157,10 @@ def test_get_sum_consolidations_grouped_by_category(client, db_session):
     json_result = response.json()
 
     assert response.status_code == 200
-    assert len(json_result) == 2
+    assert len(json_result) == 3
     assert json_result[0]["category"] == "Cat Test 1"
     assert json_result[0]["value"] == -100
     assert json_result[1]["category"] == "Cat Test 2"
     assert json_result[1]["value"] == -300
+    assert json_result[2]["category"] == "Não categorizado"
+    assert json_result[2]["value"] == -30

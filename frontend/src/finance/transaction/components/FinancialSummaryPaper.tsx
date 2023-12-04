@@ -21,50 +21,42 @@ const FinancialSummaryPaper: React.FC<FinancialSummaryPaperProps> =
 
      }) => {
 
-    const balance = previousBalance + (totalIncome-totalExpenses);
+        const balance = previousBalance + (totalIncome - totalExpenses);
 
         return (
-            <Paper
-                sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    // height: 200,
-                }}
-            >
+            <>
                 <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                     <Typography color="text.secondary" sx={{flexGrow: 1, textAlign: 'left'}}
-                                style={{fontSize: 18}}
+                                style={{fontSize: 19}}
                     >
                         Saldo anterio
                     </Typography>
                     <Typography component="p" sx={{flexGrow: 0, textAlign: 'right'}}
-                                style={{fontSize: 18}}
+                                style={{fontSize: 19}}
                     >
                         {currencyFormatter.format(previousBalance)}
                     </Typography>
                 </Box>
                 <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                     <Typography color="text.secondary" sx={{flexGrow: 1, textAlign: 'left'}}
-                                style={{fontSize: 18}}
+                                style={{fontSize: 19}}
                     >
                         Total de entradas
                     </Typography>
                     <Typography component="p" sx={{flexGrow: 0, textAlign: 'right'}}
-                                style={{color: green_color, fontSize: 18}}
+                                style={{color: green_color, fontSize: 19}}
                     >
                         {currencyFormatter.format(totalIncome)}
                     </Typography>
                 </Box>
                 <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                     <Typography color="text.secondary" sx={{flexGrow: 1, textAlign: 'left'}}
-                                style={{fontSize: 18}}
+                                style={{fontSize: 19}}
                     >
                         Total de saídas
                     </Typography>
                     <Typography component="p" sx={{flexGrow: 0, textAlign: 'right'}}
-                                style={{color: red_color, fontSize: 18}}
+                                style={{color: red_color, fontSize: 19}}
                     >
                         {currencyFormatter.format(totalExpenses)}
                     </Typography>
@@ -74,21 +66,23 @@ const FinancialSummaryPaper: React.FC<FinancialSummaryPaperProps> =
                      style={{marginTop: 10}}
                 >
                     <Typography color="text.secondary" sx={{flexGrow: 1, textAlign: 'left'}}
-                                style={{fontWeight: 'bold', fontSize: 20}}
+                                style={{fontWeight: 'bold', fontSize: 24}}
                     >
                         Saldo atual
                     </Typography>
                     <Typography sx={{flexGrow: 0, textAlign: 'right'}}
                                 style={{
                                     color: balance < 0 ? red_color : green_color,
-                                    fontWeight: 'bold', fontSize: 20}}
+                                    fontWeight: 'bold', fontSize: 24
+                                }}
                     >
                         {currencyFormatter.format(balance)}
                     </Typography>
                 </Box>
+            </>
 
-            </Paper>
-        );
+        )
+            ;
     };
 
 export default FinancialSummaryPaper;

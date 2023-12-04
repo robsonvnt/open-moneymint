@@ -7,20 +7,18 @@ import AccountList from "./account/components/AccountList";
 import Divider from "@mui/material/Divider";
 import MoneyMineAppBar from "../app/MoneyMineAppBar";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {AccountService} from "./account/AccountService";
 
 const drawerWidth = 240;
 
 const FinanceHome: React.FC = () => {
-
-    useEffect(() => {
-
-    }, []);
 
     const [checkedAccounts, setCheckedAccounts] = React.useState<Map<string, boolean>>(new Map());
     const [selectedCategoryCode, setSelectedCategoryCode] = React.useState<string>("");
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [refreshAccounts, setRefreshAccounts] = React.useState<boolean>(false);
+
 
     const runRefreshAccounts = () => {
         setRefreshAccounts(true);

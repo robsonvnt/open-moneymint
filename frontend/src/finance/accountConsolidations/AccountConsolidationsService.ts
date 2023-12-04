@@ -19,4 +19,15 @@ export const AccountConsolidationsService = {
 
     },
 
+    async getValuesByCategory(accountCodes: string[], date: Date): Promise<[]> {
+        let month = formatMonth(date)
+        let codesStr = '';
+        accountCodes.map(code => codesStr += `&account_codes=${code}`)
+        const urlCall = `${baseUrl}/grouped-by-category?month=${month}&${codesStr}`;
+        const response: AxiosResponse<[]> =
+            await axios.get(urlCall);
+        return response.data;
+
+    },
+
 };
