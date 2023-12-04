@@ -1,7 +1,6 @@
 import {AccountTransaction, InputAccountTransaction} from "../models";
 import axios, {AxiosResponse} from "axios";
 import {format} from "date-fns";
-import {Portfolio} from "../../investments/portfolio/models";
 
 
 const baseUrl = '/api/finances/transactions'; // ou a URL base do seu backend

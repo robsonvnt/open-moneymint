@@ -66,12 +66,7 @@ async def get_all_transactions(
             account_codes = [account_code.code for account_code in account_serv.get_all_by_user_code(current_user.code)]
 
         # TODO Move to Service
-        # Validates whether accounts belongs to the logged in user
-        for account_code in account_codes:
-            account_serv.get_by_code(current_user.code, account_code)
-
-        # TODO Move to Service
-        # Validates whether categories belongs to the logged in user
+        # Validates whether categories belongs to the logged-in user
         category_codes_filter = []
         if category_codes:
             for category_code in category_codes:
@@ -89,6 +84,7 @@ async def get_all_transactions(
             end_date = get_last_day_of_the_month(month_date)
 
         transactions = transaction_serv.filter_by_account_and_date(
+            current_user.code,
             account_codes,
             category_codes_filter,
             start_date,
@@ -114,7 +110,7 @@ async def get_transaction(
         account_serv = ServiceFactory.create_account_service(db_session)
         transaction = transaction_serv.get_by_code(transaction_code)
 
-        # Validates whether transaction belongs to the logged in user
+        # Validates whether transaction belongs to the logged-in user
         account_serv.get_by_code(current_user.code, transaction.account_code)
         return transaction
     except FinancialTransactionNotFound as e:
@@ -137,12 +133,14 @@ async def create_transaction(
         )
         account_serv = ServiceFactory.create_account_service(db_session)
 
-        # Validates whether transaction belongs to the logged in user
+        # Validates whether transaction belongs to the logged-in user
         account_serv.get_by_code(current_user.code, new_transaction.account_code)
         return new_transaction
     except FinancialTransactionNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccountConsolidationNotFound as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+    except Exception as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
@@ -156,7 +154,7 @@ async def update_transaction(
     try:
         transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
 
-        # Validates whether transaction belongs to the logged in user
+        # Validates whether transaction belongs to the logged-in user
         db_transaction = transaction_serv.get_by_code(transaction_code)
         account_serv = ServiceFactory.create_account_service(db_session)
         account_serv.get_by_code(current_user.code, db_transaction.account_code)
@@ -182,7 +180,7 @@ async def update_transaction(
         transaction_serv = ServiceFactory.create_financial_transaction_service(db_session)
         transaction = transaction_serv.get_by_code(transaction_code)
 
-        # Validates whether transaction belongs to the logged in user
+        # Validates whether transaction belongs to the logged-in user
         account_serv = ServiceFactory.create_account_service(db_session)
         account_serv.get_by_code(current_user.code, transaction.account_code)
 

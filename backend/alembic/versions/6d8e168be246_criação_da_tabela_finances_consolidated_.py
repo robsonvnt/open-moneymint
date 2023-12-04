@@ -29,7 +29,9 @@ def upgrade() -> None:
         sa.UniqueConstraint('account_code', 'month', name='finances_account_consolidations_account_month_uc')
     )
     op.create_index(op.f('ix_finances_account_consolidations_account_code'), 'finances_account_consolidations',
-                    ['account_code'], unique=True)
+                    ['account_code'])
+    op.create_index(op.f('ix_finances_account_consolidations_account_code_month'), 'finances_account_consolidations',
+                    ['account_code', 'month'], unique=True)
     op.create_index(op.f('ix_finances_account_consolidations_id'), 'finances_account_consolidations', ['id'],
                     unique=True)
 

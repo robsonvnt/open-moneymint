@@ -1,13 +1,12 @@
 import * as React from 'react';
-import Link from '@mui/material/Link';
+import {useEffect, useState} from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from "./Title";
-import {AccountTransaction, InputAccountTransaction} from "../../models";
-import {useEffect, useState} from "react";
+import {AccountConsolidationModel, AccountTransaction, InputAccountTransaction} from "../../models";
 import {TransactionService} from "../TransactionService";
 import MonthNavigator from "./MonthNavigator";
 import {currencyFormatter, formatDateStr} from "../../../helpers/BRFormatHelper";
@@ -26,37 +25,31 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
+import {AccountConsolidationsService} from "../../accountConsolidations/AccountConsolidationsService";
 
-// Generate Order Data
-function createData(
-    id: number,
-    date: string,
-    name: string,
-    shipTo: string,
-    paymentMethod: string,
-    amount: number,
-) {
-    return {id, date, name, shipTo, paymentMethod, amount};
-}
 
 const red_color = '#e15759';
 const green_color = '#59a14f';
-
-function preventDefault(event: React.MouseEvent) {
-    event.preventDefault();
-}
 
 interface TransactionTableProps {
     checkedAccounts: Map<string, boolean>;
     selectedCategoryCode: string;
     reloadAccounts: () => void;
+    lastMonthBalance: number;
+    setLastMonthBalance: React.Dispatch<React.SetStateAction<number>>;
+    setTotalIncome: React.Dispatch<React.SetStateAction<number>>;
+    setTotalExpenses: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const TransactionTable: React.FC<TransactionTableProps> =
     ({
          checkedAccounts,
          selectedCategoryCode,
-         reloadAccounts
+         reloadAccounts,
+         lastMonthBalance,
+         setLastMonthBalance,
+         setTotalIncome,
+         setTotalExpenses
      }) => {
 
         const transactionService = TransactionService;
@@ -64,14 +57,17 @@ const TransactionTable: React.FC<TransactionTableProps> =
         const [categoriesMap, setCategoriesMap] = React.useState<Map<string, string>>(new Map());
 
         useEffect(() => {
-            loadTransactions();
+
 
             // Carrega todas as Contas
             AccountService.getAllAccounts().then(
                 accounts => {
                     const newAccountsMap = new Map(accountsMap.entries());
-                    accounts.map(account => newAccountsMap.set(account.code, account.name))
+                    accounts.map(account => {
+                        newAccountsMap.set(account.code, account.name)
+                    })
                     setAccountsMap(newAccountsMap)
+                    loadTransactions();
                 })
 
             // Carrega todas as Categorias
@@ -83,6 +79,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
                     })
                     setCategoriesMap(newCategoriesMap);
                 })
+
         }, [selectedCategoryCode, checkedAccounts]);
 
         // Transactions
@@ -93,20 +90,55 @@ const TransactionTable: React.FC<TransactionTableProps> =
 
         const loadTransactionsWithDate = (date: Date) => {
             const account_codes = Array.from(checkedAccounts.keys()).filter(key => checkedAccounts.get(key) === true);
-            let categoryList = []
-            if (selectedCategoryCode != "")
-                categoryList.push(selectedCategoryCode)
-            transactionService.getAll(
-                date, account_codes, categoryList
-            ).then(transactions => {
-                const newTransactionTotalsByDate = new Map<string, number>();
-                let grouped = groupTransactionsByDate(transactions)
-                grouped.forEach((transactions, date) => {
-                    const total = transactions.reduce((sum, transaction) => sum + transaction.value, 0);
-                    newTransactionTotalsByDate.set(date, total);
-                });
-                setTransactionTotalsByDate(newTransactionTotalsByDate);
-                setGroupedTransaction(grouped)
+            // Pega o saldo do mês anterior
+            const newDate = new Date(currentDate);
+            newDate.setMonth(newDate.getMonth() - 1);
+            AccountConsolidationsService.getConsolidation(account_codes, newDate).then((consolidations) => {
+                // Calcula salto das contas selecionadas do mês anterior
+                let lastMonthBalance = 0;
+                consolidations.map(consolidation => lastMonthBalance += consolidation.balance)
+                setLastMonthBalance(lastMonthBalance)
+
+
+                // Cria uma lista com as categorias selecionadas
+                let categoryList = []
+                if (selectedCategoryCode != "")
+                    categoryList.push(selectedCategoryCode)
+
+                transactionService.getAll(
+                    date, account_codes, categoryList
+                ).then(transactions => {
+                    // Monta a  lista de transações agrupadas por dia
+                    const newTransactionTotalsByDate = new Map<string, number>();
+                    let grouped = groupTransactionsByDate(transactions)
+
+                    let cumulativeBalance = lastMonthBalance;
+
+
+                    let totalIncome = 0;
+                    let totalExpenses = 0;
+                    grouped.forEach((transactions, date) => {
+
+                        const dailyTotal = transactions.reduce((sum, transaction) => sum + transaction.value, 0);
+
+                        transactions.map(transaction => {
+                            console.log(transaction.value)
+                            if (transaction.value > 0)
+                                totalIncome += transaction.value
+                            else
+                                totalExpenses -= transaction.value
+                        })
+
+                        cumulativeBalance += dailyTotal;
+                        newTransactionTotalsByDate.set(date, cumulativeBalance);
+                    });
+                    setTotalIncome(totalIncome)
+                    setTotalExpenses(totalExpenses)
+
+                    setTransactionTotalsByDate(newTransactionTotalsByDate);
+                    setGroupedTransaction(grouped)
+                })
+
             })
         };
 
@@ -117,6 +149,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
 
         const [transactionTotalsByDate, setTransactionTotalsByDate] = React.useState<Map<string, number>>(new Map<string, number>());
         const [groupedTransaction, setGroupedTransaction] = React.useState<Map<string, AccountTransaction[]>>(new Map<string, AccountTransaction[]>());
+        const [lastMonthConsolidation, setLastMonthConsolidation] = React.useState<AccountConsolidationModel>({balance: 0});
 
 
         const handleSelectTransaction = (code: string) => {
@@ -292,6 +325,29 @@ const TransactionTable: React.FC<TransactionTableProps> =
                         </TableRow>
                     </TableHead>
                     <TableBody>
+
+                        <TableRow
+                            style={{backgroundColor: '#f0f0f0'}}
+                        >
+                            <TableCell colSpan={5} align="left">
+                                <b style={{marginRight: 10, color: '#444'}}>Saldo do mês anterior: </b>
+                            </TableCell>
+                            <TableCell colSpan={1} align="right"
+                                       style={{
+                                           color: lastMonthBalance < 0 ? red_color : green_color,
+                                       }}
+                            >
+                                <b>{currencyFormatter.format(lastMonthBalance)}</b>
+                            </TableCell>
+                            <TableCell colSpan={1} align="right"></TableCell>
+
+                        </TableRow>
+
+                        <TableRow
+                            style={{backgroundColor: '#fff', height: 30}}
+                        >
+                            <TableCell colSpan={7} align="right"></TableCell>
+                        </TableRow>
 
                         {Array.from(groupedTransaction.keys()).map(date => {
                             const transactions = groupedTransaction.get(date);

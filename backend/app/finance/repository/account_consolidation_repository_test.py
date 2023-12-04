@@ -70,7 +70,7 @@ def test_find_by_account_date(memory_db_session):
     add_account_consolidations(memory_db_session)
     consolidation_repo = AccountConsolidationRepo(memory_db_session)
 
-    consolidation = consolidation_repo.find_by_account_month("ACC001", date(2023, 8, 1))
+    consolidation = consolidation_repo.find_by_account_month(["ACC001"], date(2023, 8, 1))[0]
 
     assert consolidation.balance == 100
 
@@ -78,14 +78,13 @@ def test_find_by_account_date(memory_db_session):
 def test_find_by_account_date_not_found(memory_db_session):
     consolidation_repo = AccountConsolidationRepo(memory_db_session)
 
-    with pytest.raises(AccountConsolidationNotFound):
-        consolidation_repo.find_by_account_month("ACC001", date(2023, 5, 1))
+    assert len(consolidation_repo.find_by_account_month(["ACC001"], date(2023, 5, 1))) == 0
 
 
 def test_find_all_by_account(memory_db_session):
     add_account_consolidations(memory_db_session)
     consolidation_repo = AccountConsolidationRepo(memory_db_session)
 
-    consolidations = consolidation_repo.find_all_by_account("ACC001")
+    consolidations = consolidation_repo.find_all_by_account(["ACC001"])
 
     assert len(consolidations) == 3

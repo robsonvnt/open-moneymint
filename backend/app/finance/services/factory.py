@@ -35,4 +35,6 @@ class ServiceFactory:
     def create_account_consolidations_service(session=None) -> AccountConsolidationService:
         transaction_repo = FinancialTransactionRepo(session)
         cons_repo = AccountConsolidationRepo(session)
-        return AccountConsolidationService(cons_repo, transaction_repo)
+        account_repo = AccountRepo(session)
+        category_repo = CategoryRepo(session)
+        return AccountConsolidationService(cons_repo, transaction_repo, account_repo, category_repo)

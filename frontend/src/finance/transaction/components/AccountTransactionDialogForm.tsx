@@ -7,14 +7,13 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import {
     AccountModel,
-    AccountTransactionType, CategoryInput,
-    CategoryModel, CategoryTreeItem,
+    AccountTransactionType,
+    CategoryTreeItem,
     getTransactionTypeLabel,
     InputAccountTransaction
 } from "../../models";
-import {InputAdornment} from "@mui/material";
+import {Grid, InputAdornment} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
-import {Grid} from "@mui/material";
 import {AccountService} from "../../account/AccountService";
 import {CategoryService} from "../../category/CategoryService";
 

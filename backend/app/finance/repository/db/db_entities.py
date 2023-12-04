@@ -62,10 +62,6 @@ class AccountConsolidation(Base, AllFeaturesMixin):
     month = Column(Date)
     balance = Column(Float)
 
-    __table_args__ = (
-        UniqueConstraint('account_code', 'month', name='finances_consolidated_account_account_month_uc'),
-    )
-
     def __init__(self, **kwargs):
         kwargs.setdefault('id', None)
         super().__init__(**kwargs)

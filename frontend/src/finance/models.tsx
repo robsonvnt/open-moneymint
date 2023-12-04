@@ -69,3 +69,11 @@ const transactionTypeLabels: { [key: string]: string } = {
 export const getTransactionTypeLabel = (type: string): string => {
     return transactionTypeLabels[type] || "Tipo Desconhecido";
 };
+
+
+export interface AccountConsolidationModel {
+    account_code?: string;
+    month?: string;
+    balance: number;
+
+}

@@ -1,8 +1,10 @@
 import React, {useEffect} from 'react';
-import {Box, Container, Grid} from "@mui/material";
+import {Box, Container, Grid, Typography} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {Copyright} from "@mui/icons-material";
 import TransactionTable from "./components/TransactionTable";
+import Title from "./components/Title";
+import FinancialSummaryPaper from "./components/FinancialSummaryPaper";
 
 
 interface TransactionViewProps {
@@ -18,6 +20,10 @@ const TransactionView: React.FC<TransactionViewProps> =
          selectedCategoryCode,
          reloadAccounts
      }) => {
+
+        const [lastMonthBalance, setLastMonthBalance] = React.useState(0);
+        const [totalIncome, setTotalIncome] = React.useState(0);
+        const [totalExpenses, setTotalExpenses] = React.useState(0);
 
         useEffect(() => {
 
@@ -40,12 +46,28 @@ const TransactionView: React.FC<TransactionViewProps> =
                 <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
                     <Grid container spacing={3}>
 
+                        <Grid key="total-movements" item xs={12} md={6} lg={6}>
+                            <FinancialSummaryPaper
+                                previousBalance={lastMonthBalance}
+                                totalIncome={totalIncome}
+                                totalExpenses={totalExpenses}
+                            />
+                        </Grid>
+                        {/* Recent Deposits */}
+                        <Grid item xs={12} md={6} lg={6}>
+
+                        </Grid>
+
                         <Grid item xs={12}>
                             <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
                                 <TransactionTable
                                     checkedAccounts={checkedAccounts}
                                     selectedCategoryCode={selectedCategoryCode}
                                     reloadAccounts={reloadAccounts}
+                                    lastMonthBalance={lastMonthBalance}
+                                    setLastMonthBalance={setLastMonthBalance}
+                                    setTotalIncome={setTotalIncome}
+                                    setTotalExpenses={setTotalExpenses}
                                 />
                             </Paper>
                         </Grid>

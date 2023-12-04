@@ -29,11 +29,16 @@ class FinancialTransactionService:
 
     def filter_by_account_and_date(
             self,
+            user_code: str,
             account_codes: List[str],
             category_codes: Optional[List[str]],
             date_start: date = None,
             date_end: date = None
     ) -> List[FinancialTransactionModel]:
+
+        for acc in account_codes:
+            self.account_service.get_by_code(user_code, acc)
+
         return self.financial_transaction_repo.filter(
             account_codes, category_codes, date_start, date_end
         )

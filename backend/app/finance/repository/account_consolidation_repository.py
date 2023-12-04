@@ -1,4 +1,5 @@
 from datetime import date
+from typing import List
 
 from sqlalchemy.exc import NoResultFound
 
@@ -30,29 +31,31 @@ class AccountConsolidationRepo:
             return to_model(new_account)
         except NoResultFound:
             raise AccountConsolidationAlreadyExists()
+        except Exception as e:
+            raise AccountConsolidationAlreadyExists()
 
-    def find_by_account_month(self, account_code: str, month: date):
+    def find_by_account_month(self, account_codes: List[str], month: date):
         session = self.session
         try:
-            consolidation = session.query(AccountConsolidation).filter(
-                AccountConsolidation.account_code == account_code,
+            consolidations = session.query(AccountConsolidation).filter(
+                AccountConsolidation.account_code.in_(account_codes),
                 AccountConsolidation.month == date(month.year, month.month, 1)
-            ).one()
-            return to_model(consolidation)
+            ).all()
+            return [to_model(consolidation) for consolidation in consolidations]
         except NoResultFound:
             raise AccountConsolidationNotFound()
 
-    def find_all_by_account(self, account_code: str, start_month: date = None, end_month: date = None):
+    def find_all_by_account(self, account_codes: List[str], start_month: date = None, end_month: date = None):
         session = self.session
         query = session.query(AccountConsolidation).filter(
-            AccountConsolidation.account_code == account_code
+            AccountConsolidation.account_code.in_(account_codes)
         )
         if start_month:
             query = query.filter(AccountConsolidation.month >= date(start_month.year, start_month.month, 1))
         if end_month:
             query = query.filter(AccountConsolidation.month <= get_last_day_of_the_month(end_month))
-        accounts = query.all()
-        return [to_model(account) for account in accounts]
+        consolidations = query.all()
+        return [to_model(consolidation) for consolidation in consolidations]
 
     def update(
             self,
