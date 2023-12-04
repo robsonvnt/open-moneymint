@@ -58,7 +58,7 @@ const TransactionView: React.FC<TransactionViewProps> =
                                     display: 'flex',
                                     flexDirection: 'column',
                                 }}
-                                style={{height: 200}}
+                                // style={{height: 250}}
                             >
                                 <Title>Valores totais</Title>
 
@@ -77,7 +77,7 @@ const TransactionView: React.FC<TransactionViewProps> =
                                     display: 'flex',
                                     flexDirection: 'column',
                                 }}
-                                style={{height: 200}}
+                                // style={{height: 250}}
                             >
                                 <Title>% de gastos por categoria</Title>
                                 <TransactionsCategoriesChart

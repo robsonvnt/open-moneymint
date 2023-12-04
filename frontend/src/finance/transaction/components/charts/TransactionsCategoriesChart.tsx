@@ -93,7 +93,7 @@ const TransactionsCategoriesChart: React.FC<TransactionsCategoriesChartProps> =
                     },
                 ]}
                 // width={400}
-                height={160}
+                height={250}
                 sx={{
                     [`& .${pieArcLabelClasses.root}`]: {
                         fill: 'white',

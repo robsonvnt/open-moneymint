@@ -95,7 +95,7 @@ const TransactionTable: React.FC<TransactionTableProps> =
         const loadTransactionsWithDate = (date: Date) => {
             const account_codes = Array.from(checkedAccounts.keys()).filter(key => checkedAccounts.get(key) === true);
             // Pega o saldo do mês anterior
-            const newDate = new Date(currentDate);
+            const newDate = new Date(date);
             newDate.setMonth(newDate.getMonth() - 1);
             AccountConsolidationsService.getConsolidation(account_codes, newDate).then((consolidations) => {
                 // Calcula salto das contas selecionadas do mês anterior
