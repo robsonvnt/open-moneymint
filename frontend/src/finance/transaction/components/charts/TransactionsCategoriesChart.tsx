@@ -43,9 +43,6 @@ const TransactionsCategoriesChart: React.FC<TransactionsCategoriesChartProps> =
         const [total, setTotal]
             = React.useState<number>(0);
 
-        const [identifier, setIdentifier] = React.useState<null | PieItemIdentifier>(null);
-        const [id, setId] = React.useState<undefined | string | number>(undefined);
-
         const consolidationService = AccountConsolidationsService;
 
 
@@ -80,16 +77,6 @@ const TransactionsCategoriesChart: React.FC<TransactionsCategoriesChartProps> =
         React.useEffect(() => {
             loadCategoryValues();
         }, [accountCodesMap, date]);
-
-
-        const handleClick = (
-            event: React.MouseEvent<SVGPathElement, MouseEvent>,
-            itemIdentifier: PieItemIdentifier,
-            item: DefaultizedPieValueType,
-        ) => {
-            setId(item.id);
-            setIdentifier(itemIdentifier);
-        };
 
 
         const getArcLabel = (params: DefaultizedPieValueType) => {
