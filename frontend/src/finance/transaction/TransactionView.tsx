@@ -51,7 +51,7 @@ const TransactionView: React.FC<TransactionViewProps> =
                 <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
                     <Grid container spacing={3}>
 
-                        <Grid key="total-movements" item xs={12} md={5} lg={5}>
+                        <Grid key="total-movements" item xs={12} md={12} lg={5}>
                             <Paper
                                 sx={{
                                     p: 2,
@@ -70,7 +70,7 @@ const TransactionView: React.FC<TransactionViewProps> =
                             </Paper>
                         </Grid>
                         {/* Recent Deposits */}
-                        <Grid item xs={12} md={7} lg={7}>
+                        <Grid item xs={12} md={12} lg={7}>
                             <Paper
                                 sx={{
                                     p: 2,
