@@ -1,13 +1,13 @@
-import React, { FormEvent, useState, useEffect } from "react";
+import React, {FormEvent, useState, useEffect} from "react";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Box, DialogContentText, Grid, Link, Tab, Tabs } from "@mui/material";
-import { Portfolio } from "../../portfolio/models";
-import { AssetType, Investment } from "../models";
+import {Box, DialogContentText, Grid, Link, Tab, Tabs} from "@mui/material";
+import {Portfolio} from "../../portfolio/models";
+import {AssetType, Investment} from "../models";
 import TransactionList from "../../transactions/TransactionList";
 
 
@@ -33,17 +33,17 @@ interface InvestmentFormDialogI {
 }
 
 const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
-    dialogOpen,
-    setDialogOpen,
-    portfolio,
-    investment,
-    setInvestment,
-    handleFormSubmit,
-    deleteInvestment,
-    activeTab,
-    setActiveTab,
-    reloadInvestments
-}) => {
+                                                                  dialogOpen,
+                                                                  setDialogOpen,
+                                                                  portfolio,
+                                                                  investment,
+                                                                  setInvestment,
+                                                                  handleFormSubmit,
+                                                                  deleteInvestment,
+                                                                  activeTab,
+                                                                  setActiveTab,
+                                                                  reloadInvestments
+                                                              }) => {
 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [errors, setErrors] = useState<FormErrors>({});
@@ -79,10 +79,8 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
     }
 
 
-
     // Form  de Investment
-
-    if (investment.asset_type === AssetType.FIXED_INCOME && investment.quantity == 0) {
+    if ((investment.asset_type === AssetType.FIXED_INCOME || investment.asset_type === AssetType.PRIVATE_EQUITY_FUND) && investment.quantity == 0) {
         setInvestment({
             ...investment,
             quantity: 1,
@@ -108,9 +106,9 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                 <DialogContent
                 >
                     <Box
-                        sx={{ borderBottom: 0, borderColor: 'divider' }}
+                        sx={{borderBottom: 0, borderColor: 'divider'}}
 
-                        style={{ minHeight: '34vh', maxHeight: '44vh', width: '100%' }}
+                        style={{minHeight: '34vh', maxHeight: '44vh', width: '100%'}}
                     >
                         <Tabs
                             value={activeTab}
@@ -124,10 +122,10 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                 },
                                 marginBottom: 1
                             }}
-                        // style={{width: '550px', maxWidth: }}
+                            // style={{width: '550px', maxWidth: }}
                         >
-                            <Tab label="Detalhes" />
-                            <Tab label="Transações" />
+                            <Tab label="Detalhes"/>
+                            <Tab label="Transações"/>
                         </Tabs>
 
 
@@ -153,7 +151,7 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                         InputProps={{
                                             readOnly: true,
                                         }}
-                                        style={{ display: 'none' }}
+                                        style={{display: 'none'}}
                                     />
 
 
@@ -199,6 +197,7 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                             <option value="STOCK">Ações</option>
                                             <option value="REIT">FII</option>
                                             <option value="FIXED_INCOME">Renda Fixa</option>
+                                            <option value="PRIVATE_EQUITY_FUND">Fundos Privados</option>
                                         </TextField>
 
                                         <Grid container spacing={2} alignItems="center">
@@ -233,7 +232,7 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                             </Grid>
                                         </Grid>
 
-                                        {investment.asset_type !== AssetType.FIXED_INCOME && (
+                                        {investment.asset_type !== AssetType.FIXED_INCOME && investment.asset_type !== AssetType.PRIVATE_EQUITY_FUND && (
                                             <TextField
                                                 margin="dense"
                                                 id="quantity"
@@ -253,7 +252,9 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                         <TextField
                                             margin="dense"
                                             id="purchase_price"
-                                            label={investment.asset_type === AssetType.FIXED_INCOME ? "Valor aplicado" : "Preço de Compra"}
+                                            label={
+                                            investment.asset_type === AssetType.FIXED_INCOME || investment.asset_type === AssetType.PRIVATE_EQUITY_FUND?
+                                                "Valor aplicado" : "Preço de Compra"}
                                             type="number"
                                             fullWidth
                                             required
@@ -268,7 +269,10 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                         <TextField
                                             margin="dense"
                                             id="purchase_date"
-                                            label={investment.asset_type === AssetType.FIXED_INCOME ? "Dada do aplicação" : "Data de Compra"}
+                                            label={
+                                                investment.asset_type === AssetType.FIXED_INCOME || investment.asset_type === AssetType.PRIVATE_EQUITY_FUND ?
+                                                    "Data da aplicação" : "Data de Compra"
+                                            }
                                             type="date"
                                             InputLabelProps={{
                                                 shrink: true,
@@ -287,7 +291,10 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                         <TextField
                                             margin="dense"
                                             id="current_average_price"
-                                            label={investment.asset_type === AssetType.FIXED_INCOME ? "Saldo Atual" : "Preço Médio Atual"}
+                                            label={
+                                                investment.asset_type === AssetType.FIXED_INCOME || investment.asset_type === AssetType.PRIVATE_EQUITY_FUND ?
+                                                    "Valor Atual" : "Preço Médio Atual"
+                                            }
                                             type="number"
                                             fullWidth
                                             value={investment.current_average_price}
@@ -313,7 +320,7 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                             {investment.code && (
                                                 <Button
                                                     onClick={() => setConfirmOpen(true)}
-                                                    style={{ color: 'red', marginLeft: 20 }}
+                                                    style={{color: 'red', marginLeft: 20}}
                                                 >
                                                     Excluir
                                                 </Button>

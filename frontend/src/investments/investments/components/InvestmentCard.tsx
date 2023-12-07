@@ -42,21 +42,24 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment, onClick }) 
             <Typography variant="body2" color="text.secondary">
                 {formatDateStr(purchase_date)}
             </Typography>
-            {asset_type !== AssetType.FIXED_INCOME && (
+            {asset_type !== AssetType.FIXED_INCOME && asset_type !== AssetType.PRIVATE_EQUITY_FUND && (
                 <Typography variant="body2" color="text.primary">
                     Quantidade: <b>{quantity}</b>
                 </Typography>
             )}
             <Typography variant="body2" color="text.primary">
-                {asset_type === AssetType.FIXED_INCOME ? "Valor Aplicado: " : "Preço Médio (compra): "}
+                {asset_type === AssetType.FIXED_INCOME || asset_type === AssetType.PRIVATE_EQUITY_FUND ?
+                    "Valor Aplicado: " : "Preço Médio (compra): "}
                 <b>{currencyFormatter.format(purchase_price)}</b>
             </Typography>
             <Typography variant="body2" color="text.primary">
-                {asset_type === AssetType.FIXED_INCOME ? "Saldo Atual: " : "Preço Atual: "}
+                {asset_type === AssetType.FIXED_INCOME || asset_type === AssetType.PRIVATE_EQUITY_FUND ?
+                    "Saldo Atual: " : "Preço Atual: "}
                 <b>{currencyFormatter.format(current_average_price ? current_average_price : 0.0)}</b>
             </Typography>
             <Typography variant="body2" style={{ color: percentageColor }}>
-                {asset_type === AssetType.FIXED_INCOME ? "Rendimento: " : "Variação: "}
+                {asset_type === AssetType.FIXED_INCOME || asset_type === AssetType.PRIVATE_EQUITY_FUND ?
+                    "Rendimento: " : "Variação: "}
                 <b>{percentageChange.toFixed(2)}%</b>
             </Typography>
             <Typography variant="body2" color="text.primary">

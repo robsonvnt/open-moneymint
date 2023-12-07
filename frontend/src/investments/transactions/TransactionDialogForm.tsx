@@ -110,7 +110,7 @@ const FormDialogTransaction: React.FC<FormDialogTransactionInterface> = ({
         }
     };
 
-    if (investment.asset_type === AssetType.FIXED_INCOME && quantity == 0) {
+    if ((investment.asset_type === AssetType.PRIVATE_EQUITY_FUND || investment.asset_type === AssetType.FIXED_INCOME) && quantity == 0) {
         setQuantity(1);
     }
 
@@ -148,7 +148,7 @@ const FormDialogTransaction: React.FC<FormDialogTransactionInterface> = ({
                         >
                             <option value="" disabled>Selecione um valor</option>
 
-                            {investment.asset_type === "FIXED_INCOME" ? (
+                            {investment.asset_type === "FIXED_INCOME" || investment.asset_type === "PRIVATE_EQUITY_FUND" ? (
                                 <>
                                     <option value="INTEREST">Rendimento</option>
                                     <option value="WITHDRAWAL">Saque</option>
@@ -181,7 +181,7 @@ const FormDialogTransaction: React.FC<FormDialogTransactionInterface> = ({
                         />
 
 
-                        {investment.asset_type !== AssetType.FIXED_INCOME && (
+                        {investment.asset_type !== AssetType.FIXED_INCOME && investment.asset_type !== AssetType.PRIVATE_EQUITY_FUND && (
                             <TextField autoFocus
                                 label="Quantidade"
                                 id="quantityTextField"
