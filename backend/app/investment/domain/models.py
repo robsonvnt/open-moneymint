@@ -36,6 +36,7 @@ class AssetType(str, Enum):
     STOCK = "STOCK"
     REIT = "REIT"
     FIXED_INCOME = "FIXED_INCOME"
+    PRIVATE_EQUITY_FUND = "PRIVATE_EQUITY_FUND"
 
 
 class InvestmentModel(BaseModel):
