@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:8080"  # Mapeia a porta 80 do host para a porta 80 do container
+    volumes:
+      - ./dev-env/nginx-dev.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    volumes:
+      - ./dev-env/pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  backend:
+    image: python:3.11
+    volumes:
+      - ./backend:/src
+    working_dir: /src
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      BRAPI_DEV: ${BRAPI_DEV}
+      SECRET_KEY: ${SECRET_KEY}
+      PYTHONPATH: /src/app/
+    command: sh -c "pip install --no-cache-dir --use-feature=fast-deps -r requirements.txt && alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    image: node:20
+    volumes:
+      - ./frontend/:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:

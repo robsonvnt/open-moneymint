@@ -1,4 +1,5 @@
 from _datetime import timedelta
+import logging
 
 from fastapi import HTTPException, status, APIRouter, Depends
 from pydantic import BaseModel
@@ -48,6 +49,7 @@ async def signup(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=str(e))
     except Exception as e:
+        logging.error(f"UsernameAlreadyRegistered: {str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="Failed to retrieve user.")
 
