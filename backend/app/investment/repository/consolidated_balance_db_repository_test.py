@@ -1,8 +1,8 @@
-import pytest
+from datetime import date, timedelta
 from unittest.mock import Mock
 
+import pytest
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
-from datetime import date, timedelta
 
 from investment.domain.consolidated_balance_errors import ConsolidatedPortfolioDatabaseError, \
     ConsolidatedPortfolioUnexpectedError

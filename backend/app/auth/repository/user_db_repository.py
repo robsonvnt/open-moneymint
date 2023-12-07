@@ -2,8 +2,8 @@ from datetime import date
 
 from sqlalchemy import Column, Date, Integer, String
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
 from sqlalchemy_mixins import AllFeaturesMixin
 
 from auth.domain.models import UserModel

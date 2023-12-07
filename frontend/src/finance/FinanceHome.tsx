@@ -7,20 +7,22 @@ import AccountList from "./account/components/AccountList";
 import Divider from "@mui/material/Divider";
 import MoneyMineAppBar from "../app/MoneyMineAppBar";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {AccountService} from "./account/AccountService";
 
 const drawerWidth = 240;
 
 const FinanceHome: React.FC = () => {
 
-    useEffect(() => {
-
-    }, []);
-
     const [checkedAccounts, setCheckedAccounts] = React.useState<Map<string, boolean>>(new Map());
     const [selectedCategoryCode, setSelectedCategoryCode] = React.useState<string>("");
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [refreshAccounts, setRefreshAccounts] = React.useState<boolean>(false);
 
+
+    const runRefreshAccounts = () => {
+        setRefreshAccounts(true);
+    }
 
     // Barra lateral
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -78,6 +80,8 @@ const FinanceHome: React.FC = () => {
                     <AccountList
                         checked={checkedAccounts}
                         setChecked={setCheckedAccounts}
+                        refresh={refreshAccounts}
+                        setRefresh={setRefreshAccounts}
                     />
                     <Divider/>
                     <CategoryTree
@@ -99,6 +103,7 @@ const FinanceHome: React.FC = () => {
                 <TransactionView
                     checkedAccounts={checkedAccounts}
                     selectedCategoryCode={selectedCategoryCode}
+                    reloadAccounts={runRefreshAccounts}
                 />
 
             </Box>

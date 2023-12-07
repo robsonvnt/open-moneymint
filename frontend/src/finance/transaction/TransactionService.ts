@@ -1,7 +1,6 @@
-import {AccountTransaction, NewAccountTransaction} from "../models";
+import {AccountTransaction, InputAccountTransaction} from "../models";
 import axios, {AxiosResponse} from "axios";
 import {format} from "date-fns";
-import {Portfolio} from "../../investments/portfolio/models";
 
 
 const baseUrl = '/api/finances/transactions'; // ou a URL base do seu backend
@@ -24,19 +23,27 @@ export const TransactionService = {
         }
     },
 
-    async create(transaction: NewAccountTransaction): Promise<AccountTransaction> {
+    async create(transaction: InputAccountTransaction): Promise<AccountTransaction> {
         let url_call = `${baseUrl}`;
         const response: AxiosResponse<AccountTransaction> = await axios.post(url_call, transaction);
         return response.data;
     },
 
+    async update(transaction: InputAccountTransaction): Promise<AccountTransaction> {
+        let url_call = `${baseUrl}/${transaction.code}`;
+        const response: AxiosResponse<AccountTransaction> = await axios.put(url_call, transaction);
+        return response.data;
+    },
+
     async delete(code: string): Promise<void> {
-        try {
-            let url_call = `${baseUrl}/${code}`;
-            return await axios.delete(url_call);
-        } catch (error) {
-            throw new Error(`Erro ao deletar o transação: ${error}`);
-        }
+        let url_call = `${baseUrl}/${code}`;
+        return await axios.delete(url_call);
+    },
+
+    async get(code: string): Promise<AccountTransaction> {
+        let url_call = `${baseUrl}/${code}`;
+        const response: AxiosResponse<AccountTransaction> = await axios.get(url_call);
+        return response.data;
     }
 
 };

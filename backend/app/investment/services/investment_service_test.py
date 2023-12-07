@@ -1,9 +1,8 @@
 from datetime import date, timedelta, datetime
-
-import pytest
 from unittest.mock import Mock
 
-from investment.domain.investment_errors import UnexpectedError
+import pytest
+
 from investment.domain.models import (
     InvestmentModel,
     PortfolioModel, TransactionModel, AssetType, TransactionType

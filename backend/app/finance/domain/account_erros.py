@@ -1,38 +1,38 @@
-class AccountError(Exception):
-    """Base class for account-related errors."""
+class AccountConsolidationError(Exception):
+    """Base class for consolidation-related errors."""
     pass
 
 
-class AccountAlreadyExists(AccountError):
-    """Raised when a account already exists."""
+class AccountConsolidationAlreadyExists(AccountConsolidationError):
+    """Raised when a consolidation already exists."""
 
     def __str__(self):
-        return "Account already exists"
+        return "AccountConsolidation already exists"
 
 
-class AccountNotFound(AccountError):
-    """Raised when a account is not found."""
+class AccountConsolidationNotFound(AccountConsolidationError):
+    """Raised when a consolidation is not found."""
 
     def __str__(self):
-        return "Account not found"
+        return "AccountConsolidation not found"
 
 
-class AccountDatabaseError(AccountError):
-    """Raised for general database errors in accounts."""
+class AccountDatabaseConsolidationError(AccountConsolidationError):
+    """Raised for general database errors in consolidation."""
 
     def __str__(self):
         return "Database error"
 
 
-class AccountUnexpectedError(AccountError):
-    """Raised for unexpected errors in account processing."""
+class AccountUnexpectedConsolidationError(AccountConsolidationError):
+    """Raised for unexpected errors in consolidation processing."""
 
     def __str__(self):
         return "Unexpected error"
 
 
-class AccountOperationNotPermittedError(AccountError):
-    """Raised when an operation on a account is not permitted."""
+class AccountOperationNotPermittedConsolidationError(AccountConsolidationError):
+    """Raised when an operation on a consolidation is not permitted."""
 
     def __str__(self):
         return "Operation not permitted"

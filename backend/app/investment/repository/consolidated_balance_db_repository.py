@@ -1,5 +1,6 @@
 from datetime import date
 from typing import List, Optional
+
 from sqlalchemy import Date
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 

@@ -1,7 +1,8 @@
+from typing import List, Optional
+
+from fastapi import Depends
 from fastapi import HTTPException, status, APIRouter
 from pydantic import BaseModel
-from typing import List, Optional
-from fastapi import Depends
 
 from auth.user import User, get_current_user
 from investment.domain.models import PortfolioModel

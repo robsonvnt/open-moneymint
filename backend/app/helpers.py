@@ -1,7 +1,7 @@
-import string
-import random
 import calendar
 import datetime
+import random
+import string
 
 
 def generate_code(length=10):

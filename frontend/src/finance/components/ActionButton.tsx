@@ -17,17 +17,14 @@ const ActionButton: React.FC = () => {
 
     // Substitua essas funções pelas ações reais
     const handleAction1 = () => {
-        console.log("Ação 1");
         handleClose();
     };
 
     const handleAction2 = () => {
-        console.log("Ação 2");
         handleClose();
     };
 
     const handleAction3 = () => {
-        console.log("Ação 3");
         handleClose();
     };
 

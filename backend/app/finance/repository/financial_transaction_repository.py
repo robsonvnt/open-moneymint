@@ -1,12 +1,11 @@
+from datetime import date
 from typing import List
 
 from sqlalchemy.exc import NoResultFound
-from datetime import date
 
 from finance.domain.financial_transaction_erros import FinancialTransactionUnexpectedError, FinancialTransactionNotFound
 from finance.domain.models import FinancialTransactionModel
 from finance.repository.db.db_entities import FinancialTransaction
-
 from helpers import generate_code
 
 
@@ -86,7 +85,7 @@ class FinancialTransactionRepo:
             transaction = session.query(FinancialTransaction).filter(
                 FinancialTransaction.code == transaction_code
             ).one()
-            for key, value in updated_transaction_data.model_dump(exclude={'code', 'account_code'}).items():
+            for key, value in updated_transaction_data.model_dump(exclude={'code'}).items():
                 setattr(transaction, key, value if key != "type" else value.value)
             session.commit()
             session.refresh(transaction)

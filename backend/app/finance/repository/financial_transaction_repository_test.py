@@ -1,14 +1,14 @@
 from datetime import date
-
-import pytest
 from unittest.mock import Mock, create_autospec
 
+import pytest
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
-from finance.repository.financial_transaction_repository import FinancialTransactionRepo
+
+from finance.domain.financial_transaction_erros import FinancialTransactionNotFound
 from finance.domain.models import FinancialTransactionModel, TransactionType
 from finance.repository.db.db_entities import FinancialTransaction
-from finance.domain.financial_transaction_erros import FinancialTransactionNotFound, FinancialTransactionUnexpectedError
+from finance.repository.financial_transaction_repository import FinancialTransactionRepo
 
 
 def generate_financial_transaction_model(code=None):

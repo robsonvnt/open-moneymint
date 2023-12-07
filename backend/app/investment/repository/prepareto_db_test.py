@@ -1,17 +1,17 @@
-from unittest.mock import Mock, patch
-import tempfile
 import os
+import tempfile
+from datetime import date
+from unittest.mock import Mock, patch
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from datetime import date
 
 from auth.user import User, get_current_user
 from investment.repository.db.db_connection import get_db_session
 from investment.repository.db.db_entities import Base, Portfolio, ConsolidatedPortfolio, Transaction
 from investment.repository.investment_db_repository import Investment
-from fastapi.testclient import TestClient
 
 
 @pytest.fixture(scope="function")

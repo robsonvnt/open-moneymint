@@ -1,10 +1,11 @@
 from datetime import date
 
+from sqlalchemy import func
 from sqlalchemy.exc import NoResultFound
 
-from finance.domain.account_erros import AccountNotFound, AccountUnexpectedError
+from finance.domain.account_erros import AccountConsolidationNotFound, AccountUnexpectedConsolidationError
 from finance.domain.models import AccountModel
-from finance.repository.db.db_entities import Account
+from finance.repository.db.db_entities import Account, FinancialTransaction
 from helpers import generate_code
 
 
@@ -33,9 +34,9 @@ class AccountRepo:
             return to_model(new_account)
         except Exception as e:
             if 'unique constraint' in str(e).lower():
-                raise AccountNotFound()
+                raise AccountConsolidationNotFound()
             else:
-                raise AccountUnexpectedError()
+                raise AccountUnexpectedConsolidationError()
 
     def find_by_code(self, user_code: str, account_code: str):
         session = self.session
@@ -46,9 +47,9 @@ class AccountRepo:
             ).one()
             return to_model(account)
         except NoResultFound:
-            raise AccountNotFound()
+            raise AccountConsolidationNotFound()
         except Exception as w:
-            raise AccountUnexpectedError()
+            raise AccountUnexpectedConsolidationError()
 
     def find_all(self, user_code: str):
         session = self.session
@@ -58,7 +59,7 @@ class AccountRepo:
             ).all()
             return [to_model(account) for account in accounts]
         except Exception as e:
-            raise AccountUnexpectedError()
+            raise AccountUnexpectedConsolidationError()
 
     def delete(self, user_code: str, account_code: str):
         session = self.session
@@ -71,9 +72,9 @@ class AccountRepo:
             session.commit()
             return True
         except NoResultFound:
-            raise AccountNotFound()
+            raise AccountConsolidationNotFound()
         except Exception:
-            raise AccountUnexpectedError()
+            raise AccountUnexpectedConsolidationError()
 
     def update(
             self,
@@ -93,6 +94,14 @@ class AccountRepo:
             session.refresh(account)
             return to_model(account)
         except NoResultFound:
-            raise AccountNotFound()
+            raise AccountConsolidationNotFound()
         except Exception as e:
-            raise AccountUnexpectedError()
+            raise AccountUnexpectedConsolidationError()
+
+    def calculate_balance(self, account_code):
+        session = self.session
+        query = session.query(
+            func.sum(FinancialTransaction.value).label('total_value')
+        ).filter(FinancialTransaction.account_code == account_code)
+        result = query.one()
+        return result.total_value

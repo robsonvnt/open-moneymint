@@ -1,4 +1,3 @@
-from finance.domain.account_erros import AccountNotFound
 from finance.repository.db.prepare_to_db_test import *
 
 

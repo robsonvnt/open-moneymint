@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 
 from investment.domain.models import PortfolioModel
 from investment.repository.portfolio_db_repository import PortfolioRepo

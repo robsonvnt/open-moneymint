@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import Mock
 from datetime import date
+from unittest.mock import Mock
+
+import pytest
 
 from investment.domain.models import (
     PortfolioOverviewModel, ConsolidatedPortfolioModel

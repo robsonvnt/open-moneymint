@@ -1,8 +1,4 @@
-from datetime import date
-
-import pytest
-
-from finance.domain.account_erros import AccountNotFound
+from finance.domain.account_erros import AccountConsolidationNotFound
 from finance.domain.models import AccountModel
 from finance.repository.account_repository import AccountRepo
 from finance.repository.db.prepare_to_db_test import *
@@ -36,7 +32,7 @@ def test_find_by_code(memory_db_session):
     assert account_model.name == "Existing Account"
     assert account_model.user_code == "USER001"
 
-    with pytest.raises(AccountNotFound):
+    with pytest.raises(AccountConsolidationNotFound):
         account_repo.find_by_code("USER001", "NONEXISTENT")
 
 
@@ -50,7 +46,7 @@ def test_delete_account(memory_db_session):
     result = account_repo.delete("USER001", "ACC123")
     assert result is True
 
-    with pytest.raises(AccountNotFound):
+    with pytest.raises(AccountConsolidationNotFound):
         account_repo.delete("USER001", "NONEXISTENT")
 
 
@@ -66,7 +62,7 @@ def test_update_account(memory_db_session):
     assert updated_account_model.name == "Updated Account"
     assert updated_account_model.user_code == "USER789"
 
-    with pytest.raises(AccountNotFound):
+    with pytest.raises(AccountConsolidationNotFound):
         account_repo.update("PORT123", "NONEXISTENT", updated_account_data)
 
 
@@ -89,3 +85,14 @@ def test_find_all_by_user_code(memory_db_session):
     # Testa o retorno de contas para um user_code que não existe
     accounts = account_repo.find_all("NONEXISTENT_USER")
     assert len(accounts) == 0
+
+
+def test_calculate_balance(memory_db_session):
+    add_accounts(memory_db_session)
+    add_transactions(memory_db_session)
+    account_repo = AccountRepo(memory_db_session)
+
+    result = account_repo.calculate_balance("ACC123")
+
+     # Saldo deve ser 0
+    assert result == 0

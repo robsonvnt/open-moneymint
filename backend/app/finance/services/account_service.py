@@ -21,3 +21,9 @@ class AccountService:
 
     def delete(self, user_code: str, account_code: str) -> bool:
         return self.account_repo.delete(user_code, account_code)
+
+    def refresh_balance(self, user_code, account_code):
+        account = self.get_by_code(user_code, account_code)
+        new_balance = self.account_repo.calculate_balance(account_code)
+        account.balance = new_balance
+        return self.update(user_code, account_code, account)

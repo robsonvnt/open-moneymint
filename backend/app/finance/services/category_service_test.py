@@ -1,9 +1,9 @@
 from datetime import date
-
-import pytest
 from unittest.mock import create_autospec, Mock
 
-from finance.domain.category_erros import CategoryNotFound, CategoryUnexpectedError, CategoryOperationNotPermittedError
+import pytest
+
+from finance.domain.category_erros import CategoryNotFound, CategoryOperationNotPermittedError
 from finance.domain.models import CategoryModel
 from finance.repository.category_repository import CategoryRepo
 from finance.repository.financial_transaction_repository import FinancialTransactionRepo

@@ -44,7 +44,8 @@ export interface AccountTransaction {
     value: number;
 }
 
-export interface NewAccountTransaction {
+export interface InputAccountTransaction {
+    code?: string;
     account_code?: string;
     description?: string;
     category_code?: string;
@@ -68,3 +69,11 @@ const transactionTypeLabels: { [key: string]: string } = {
 export const getTransactionTypeLabel = (type: string): string => {
     return transactionTypeLabels[type] || "Tipo Desconhecido";
 };
+
+
+export interface AccountConsolidationModel {
+    account_code?: string;
+    month?: string;
+    balance: number;
+
+}

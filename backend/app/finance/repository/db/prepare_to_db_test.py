@@ -1,17 +1,17 @@
+import os
+import tempfile
 from datetime import date
 from unittest.mock import Mock, patch
-import tempfile
-import os
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from auth.user import User, get_current_user
 from finance.domain.models import TransactionType
 from finance.repository.db.db_connection import get_db_session
-from finance.repository.db.db_entities import Account, Base, Category, FinancialTransaction
-from fastapi.testclient import TestClient
+from finance.repository.db.db_entities import Account, Base, Category, FinancialTransaction, AccountConsolidation
 
 
 @pytest.fixture(scope="function")
@@ -93,7 +93,7 @@ def add_transactions(session):
         ),
         FinancialTransaction(
             code="TRA003", account_code="ACC123", description="Description 3", category_code="CAT003",
-            type=TransactionType.TRANSFER.value, date=date(2023, 6, 5), value=300.0
+            type=TransactionType.TRANSFER.value, date=date(2023, 6, 5), value=-300.0
         ),
         FinancialTransaction(
             code="TRA004", account_code="ACC124", description="Description 4", category_code="CAT004",
@@ -168,3 +168,15 @@ def add_categories(session):
         )
     session.add_all(categories)
     session.commit()
+
+
+def add_account_consolidations(session):
+    consolidations = [
+        AccountConsolidation(account_code="ACC001", month=date(2023, 8, 1), balance=100),
+        AccountConsolidation(account_code="ACC001", month=date(2023, 9, 1), balance=110),
+        AccountConsolidation(account_code="ACC001", month=date(2023, 10, 1), balance=120)
+    ]
+
+    session.add_all(consolidations)
+    session.commit()
+

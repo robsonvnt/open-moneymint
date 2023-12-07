@@ -1,4 +1,4 @@
-from investment.domain.investment_errors import InvestmentNotFound, ColumnDoesNotExistError
+from investment.domain.investment_errors import ColumnDoesNotExistError
 from investment.repository.investment_db_repository import InvestmentRepo
 from investment.repository.prepareto_db_test import *
 

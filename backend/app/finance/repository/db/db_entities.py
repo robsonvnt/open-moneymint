@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, Date, Integer, String, Text
+from sqlalchemy import Column, Float, Date, Integer, String, UniqueConstraint, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_mixins import AllFeaturesMixin
 
@@ -52,4 +52,16 @@ class FinancialTransaction(Base, AllFeaturesMixin):
         kwargs.setdefault('id', None)
         if isinstance(kwargs.get('type'), TransactionType):
             kwargs['type'] = kwargs['type'].value
+        super().__init__(**kwargs)
+
+
+class AccountConsolidation(Base, AllFeaturesMixin):
+    __tablename__ = 'finances_account_consolidations'
+    id = Column(Integer, primary_key=True, index=True, unique=True)
+    account_code = Column(String, ForeignKey('finances_accounts.code'), index=True)
+    month = Column(Date)
+    balance = Column(Float)
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('id', None)
         super().__init__(**kwargs)

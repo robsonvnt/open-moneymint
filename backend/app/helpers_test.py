@@ -1,8 +1,6 @@
-import json
-import random
-from calendar import calendar
 import datetime
-from unittest.mock import patch, Mock
+import json
+from unittest.mock import patch
 
 from helpers import generate_code, get_last_day_of_the_month, ofx_to_json
 

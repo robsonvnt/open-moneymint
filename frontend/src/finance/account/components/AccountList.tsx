@@ -9,19 +9,23 @@ import {AccountService} from "../AccountService";
 import {currencyFormatter} from "../../../helpers/BRFormatHelper";
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
-import AccountDialogForm, {NewAccountModel} from "./AccountDialogForm"; // Substitua por seu ícone preferido
+import AccountDialogForm, {InputAccountModel} from "./AccountDialogForm"; // Substitua por seu ícone preferido
 
 
 interface AccountListProps {
     checked: Map<string, boolean>;
     setChecked: React.Dispatch<React.SetStateAction<Map<string, boolean>>>;
+    refresh: boolean,
+    setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
 const AccountList: React.FC<AccountListProps> =
     ({
          checked,
-         setChecked
+         setChecked,
+         refresh,
+         setRefresh
      }) => {
 
         const [accountList, setAccountList] = React.useState<AccountModel[]>([]);
@@ -48,33 +52,88 @@ const AccountList: React.FC<AccountListProps> =
 
         useEffect(() => {
             if (accountList.length == 0) {
-                accountService.getAllAccounts()
+                AccountService.getAllAccounts()
                     .then(accounts => {
+                        const newCheckedMap = new Map<string, boolean>();
+                        accounts.map(acc => newCheckedMap.set(acc.code, true))
+                        setChecked(newCheckedMap);
                         updateList(accounts);
                     });
             }
         }, []);
 
+        useEffect(() => {
+            if (refresh) {
+                accountService.getAllAccounts()
+                    .then(accounts => {
+                        updateList(accounts);
+                        setRefresh(false);
+                    });
+            }
+        }, [refresh]);
+
+
         // New or Edit Account
         const [openForm, setOpenForm] = useState<boolean>(false);
         const [onCloseForm, setOnCloseForm] = useState<boolean>(false);
         const [onSaveAccount, setOnSaveAccount] = useState<boolean>(false);
+        const [currentAccount, setCurrentAccount] = useState<InputAccountModel>({
+            name: '',
+            description: '',
+            balance: 0
+        });
+
 
         const handleIconClick = () => {
+            setCurrentAccount({name: '', description: '', balance: 0})
             setOpenForm(true);
+        };
+
+        const handleItemListDoubleClick = (code: string) => {
+            accountService.get(code).then((account) => {
+                setCurrentAccount(account)
+                setOpenForm(true);
+            })
         };
 
         const handleDialogClose = () => {
             setOpenForm(false);
         };
 
-        const handleOnSave = (account: NewAccountModel) => {
-            AccountService.create(account).then((createdAccount) => {
-                let newAccountList: AccountModel[] = []
-                accountList.map((acc) => newAccountList.push(acc))
-                newAccountList.push(createdAccount);
-                updateList(newAccountList);
-            })
+        const handleOnDelete = (account: InputAccountModel) => {
+            if (account.code) {
+                accountService.delete(account.code)
+                setOpenForm(false);
+                setCurrentAccount({name: '', description: '', balance: 0})
+                accountService.getAllAccounts()
+                    .then(accounts => {
+                        updateList(accounts);
+                    });
+            }
+        }
+
+        const handleOnSave = (account: InputAccountModel) => {
+            if (account.code) {
+                AccountService.update(account).then((updatedAccount) => {
+                    let newAccountList: AccountModel[] = []
+                    accountList.map((acc): void => {
+                        if (acc.code === updatedAccount.code) {
+                            newAccountList.push(updatedAccount)
+                        } else {
+                            newAccountList.push(acc)
+                        }
+                    })
+
+                    updateList(newAccountList);
+                })
+            } else {
+                AccountService.create(account).then((createdAccount) => {
+                    let newAccountList: AccountModel[] = []
+                    accountList.map((acc) => newAccountList.push(acc))
+                    newAccountList.push(createdAccount);
+                    updateList(newAccountList);
+                })
+            }
         };
 
 
@@ -123,7 +182,7 @@ const AccountList: React.FC<AccountListProps> =
                                 }
                                 disablePadding
                             >
-                                <ListItemButton>
+                                <ListItemButton onDoubleClick={() => handleItemListDoubleClick(account.code)}>
                                     <ListItemText id={labelId} primary={`${account.name}`}/>
                                     <div style={{
                                         display: 'flex',
@@ -139,7 +198,7 @@ const AccountList: React.FC<AccountListProps> =
                     })}
                     {/*<Divider light/>*/}
                     <ListItem disablePadding style={{backgroundColor: "#f0f0f0"}}>
-                        <ListItemButton >
+                        <ListItemButton>
                             <ListItemText primary="Total"/>
                             <div style={{
                                 display: 'flex',
@@ -156,9 +215,12 @@ const AccountList: React.FC<AccountListProps> =
                 </List>
 
                 <AccountDialogForm
+                    currentAccount={currentAccount}
+                    setCurrentAccount={setCurrentAccount}
                     open={openForm}
                     onClose={handleDialogClose}
                     onSave={handleOnSave}
+                    onDelete={handleOnDelete}
                 />
             </>
         );

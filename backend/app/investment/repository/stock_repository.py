@@ -1,7 +1,7 @@
-import os
+import asyncio
+
 import requests
 from pydantic import BaseModel, ValidationError
-import asyncio
 
 
 class ApiResult(BaseModel):

@@ -3,8 +3,8 @@ from datetime import date
 import pytest
 
 from auth.domain.models import UserModel
-from auth.service.services import UserServiceFactory
 from auth.repository.prepareto_db_test import db_session, client
+from auth.service.services import UserServiceFactory
 
 
 @pytest.fixture
