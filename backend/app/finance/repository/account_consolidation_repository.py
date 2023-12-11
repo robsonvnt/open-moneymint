@@ -55,6 +55,8 @@ class AccountConsolidationRepo:
         if end_month:
             query = query.filter(AccountConsolidation.month <= get_last_day_of_the_month(end_month))
         consolidations = query.all()
+        if consolidations is None:
+            consolidations = []
         return [to_model(consolidation) for consolidation in consolidations]
 
     def update(
