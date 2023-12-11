@@ -111,6 +111,11 @@ class TransactionService:
                 updated_investment.code,
                 updated_investment
             )
+            transactions = self.transaction_repo.find_all(portfolio_code, investment.code)
+            transactions.append(new_transaction)
+            self.investment_service. \
+                refresh_investment_details(user_code, investment_code, transactions)
+
         return self.transaction_repo.create(new_transaction)
 
     def delete(self, user_code: str, portfolio_code: str, investment_code, transaction: TransactionModel):
