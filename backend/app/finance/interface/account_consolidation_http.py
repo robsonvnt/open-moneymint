@@ -47,7 +47,8 @@ async def get_all_consolidations(
         end_month_date = datetime.strptime(end_month, "%Y-%m").date().replace(day=1)
 
     account_consolidations_service = ServiceFactory.create_account_consolidations_service(db_session)
-    return account_consolidations_service.find_all_by_account(account_codes, start_month_date, end_month_date)
+    result = account_consolidations_service.find_all_by_account(account_codes, start_month_date, end_month_date)
+    return result
 
 
 @account_consolidation_router.get("/consolidations/last-month", response_model=List[AccountConsolidationModel])

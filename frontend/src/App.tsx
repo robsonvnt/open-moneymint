@@ -1,9 +1,7 @@
 // src/App.tsx
-import React, { useState, useEffect } from 'react';
-import { Portfolio } from './investments/portfolio/models';
-import PortfolioService from './investments/portfolio/PortfolioService';
-import { ThemeProvider, createTheme } from '@mui/material';
-import { AuthProvider } from './auth/AuthContext';
+import React from 'react';
+import {createTheme, ThemeProvider} from '@mui/material';
+import {AuthProvider} from './auth/AuthContext';
 import Router from './Router';
 import axios from 'axios';
 
@@ -44,6 +42,19 @@ axios.interceptors.request.use((config) => {
 }, (error) => {
   return Promise.reject(error);
 });
+
+// Interceptar retornos 401
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('accessToken');
+            console.log("Removei accessToken")
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
 
 
 const App: React.FC = () => {
