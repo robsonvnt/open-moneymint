@@ -1,15 +1,15 @@
 // InvestmentCard.tsx
 import * as React from 'react';
-import { CardContent, Typography } from '@mui/material';
-import { AssetType, Investment, getAssetTypeLabel } from '../models';
-import { currencyFormatter, formatDateStr } from '../../../helpers/BRFormatHelper';
+import {CardContent, Typography} from '@mui/material';
+import {AssetType, Investment, getAssetTypeLabel} from '../models';
+import {currencyFormatter, formatDateStr} from '../../../helpers/BRFormatHelper';
 
 interface InvestmentCardProps {
     investment: Investment;
     onClick: (investment: Investment) => void;
 }
 
-const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment, onClick }) => {
+const InvestmentCard: React.FC<InvestmentCardProps> = ({investment, onClick}) => {
     const {
         ticker,
         asset_type,
@@ -57,14 +57,16 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment, onClick }) 
                     "Saldo Atual: " : "Preço Atual: "}
                 <b>{currencyFormatter.format(current_average_price ? current_average_price : 0.0)}</b>
             </Typography>
-            <Typography variant="body2" style={{ color: percentageColor }}>
+            <Typography variant="body2" style={{color: percentageColor}}>
                 {asset_type === AssetType.FIXED_INCOME || asset_type === AssetType.PRIVATE_EQUITY_FUND ?
                     "Rendimento: " : "Variação: "}
                 <b>{percentageChange.toFixed(2)}%</b>
             </Typography>
-            <Typography variant="body2" color="text.primary">
-                Saldo Atual: <b>{currencyFormatter.format(balance)}</b>
-            </Typography>
+            {asset_type !== AssetType.FIXED_INCOME && asset_type !== AssetType.PRIVATE_EQUITY_FUND && (
+                <Typography variant="body2" color="text.primary">
+                    Saldo Atual: <b>{currencyFormatter.format(balance)}</b>
+                </Typography>
+            )}
         </CardContent>
     );
 }

@@ -47,6 +47,9 @@ class AccountConsolidationRepo:
 
     def find_all_by_account(self, account_codes: List[str], start_month: date = None, end_month: date = None):
         session = self.session
+        if account_codes is None:
+            account_codes = []
+
         query = session.query(AccountConsolidation).filter(
             AccountConsolidation.account_code.in_(account_codes)
         )
