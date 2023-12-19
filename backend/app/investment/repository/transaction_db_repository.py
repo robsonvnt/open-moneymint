@@ -83,7 +83,7 @@ class TransactionRepo:
             inv = InvestmentRepo(session).find_by_portf_investment_code(portfolio_code, investment_code)
             transactions = session.query(Transaction).filter(
                 Transaction.investment_code == inv.code,
-            ).order_by(Transaction.date.desc()).all()
+            ).order_by(Transaction.date.desc(), Transaction.id.desc()).all()
             return [to_model(transaction) for transaction in transactions]
         except NoResultFound:
             return []
