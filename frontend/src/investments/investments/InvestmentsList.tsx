@@ -180,7 +180,7 @@ const InvestmentsList: React.FC = () => {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: 5
+                    marginBottom: 30
                 }}>
                     <h2 style={{color: '#444444'}}>Detalhes do Portfólio: <b>{consolidatedPortfolio.name}</b></h2>
                 </div>
