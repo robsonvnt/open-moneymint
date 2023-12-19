@@ -29,7 +29,7 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({investment, onClick}) =>
     const percentageColor = percentageChange >= 0 ? 'green' : 'red';
 
     const disabledCardStyle = {
-        opacity: 0.5,  // Diminui a opacidade para dar um aspecto de desativado
+        opacity: 0.5,   // Diminui a opacidade para dar um aspecto de desativado
         backgroundColor: '#f0f0f0' // Você pode ajustar a cor para combinar com o tema da sua interface
     };
 
