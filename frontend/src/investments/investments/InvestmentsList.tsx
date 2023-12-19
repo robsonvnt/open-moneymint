@@ -175,12 +175,16 @@ const InvestmentsList: React.FC = () => {
             <MoneyMineAppBar
                 handleDrawerToggle={handleDrawerToggle}
             />
-            <Container>
+            <Container
+                style={{
+                    marginBottom: 25
+                }}
+            >
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: 30
+                    marginBottom: 5
                 }}>
                     <h2 style={{color: '#444444'}}>Detalhes do Portfólio: <b>{consolidatedPortfolio.name}</b></h2>
                 </div>
