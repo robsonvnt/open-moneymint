@@ -181,9 +181,9 @@ def test_create_transaction(session, transaction_service):
         .investment_service \
         .find_by_code("001", "PORT100", "INV100")
 
-    assert inv.quantity == 60
+    assert inv.quantity == 10
     assert inv.current_average_price == 530
-    assert inv.purchase_price == 505
+    assert inv.purchase_price == 530
 
 
 def test_create_no_investment_update_transaction(session, transaction_service):

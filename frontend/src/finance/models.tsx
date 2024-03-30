@@ -62,8 +62,8 @@ export enum AccountTransactionType {
 
 const transactionTypeLabels: { [key: string]: string } = {
     [AccountTransactionType.TRANSFER]: "Transferência",
-    [AccountTransactionType.WITHDRAWAL]: "Saque",
-    [AccountTransactionType.DEPOSIT]: "Depósito"
+    [AccountTransactionType.WITHDRAWAL]: "Saída",
+    [AccountTransactionType.DEPOSIT]: "Entrada"
 };
 
 export const getTransactionTypeLabel = (type: string): string => {

@@ -128,32 +128,9 @@ class InvestmentService:
             self.update(user_code, portfolio_code, investment.code, investment)
         return SUCCESS_RESULT
 
-    def refresh_investment_details(
-            self, user_code: str, investment_code: str, transactions: List[TransactionModel]
-    ) -> InvestmentModel:
-        """
-            Updates the details of an investment based on the provided transactions.
-
-            This method processes a list of transactions, calculating the total quantity and
-            average purchase price of the investment. It updates the corresponding investment
-            model with the current average price (based on the most recent transaction),
-            the total quantity (adjusted for sell transactions), and the average purchase price.
-
-            Parameters:
-                investment_code (str): The code of the investment to be updated.
-                transactions (List[TransactionModel]): A list of transactions associated with the investment.
-
-            Returns:
-                InvestmentModel: The updated investment model.
-
-            Exceptions:
-                TransactionInvalidType: If a transaction with an invalid type is encountered.
-                UnexpectedError: If the final quantity of the investment is negative.
-
-            Note: This method assumes that the investment repository and update function
-            are available and correctly configured.
-        """
-
+    def _refresh_stock_price(
+            self, user_code: str, investment: InvestmentModel, transactions: List[TransactionModel]
+    ):
         total_quantity = 0
         total_sold = 0
         total_cost = 0
@@ -174,7 +151,6 @@ class InvestmentService:
                 latest_price = transaction.price
 
         average_price = total_cost / total_quantity if total_quantity > 0 else 0
-        investment: InvestmentModel = self.investment_repo.find_by_code(investment_code)
         investment.current_average_price = latest_price
         investment.quantity = total_quantity - total_sold
         investment.purchase_price = round(average_price * 100) / 100
@@ -182,3 +158,34 @@ class InvestmentService:
         if investment.quantity < 0:
             raise TransactionOperationNotPermitted("Quantity cannot be negative")
         return self.update(user_code, investment.portfolio_code, investment.code, investment)
+
+    def _refresh_fixed_income_balance(
+            self, user_code: str, investment: InvestmentModel, transactions: List[TransactionModel]
+    ):
+        investment
+        balance = 0
+        total_invested = 0
+        for transaction in transactions:
+            if transaction.type == TransactionType.DEPOSIT:
+                balance += transaction.price
+                total_invested += transaction.price
+            elif transaction.type == TransactionType.INTEREST:
+                balance += transaction.price
+            elif transaction.type == TransactionType.WITHDRAWAL:
+                balance -= transaction.price
+                total_invested -= transaction.price
+            else:
+                raise TransactionInvalidType()
+
+        investment.current_average_price = balance
+        investment.purchase_price = total_invested
+        return self.update(user_code, investment.portfolio_code, investment.code, investment)
+
+    def refresh_investment_details(
+            self, user_code: str, investment_code: str, transactions: List[TransactionModel]
+    ) -> InvestmentModel:
+        investment: InvestmentModel = self.investment_repo.find_by_code(investment_code)
+        if investment.asset_type in (AssetType.STOCK, AssetType.REIT):
+            return self._refresh_stock_price(user_code, investment, transactions)
+        else:
+            return self._refresh_fixed_income_balance(user_code, investment, transactions)

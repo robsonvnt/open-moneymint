@@ -47,6 +47,9 @@ class AccountConsolidationRepo:
 
     def find_all_by_account(self, account_codes: List[str], start_month: date = None, end_month: date = None):
         session = self.session
+        if account_codes is None:
+            account_codes = []
+
         query = session.query(AccountConsolidation).filter(
             AccountConsolidation.account_code.in_(account_codes)
         )
@@ -55,6 +58,8 @@ class AccountConsolidationRepo:
         if end_month:
             query = query.filter(AccountConsolidation.month <= get_last_day_of_the_month(end_month))
         consolidations = query.all()
+        if consolidations is None:
+            consolidations = []
         return [to_model(consolidation) for consolidation in consolidations]
 
     def update(

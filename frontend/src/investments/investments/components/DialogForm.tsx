@@ -219,9 +219,10 @@ const FormDialogPortfolio: React.FC<InvestmentFormDialogI> = ({
                                                 />
                                             </Grid>
                                             <Grid item>
+
                                                 {(investment.asset_type === AssetType.STOCK || investment.asset_type === AssetType.REIT) && (
                                                     <Link
-                                                        href={`https://statusinvest.com.br/acoes/${encodeURIComponent(investment.ticker)}`}
+                                                        href={`https://statusinvest.com.br/${investment.asset_type === AssetType.STOCK ? 'acoes' : 'fundos-imobiliarios'}/${encodeURIComponent(investment.ticker)}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                     >

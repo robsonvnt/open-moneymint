@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from pydantic import BaseModel
 
+from auth.domain.auth_erros import ExpiredToken
 from auth.repository.db_connection import get_db_session
 from auth.service.services import UserServiceFactory
 
@@ -27,4 +28,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db_session=Depends(get
         token_data = User(**user.model_dump())
     except JWTError:
         raise credentials_exception
+    except ExpiredToken:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Expired Token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return token_data

@@ -8,6 +8,8 @@ htmlcov
 
 dev-env/pgdata/
 
+.env
+
 # Distribution / packaging
 .Python
 build/

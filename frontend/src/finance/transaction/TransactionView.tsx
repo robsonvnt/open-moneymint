@@ -31,7 +31,7 @@ const TransactionView: React.FC<TransactionViewProps> =
         const [currentDate, setCurrentDate] = useState(new Date());
 
         useEffect(() => {
-            console.log(`Mudou reloadAccounts: ${Array.from(checkedAccounts.keys())}`)
+
         }, [reloadAccounts, checkedAccounts]);
 
         return (

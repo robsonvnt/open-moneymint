@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {Card, CardActionArea, Grid, Container} from '@mui/material';
-import {Investment, createEmptynvestment} from './models';
+import {Investment, createEmptynvestment, getAssetTypeLabel} from './models';
 import InvestmentsService from './InvestmentsService';
 import {Portfolio, PortfolioConsolidationModel} from '../portfolio/models';
 import PortfolioService from '../portfolio/PortfolioService';
@@ -141,6 +141,16 @@ const InvestmentsList: React.FC = () => {
         }
     };
 
+    const groupedInvestments = investments.reduce((groups, investment) => {
+        const type = investment.asset_type;
+        if (!groups[type]) {
+            groups[type] = [];
+        }
+        groups[type].push(investment);
+        return groups;
+    }, {} as Record<string, typeof investments>);
+
+
     if (loadingPortfolio && loadingInvestments) {
         return <div>Carregando...</div>;
     }
@@ -165,7 +175,11 @@ const InvestmentsList: React.FC = () => {
             <MoneyMineAppBar
                 handleDrawerToggle={handleDrawerToggle}
             />
-            <Container>
+            <Container
+                style={{
+                    marginBottom: 25
+                }}
+            >
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -235,23 +249,28 @@ const InvestmentsList: React.FC = () => {
                     <h2>Ativos</h2>
                 </div>
 
-                <Grid container
-                      spacing={2}
-                      direction="row"
-                      alignItems="stretch">
-                    {investments.map((investment, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={index} style={{display: 'flex'}}>
-                            <Card sx={{flex: 1}}>
-                                <CardActionArea>
-                                    <InvestmentCard
-                                        investment={investment}
-                                        onClick={selectInvestment}
-                                    />
-                                </CardActionArea>
-                            </Card>
-                        </Grid>
+                <Grid container spacing={2} direction="row" alignItems="stretch">
+                    {Object.keys(groupedInvestments).map((type) => (
+                        <React.Fragment key={type}>
+                            <Grid item xs={12}>
+                                <h4>{getAssetTypeLabel(type)}</h4>
+                            </Grid>
+                            {groupedInvestments[type].map((investment, index) => (
+                                <Grid item xs={12} sm={6} md={4} lg={3} key={index} style={{display: 'flex'}}>
+                                    <Card sx={{flex: 1}}>
+                                        <CardActionArea>
+                                            <InvestmentCard
+                                                investment={investment}
+                                                onClick={selectInvestment}
+                                            />
+                                        </CardActionArea>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </React.Fragment>
                     ))}
                 </Grid>
+
 
             </Container>
 
