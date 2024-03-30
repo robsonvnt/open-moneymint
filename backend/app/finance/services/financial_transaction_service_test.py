@@ -93,7 +93,7 @@ csv_content = """01/01/2022;Groceries;-50.00
 
 # Test for CSV file parsing and transaction creation
 def test_create_transactions_from_csv():
-    account_code = 'acc123'
+    account_code = 'acc321'
     user_code = 'user456'
 
     # Set up the mocks for dependencies
