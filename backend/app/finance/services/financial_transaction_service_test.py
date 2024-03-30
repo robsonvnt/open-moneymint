@@ -2,7 +2,7 @@ from datetime import date
 from unittest.mock import create_autospec, Mock
 
 import pytest
-
+from unittest.mock import MagicMock, mock_open, patch
 from finance.domain.models import FinancialTransactionModel, TransactionType
 from finance.repository.financial_transaction_repository import FinancialTransactionRepo
 from finance.services.account_consolidation_service import AccountConsolidationService
@@ -83,3 +83,50 @@ def test_delete_transaction_success(transaction_service,
     mock_financial_transaction_repo.delete.assert_called_once()
     mock_account_service.refresh_balance.assert_called_once()
     mock_consolidation_service.refresh_month_balance.assert_called_once()
+
+
+# Sample data to be used in the tests
+csv_content = """01/01/2022;Groceries;-50.00
+02/01/2022;Salary;1500.00
+"""
+
+
+# Test for CSV file parsing and transaction creation
+def test_create_transactions_from_csv():
+    account_code = 'acc123'
+    user_code = 'user456'
+
+    # Set up the mocks for dependencies
+    mock_repo = MagicMock()
+    mock_account_service = MagicMock()
+    mock_consolidation_service = MagicMock()
+
+    # Mock for open() to read the CSV file
+    with patch("builtins.open", mock_open(read_data=csv_content)):
+        # Mock for csv.reader to return expected rows
+        with patch("csv.reader",
+                   return_value=[["01/01/2022", "Groceries", "-50,00"], ["02/01/2022", "Salary", "1500,00"]]):
+            service = FinancialTransactionService(mock_repo, mock_account_service, mock_consolidation_service)
+            service.create = MagicMock()  # Mock the create method to verify calls later
+
+            # Execute the method under test
+            service.create_transactions_from_csv("path/to/file.csv", account_code, user_code)
+
+            # Verify create was called correctly for each row in the CSV
+            expected_calls = [
+                ((user_code, FinancialTransactionModel(
+                    account_code=account_code,
+                    description="Groceries",
+                    category_code=None,
+                    type=TransactionType.WITHDRAWAL,
+                    date="2022-01-01",
+                    value=-50.00)),),
+                ((user_code, FinancialTransactionModel(
+                    account_code=account_code,
+                    description="Salary",
+                    category_code=None,
+                    type=TransactionType.DEPOSIT,
+                    date="2022-01-02",
+                    value=1500.00)),)
+            ]
+            service.create.assert_has_calls(expected_calls, any_order=True)
