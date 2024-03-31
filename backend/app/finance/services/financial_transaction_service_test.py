@@ -98,35 +98,16 @@ def test_create_transactions_from_csv():
 
     # Set up the mocks for dependencies
     mock_repo = MagicMock()
+    mock_repo.create = MagicMock()  # Mock the create method to verify calls later
     mock_account_service = MagicMock()
     mock_consolidation_service = MagicMock()
 
-    # Mock for open() to read the CSV file
-    with patch("builtins.open", mock_open(read_data=csv_content)):
-        # Mock for csv.reader to return expected rows
-        with patch("csv.reader",
-                   return_value=[["01/01/2022", "Groceries", "-50,00"], ["02/01/2022", "Salary", "1500,00"]]):
-            service = FinancialTransactionService(mock_repo, mock_account_service, mock_consolidation_service)
-            service.create = MagicMock()  # Mock the create method to verify calls later
+    csv_content = "01/01/2022;Groceries;-50,00\n02/01/2022;Salary;1500,00\n02/01/2022;Salary;1500,00"
+    service = FinancialTransactionService(mock_repo, mock_account_service, mock_consolidation_service)
 
-            # Execute the method under test
-            service.create_transactions_from_csv("path/to/file.csv", account_code, user_code)
+    # Execute the method under test
+    service.create_transactions_from_csv(csv_content, account_code, user_code)
 
-            # Verify create was called correctly for each row in the CSV
-            expected_calls = [
-                ((user_code, FinancialTransactionModel(
-                    account_code=account_code,
-                    description="Groceries",
-                    category_code=None,
-                    type=TransactionType.WITHDRAWAL,
-                    date="2022-01-01",
-                    value=-50.00)),),
-                ((user_code, FinancialTransactionModel(
-                    account_code=account_code,
-                    description="Salary",
-                    category_code=None,
-                    type=TransactionType.DEPOSIT,
-                    date="2022-01-02",
-                    value=1500.00)),)
-            ]
-            service.create.assert_has_calls(expected_calls, any_order=True)
+    assert mock_repo.create.call_count == 3
+    assert mock_account_service.refresh_balance.call_count == 1
+    assert mock_consolidation_service.refresh_month_balance.call_count == 2

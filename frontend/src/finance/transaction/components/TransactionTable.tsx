@@ -16,6 +16,7 @@ import {Alert, Checkbox, DialogContentText, IconButton, Snackbar} from "@mui/mat
 import AccountTransactionDialogForm from "./AccountTransactionDialogForm";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import Fab from "@mui/material/Fab";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
@@ -26,6 +27,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import {AccountConsolidationsService} from "../../accountConsolidations/AccountConsolidationsService";
+import UploadDialog from './UploadDialog';
 
 
 const red_color = '#e15759';
@@ -144,6 +146,18 @@ const TransactionTable: React.FC<TransactionTableProps> =
 
             })
         };
+
+        // Upload de arquivo TXT de transações
+        const [dialogUploadOpen, setDialogUploadOpen] = useState(false);
+
+        const handleOpenDialog = () => {
+            setDialogUploadOpen(true);
+        };
+
+        const handleCloseDialog = () => {
+            setDialogUploadOpen(false);
+        };
+
 
         // Seleção de itens na tabela
 
@@ -468,6 +482,21 @@ const TransactionTable: React.FC<TransactionTableProps> =
                 >
                     {selectedTransactions.size > 0 ? <DeleteIcon/> : <AddIcon/>}
                 </Fab>
+                <Fab
+                    color="primary"
+                    aria-label="Import"
+                    style={{
+                        margin: '20px 0',
+                        position: 'fixed',
+                        bottom: '80px',
+                        right: '30px',
+                        height: '36px',
+                        width: '36px'
+                    }}
+                    onClick={handleOpenDialog}
+                >
+                    <CloudUploadIcon/>
+                </Fab>
 
                 <Dialog
                     open={confirmOpen}
@@ -492,6 +521,13 @@ const TransactionTable: React.FC<TransactionTableProps> =
                         </Button>
                     </DialogActions>
                 </Dialog>
+
+                <UploadDialog 
+                    open={dialogUploadOpen} 
+                    setOpen={setDialogUploadOpen} 
+                    aria-labelledby="form-dialog-title" 
+                />
+            
 
             </React.Fragment>
         )

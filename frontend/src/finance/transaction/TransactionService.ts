@@ -44,6 +44,58 @@ export const TransactionService = {
         let url_call = `${baseUrl}/${code}`;
         const response: AxiosResponse<AccountTransaction> = await axios.get(url_call);
         return response.data;
-    }
+    },
+
+    async uploadTransactionsFile(account_code: string, file: File) {
+        let url_call = `${baseUrl}/upload?account_code=${account_code}`;
+
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            const fileContent = event.target?.result as string;
+            const lineCount = (fileContent.match(/\n/g) || []).length + 1; // +1 para incluir a última linha
+            console.log(`lineCount: ${lineCount}`)
+        };
+
+        reader.onloadend = async () => {
+            // Converte o arquivo para base64
+            const base64File = reader.result;
+
+            // Prepara o objeto JSON para enviar
+            const jsonData = {
+                file: base64File,
+                filename: file.name,
+            };
+
+            try {
+                const response = await axios.post(url_call, jsonData);
+
+                console.log('Resultado do upload:', response.data);
+                alert('Arquivo enviado com sucesso!');
+                return true;
+            } catch (error) {
+                console.error('Erro ao enviar o arquivo:', error);
+                alert('Erro ao enviar arquivo.');
+                return false;
+            }
+
+        };
+
+        reader.readAsDataURL(file);
+
+        // try {
+        //     // Use o Axios para enviar o arquivo
+        //     const response = await axios.post(url_call, formData);
+        //
+        //     console.log('Resultado do upload:', response.data);
+        //     alert('Arquivo enviado com sucesso!');
+        //     return true;
+        // } catch (error) {
+        //     console.error('Erro ao enviar o arquivo:', error);
+        //     alert('Erro ao enviar arquivo.');
+        //     return false;
+        // }
+
+    },
 
 };

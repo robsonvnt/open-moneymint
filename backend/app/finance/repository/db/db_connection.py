@@ -14,7 +14,6 @@ if db_url:
         Base.metadata.create_all(bind=engine)
     session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-@contextmanager
 def get_db_session():
     db = session()
     try:

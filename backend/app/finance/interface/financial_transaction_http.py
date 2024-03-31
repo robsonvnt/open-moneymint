@@ -1,8 +1,14 @@
+import base64
+import os
+import shutil
+import logging
 from datetime import date, datetime
+from tempfile import NamedTemporaryFile
 from typing import List, Optional, Annotated
 
-from fastapi import APIRouter, Query, HTTPException, status
+from fastapi import APIRouter, Query, HTTPException, status, UploadFile
 from fastapi import Depends
+from fastapi.params import File
 from pydantic import BaseModel
 
 from auth.user import User, get_current_user
@@ -12,6 +18,7 @@ from finance.domain.financial_transaction_erros import FinancialTransactionNotFo
 from finance.domain.models import TransactionType, FinancialTransactionModel
 from finance.repository.db.db_connection import get_db_session
 from finance.services.factory import ServiceFactory
+from finance.services.financial_transaction_service import FinancialTransactionService
 from helpers import get_last_day_of_the_month
 
 finance_transaction_router = APIRouter()
@@ -190,3 +197,26 @@ async def update_transaction(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccountConsolidationNotFound as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+
+class UploadFileSchema(BaseModel):
+    file: str  # Conteúdo do arquivo em base64
+    filename: str
+@router.post("/transactions/upload")
+async def upload_transactions_file(
+        account_code: str,
+        upload_schema: UploadFileSchema,
+        db_session=Depends(get_db_session),
+        current_user: User = Depends(get_current_user)
+):
+    file_content = base64.b64decode(upload_schema.file.split(",")[1])
+
+    line_count = file_content.decode('utf-8').count('\n') + 1
+    file_content_str = file_content.decode('utf-8')
+    print(f"O arquivo tem {line_count} linhas.")
+
+    # Verifica se o serviço pode processar o arquivo
+    transaction_serv: FinancialTransactionService = ServiceFactory.create_financial_transaction_service(db_session)
+    transaction_serv.create_transactions_from_csv(file_content_str, account_code, current_user.code)
+
+    return {"message": "File uploaded and processed successfully."}

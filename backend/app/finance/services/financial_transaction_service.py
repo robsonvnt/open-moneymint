@@ -63,23 +63,28 @@ class FinancialTransactionService:
         self.account_service.refresh_balance(user_code, account_code)
         self.consolidation_service.refresh_month_balance(account_code, transaction.date)
 
-    def create_transactions_from_csv(self, csv_path: str, account_code: str, user_code: str):
+    def create_transactions_from_csv(self, file_content: str, account_code: str, user_code: str):
         import csv
-        with open(csv_path, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=';', quotechar='"')
-            for row in reader:
-                transaction_date = datetime.strptime(row[0], "%d/%m/%Y").date()
-                description = row[1]
-                value = float(Decimal(row[2].replace(',', '.')))
-                transaction_type = TransactionType.WITHDRAWAL if value < 0 else TransactionType.DEPOSIT
+        print(f"account_code: {account_code}")
+        lines = file_content.split('\n')
+        date_to_consolidate = set([])
+        for line in lines:
+            row = line.split(';')
+            transaction_date = datetime.strptime(row[0], "%d/%m/%Y").date()
+            date_to_consolidate.add(transaction_date)
+            description = row[1]
+            value = float(Decimal(row[2].replace(',', '.')))
+            transaction_type = TransactionType.WITHDRAWAL if value < 0 else TransactionType.DEPOSIT
 
-                new_transaction = FinancialTransactionModel(
-                    account_code=account_code,
-                    description=description,
-                    category_code=None,
-                    type=transaction_type,
-                    date=transaction_date,
-                    value=value
-                )
-
-                self.create(user_code, new_transaction)
+            new_transaction = FinancialTransactionModel(
+                account_code=account_code,
+                description=description,
+                category_code=None,
+                type=transaction_type,
+                date=transaction_date,
+                value=value
+            )
+            self.financial_transaction_repo.create(new_transaction)
+        self.account_service.refresh_balance(user_code, account_code)
+        for date in list(date_to_consolidate):
+            self.consolidation_service.refresh_month_balance(account_code, date)
